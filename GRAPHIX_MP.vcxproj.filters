@@ -29,9 +29,22 @@
     <ClInclude Include="tiny_obj_loader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Dependencies\include\main.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencies\Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\ShaderClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="Shaders\skybox.frag" />
     <CopyFileToFolders Include="Shaders\skybox.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\objVert.vert" />
+    <None Include="Shaders\objFrag.frag" />
   </ItemGroup>
 </Project>
