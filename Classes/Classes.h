@@ -4,7 +4,9 @@
 class ShaderClass {
 private:
     GLuint shaderProgram;
-
+/// <summary>
+/// todo: make a texture loader; add the uniform searcher and unifor setter
+/// </summary>
 public:
     ShaderClass(std::string vertPath, std::string fragPath) {
         // Load .vert file
