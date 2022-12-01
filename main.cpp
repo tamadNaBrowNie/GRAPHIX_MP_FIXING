@@ -1,5 +1,5 @@
 #include "main.h"
-#include "Classes/ShaderClass.h"
+#include "Classes/Classes.h"
 /*
     Global Variables
 */
@@ -9,8 +9,10 @@ float screenHeight = 1000.0f;
 
 // Camera Positioning and Movement
 float cameraSpeed = 0.1f;
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 1.0f);
+glm::vec3 tps_cameraPos = glm::vec3(0.0f, 0.0f, 1.0f);
+glm::vec3 fps_cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 playerPos = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 td_cameraPos = playerPos; // NOTE: Top-down camera resets to player position on toggle
 glm::vec3 worldUp = glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f));
 
 // Camera Rotation (yaw and pitch)
@@ -61,7 +63,7 @@ void Mouse_Callback(GLFWwindow* window, double xpos, double ypos)
     }
 
     /*
-        Updating the position of the front of the camera.
+        Updating the position of the camera.
     */
     glm::vec3 direction = glm::vec3(
         (cos(glm::radians(yaw)) * cos(glm::radians(pitch))),
@@ -69,7 +71,7 @@ void Mouse_Callback(GLFWwindow* window, double xpos, double ypos)
         (sin(glm::radians(yaw)) * cos(glm::radians(pitch)))
     );
 
-    cameraPos = playerPos - glm::normalize(direction);
+    tps_cameraPos = playerPos - glm::normalize(direction);
 }
 
 int main(void)
@@ -91,177 +93,25 @@ int main(void)
     // -------------------------------------------------------
     // LOADING OBJECTS
 
-    // Loading .obj file
-    std::string path = "3D/submarine/submarine.obj";
-    std::vector<tinyobj::shape_t> shapes;
-    std::vector<tinyobj::material_t> materials;
-    std::string warning, error;
-    tinyobj::attrib_t attributes;
-
-    bool mainObj_success = tinyobj::LoadObj(
-        &attributes,
-        &shapes,
-        &materials,
-        &warning,
-        &error,
-        path.c_str()
-    );
-
-    // Loading tangents and bitangents
-    std::vector<glm::vec3> tangents;
-    std::vector<glm::vec3> bitangents;
-
-    for (int i = 0; i < shapes[0].mesh.indices.size(); i += 3) {
-        tinyobj::index_t vData1 = shapes[0].mesh.indices[i];
-        tinyobj::index_t vData2 = shapes[0].mesh.indices[i + 1];
-        tinyobj::index_t vData3 = shapes[0].mesh.indices[i + 2];
-
-        glm::vec3 v1 = glm::vec3(
-            attributes.vertices[vData1.vertex_index * 3],
-            attributes.vertices[vData1.vertex_index * 3 + 1],
-            attributes.vertices[vData1.vertex_index * 3 + 2]
-        );
-
-        glm::vec3 v2 = glm::vec3(
-            attributes.vertices[vData2.vertex_index * 3],
-            attributes.vertices[vData2.vertex_index * 3 + 1],
-            attributes.vertices[vData2.vertex_index * 3 + 2]
-        );
-
-        glm::vec3 v3 = glm::vec3(
-            attributes.vertices[vData3.vertex_index * 3],
-            attributes.vertices[vData3.vertex_index * 3 + 1],
-            attributes.vertices[vData3.vertex_index * 3 + 2]
-        );
-
-        glm::vec2 uv1 = glm::vec2(
-            attributes.texcoords[vData1.texcoord_index * 2],
-            attributes.texcoords[vData1.texcoord_index * 2 + 1]
-        );
-
-        glm::vec2 uv2 = glm::vec2(
-            attributes.texcoords[vData2.texcoord_index * 2],
-            attributes.texcoords[vData2.texcoord_index * 2 + 1]
-        );
-
-        glm::vec2 uv3 = glm::vec2(
-            attributes.texcoords[vData3.texcoord_index * 2],
-            attributes.texcoords[vData3.texcoord_index * 2 + 1]
-        );
-
-        glm::vec3 deltaPos1 = v2 - v1;
-        glm::vec3 deltaPos2 = v3 - v1;
-
-        glm::vec2 deltaUV1 = uv2 - uv1;
-        glm::vec2 deltaUV2 = uv3 - uv1;
-
-        float r = 1.0f / ((deltaUV1.x * deltaUV2.y) - (deltaUV1.y * deltaUV2.x));
-
-        glm::vec3 tangent = r * (deltaPos1 * deltaUV2.y - deltaPos2 * deltaUV1.y);
-        glm::vec3 bitangent = r * (deltaPos2 * deltaUV1.x - deltaPos1 * deltaUV2.x);
-
-        tangents.push_back(tangent);
-        tangents.push_back(tangent);
-        tangents.push_back(tangent);
-
-        bitangents.push_back(bitangent);
-        bitangents.push_back(bitangent);
-        bitangents.push_back(bitangent);
-    }
-
-    // Loading vertex data
-    std::vector<GLfloat> vertexData;
-    for (int i = 0; i < shapes[0].mesh.indices.size(); i++) {
-        tinyobj::index_t vData = shapes[0].mesh.indices[i];
-        int vertexIndex = vData.vertex_index * 3;
-        int normalIndex = vData.normal_index * 3;
-        int uvIndex = vData.texcoord_index * 2;
-
-        // ---------------------------------------------------
-        // POSITION
-        vertexData.push_back(
-            attributes.vertices[vertexIndex]
-        );
-
-        vertexData.push_back(
-            attributes.vertices[vertexIndex + 1]
-        );
-
-        vertexData.push_back(
-            attributes.vertices[vertexIndex + 2]
-        );
-
-        // ---------------------------------------------------
-        // NORMALS
-        vertexData.push_back(
-            attributes.normals[normalIndex]
-        );
-
-        vertexData.push_back(
-            attributes.normals[normalIndex + 1]
-        );
-
-        vertexData.push_back(
-            attributes.normals[normalIndex + 2]
-        );
-
-        // ---------------------------------------------------
-        // TEXTURE COORDINATES
-        vertexData.push_back(
-            attributes.texcoords[uvIndex]
-        );
-
-        vertexData.push_back(
-            attributes.texcoords[uvIndex + 1]
-        );
-
-        // ---------------------------------------------------
-        // TANGENTS
-        vertexData.push_back(
-            tangents[i].x
-        );
-        vertexData.push_back(
-            tangents[i].y
-        );
-        vertexData.push_back(
-            tangents[i].z
-        );
-
-        // ---------------------------------------------------
-        // BITANGENTS
-        vertexData.push_back(
-            bitangents[i].x
-        );
-        vertexData.push_back(
-            bitangents[i].y
-        );
-        vertexData.push_back(
-            bitangents[i].z
-        );
-    }
-
+    ModelClass playerSub = ModelClass("3D/submarine/submarine.obj");
+    ModelClass donut = ModelClass("3D/donut/Donut.obj");
+    
     // -------------------------------------------------------
     // SETTING SKYBOX VERTICES AND INDICES
-
     /*
-      7--------6
-     /|       /|
-    4--------5 |
-    | |      | |
-    | 3------|-2
-    |/       |/
-    0--------1
+        These vertices and indices were taken from previous individual submissions
+        and class hands-on activities
     */
     // Vertices for the cube
     float skyboxVertices[]{
-        -1.f, -1.f, 1.f, //0
-        1.f, -1.f, 1.f,  //1
-        1.f, -1.f, -1.f, //2
-        -1.f, -1.f, -1.f,//3
-        -1.f, 1.f, 1.f,  //4
-        1.f, 1.f, 1.f,   //5
-        1.f, 1.f, -1.f,  //6
-        -1.f, 1.f, -1.f  //7
+        -1.f, -1.f, 1.f, 
+        1.f, -1.f, 1.f,  
+        1.f, -1.f, -1.f, 
+        -1.f, -1.f, -1.f,
+        -1.f, 1.f, 1.f,  
+        1.f, 1.f, 1.f,   
+        1.f, 1.f, -1.f,  
+        -1.f, 1.f, -1.f  
     };
 
     // Skybox Indices
@@ -302,72 +152,19 @@ int main(void)
 
     // -------------------------------------------------------
     // LOADING TEXTURES
-     
-    // Flip image vertically on load
-    stbi_set_flip_vertically_on_load(true);
+    /*
+        In calling the attachTexture() and attachNormalTexture() function, take note of the order:
+            1st - base textures
+            2nd - normal textures
+    */
+    // Player submarine base textures
+    playerSub.attachTexture("3D/submarine/submarine_submarine_BaseColor.png", GL_RGB);
 
-    // Initialize variables for loading the texture
-    int img_width, img_height, colorChannels;
+    // Player submarine normal textures
+    playerSub.attachNormalTexture("3D/submarine/submarine_submarine_Normal.png", GL_RGB);
 
-    unsigned char* tex_bytes = stbi_load(
-        "3D/submarine/submarine_submarine_BaseColor.png",
-        &img_width, &img_height, &colorChannels,
-        0
-    );
-
-    // Initialize texture variable
-    GLuint texture;
-    glGenTextures(1, &texture);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture);
-
-    // Attach loaded image to texture variable
-    glTexImage2D(
-        GL_TEXTURE_2D,
-        0,
-        GL_RGB,
-        img_width,
-        img_height,
-        0,
-        GL_RGB,
-        GL_UNSIGNED_BYTE,
-        tex_bytes
-    );
-    // Generate Mipmap
-    glGenerateMipmap(GL_TEXTURE_2D);
-
-    // Free up loaded bytes
-    stbi_image_free(tex_bytes);
-
-    unsigned char* norm_bytes = stbi_load(
-        "3D/submarine/submarine_submarine_Normal.png",
-        &img_width, &img_height, &colorChannels,
-        0
-    );
-
-    // Initialize texture variable
-    GLuint norm_tex;
-    glGenTextures(1, &norm_tex);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, norm_tex);
-
-    // Attach loaded image to texture variable
-    glTexImage2D(
-        GL_TEXTURE_2D,
-        0,
-        GL_RGB,
-        img_width,
-        img_height,
-        0,
-        GL_RGB,
-        GL_UNSIGNED_BYTE,
-        norm_bytes
-    );
-    // Generate Mipmap
-    glGenerateMipmap(GL_TEXTURE_2D);
-
-    // Free up loaded bytes
-    stbi_image_free(norm_bytes);
+    // Donut base textures
+    donut.attachTexture("3D/donut/Gus.png", GL_RGBA);
 
     // Enable depth test
     glEnable(GL_DEPTH_TEST);
@@ -442,83 +239,8 @@ int main(void)
     // -------------------------------------------------------
     // CREATING OBJECT VAOs and VBOs
 
-    GLintptr normalPtr = 3 * sizeof(GL_FLOAT);
-    GLintptr uvPtr = 6 * sizeof(GL_FLOAT);
-    GLintptr tangentPtr = 8 * sizeof(GL_FLOAT);
-    GLintptr bitangentPtr = 11 * sizeof(GL_FLOAT);
-
-    GLuint VAO, VBO;
-
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(
-        GL_ARRAY_BUFFER,
-        sizeof(GL_FLOAT) * vertexData.size(),
-        vertexData.data(),
-        GL_STATIC_DRAW
-    );
-
-    // Vertices
-    glVertexAttribPointer(
-        0,
-        3,
-        GL_FLOAT,
-        GL_FALSE,
-        14 * sizeof(GL_FLOAT),
-        (void*)0
-    );
-
-    // Normals
-    glVertexAttribPointer(
-        1,
-        3,
-        GL_FLOAT,
-        GL_FALSE,
-        14 * sizeof(GL_FLOAT),
-        (void*)normalPtr
-    );
-
-    // Texture coordinates
-    glVertexAttribPointer(
-        2,
-        2,
-        GL_FLOAT,
-        GL_FALSE,
-        14 * sizeof(GL_FLOAT),
-        (void*)uvPtr
-    );
-
-    // Tangents
-    glVertexAttribPointer(
-        3,
-        3,
-        GL_FLOAT,
-        GL_FALSE,
-        14 * sizeof(GL_FLOAT),
-        (void*)tangentPtr
-    );
-
-    // Bitangents
-    glVertexAttribPointer(
-        4,
-        3,
-        GL_FLOAT,
-        GL_FALSE,
-        14 * sizeof(GL_FLOAT),
-        (void*)bitangentPtr
-    );
-
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-    glEnableVertexAttribArray(2);
-    glEnableVertexAttribArray(3);
-    glEnableVertexAttribArray(4);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    playerSub.createVAO_VBO();
+    donut.createVAO_VBO();
 
     // -------------------------------------------------------
     // CREATING SKYBOX VAO, VBO, and EBO
@@ -576,7 +298,7 @@ int main(void)
         glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 
         // Initialize view matrix
-        glm::mat4 viewMatrix = glm::lookAt(cameraPos, playerPos, worldUp);
+        glm::mat4 viewMatrix = glm::lookAt(tps_cameraPos, playerPos, worldUp);
         unsigned int viewLoc = glGetUniformLocation(obj_shaderProgram.getShader(), "view");
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 
@@ -611,37 +333,26 @@ int main(void)
         // -----------------------------------------------------------------
         // RENDERING OBJECTS
         
-        glUseProgram(obj_shaderProgram.getShader());
-        glBindVertexArray(VAO);
+        playerSub.draw(
+            playerPos,                          // Object Position
+            obj_shaderProgram.getShader(),      // Shader Program to use
+            0.15f,                              // Scale
+            90.0f, glm::vec3(0.0f, 1.0f, 0.0f)  // Rotation value and axis, respectively
+        );
 
-        // Initialize transformation matrix, and assign position, scaling, and rotation
-        glm::mat4 transformationMatrix = glm::translate(glm::mat4(1.0f), playerPos);
-        transformationMatrix = glm::scale(transformationMatrix, glm::vec3(0.15f, 0.15f, 0.15f));
-        transformationMatrix = glm::rotate(transformationMatrix, glm::radians(90.0f), glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)));
-
-        // Initialize transformation location, and assign transformation
-        unsigned int transformationLoc = glGetUniformLocation(obj_shaderProgram.getShader(), "transform");
-        glUniformMatrix4fv(transformationLoc, 1, GL_FALSE, glm::value_ptr(transformationMatrix));
-
-        glActiveTexture(GL_TEXTURE0);
-        GLuint tex0Address = glGetUniformLocation(obj_shaderProgram.getShader(), "tex0");
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glUniform1i(tex0Address, 0);
-
-        glActiveTexture(GL_TEXTURE1);
-        GLuint tex1Address = glGetUniformLocation(obj_shaderProgram.getShader(), "norm_tex");
-        glBindTexture(GL_TEXTURE_2D, norm_tex);
-        glUniform1i(tex1Address, 1);
-
-        // Draw
-        glDrawArrays(GL_TRIANGLES, 0, vertexData.size() / 5);
+        donut.draw(
+            glm::vec3(0.0f, -10.0f, -5.0f),
+            obj_shaderProgram.getShader(),
+            5.0f,    
+            90.0f, glm::vec3(0.0f, 1.0f, 0.0f)
+        );
 
         after = GetTickCount64();
         int temp = (after - before) / 1000;
         if (!(elapsed == temp)) {
             elapsed = temp;
             // Show elapsed time in console (refreshes after object spawn)
-            cout << "Camera Position: (" << cameraPos.x << ", " << cameraPos.y << ", " << cameraPos.z << ")\n";
+            cout << "Camera Position: (" << fps_cameraPos.x << ", " << fps_cameraPos.y << ", " << fps_cameraPos.z << ")\n";
         }
 
         /* Swap front and back buffers */
@@ -652,8 +363,6 @@ int main(void)
     }
 
     // Cleanup
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
     glDeleteVertexArrays(1, &skyboxVAO);
     glDeleteBuffers(1, &skyboxVBO);
     glDeleteBuffers(1, &skyboxEBO);

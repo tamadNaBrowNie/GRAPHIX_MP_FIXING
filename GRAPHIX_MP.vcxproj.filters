@@ -35,7 +35,7 @@
     <ClInclude Include="Dependencies\Shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Classes\ShaderClass.h">
+    <ClInclude Include="Classes\Classes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

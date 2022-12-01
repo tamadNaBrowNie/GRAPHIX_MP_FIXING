@@ -137,7 +137,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Classes\ShaderClass.h" />
+    <ClInclude Include="Classes\Classes.h" />
     <ClInclude Include="Dependencies\Shader.h" />
     <ClInclude Include="Dependencies\include\main.h" />
     <ClInclude Include="stb_image.h" />
