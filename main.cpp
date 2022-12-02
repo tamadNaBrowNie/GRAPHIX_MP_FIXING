@@ -9,10 +9,10 @@ float screenHeight = 1000.0f;
 
 // Camera Positioning and Movement
 float cameraSpeed = 0.1f;
-glm::vec3 playerPos = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 tps_cameraPos = glm::vec3(0.0f, 0.0f, 1.0f);
 glm::vec3 fps_cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
-glm::vec3 td_cameraPos = glm::vec3(0.0f, 20.0f, 0.0f);
+glm::vec3 playerPos = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 td_cameraPos = playerPos; // NOTE: Top-down camera resets to player position on toggle
 glm::vec3 worldUp = glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f));
 
 // Camera Rotation (yaw and pitch)
@@ -21,34 +21,9 @@ float   lastX = 500.0f, lastY = 500.0f,
 yaw = -90.0f, pitch = 0.0f,
 sensitivity = 0.1f;
 
-// Camera Toggle
-bool toggle_tps = true;
-bool toggle_fps = false;
-bool toggle_td = false;
-
 void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-    // Toggle TPS and FPS Camera
-    if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
-        if (toggle_tps && !toggle_td) {
-            toggle_tps = false;
-            toggle_fps = true;
-        }
-        else if (toggle_fps && !toggle_td) {
-            toggle_fps = false;
-            toggle_tps = true;
-        }
-    }
-
-    // Toggle TD Camera
-    if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
-        if (toggle_td) {
-            toggle_td = false;
-        }
-        else {
-            toggle_td = true;
-        }
-    }
+    
 }
 
 void Mouse_Callback(GLFWwindow* window, double xpos, double ypos)
@@ -120,11 +95,6 @@ int main(void)
 
     ModelClass playerSub = ModelClass("3D/submarine/submarine.obj");
     ModelClass donut = ModelClass("3D/donut/Donut.obj");
-    ModelClass car = ModelClass("3D/car/PASSAT_OBJ.obj");
-    ModelClass chest = ModelClass("3D/chest/TreasureChestSimple.obj");
-    ModelClass sphere = ModelClass("3D/sphere/Sphere.obj");
-    ModelClass solaire = ModelClass("3D/solaire/SOLAIRE.obj");
-    ModelClass cube = ModelClass("3D/cube/DADO.obj");
     
     // -------------------------------------------------------
     // SETTING SKYBOX VERTICES AND INDICES
@@ -187,15 +157,14 @@ int main(void)
             1st - base textures
             2nd - normal textures
     */
+    // Player submarine base textures
     playerSub.attachTexture("3D/submarine/submarine_submarine_BaseColor.png", GL_RGB);
+
+    // Player submarine normal textures
     playerSub.attachNormalTexture("3D/submarine/submarine_submarine_Normal.png", GL_RGB);
 
+    // Donut base textures
     donut.attachTexture("3D/donut/Gus.png", GL_RGBA);
-    sphere.attachTexture("3D/sphere/lost_ark.jpg", GL_RGB);
-    car.attachTexture("3D/car/myImage.png", GL_RGBA);
-    chest.attachTexture("3D/chest/sad_gouba.png", GL_RGBA);
-    solaire.attachTexture("3D/solaire/Peasant.jpg", GL_RGB);
-    cube.attachTexture("3D/cube/DADO.jpg", GL_RGB);
 
     // Enable depth test
     glEnable(GL_DEPTH_TEST);
@@ -272,11 +241,6 @@ int main(void)
 
     playerSub.createVAO_VBO();
     donut.createVAO_VBO();
-    sphere.createVAO_VBO();
-    car.createVAO_VBO();
-    chest.createVAO_VBO();
-    solaire.createVAO_VBO();
-    cube.createVAO_VBO();
 
     // -------------------------------------------------------
     // CREATING SKYBOX VAO, VBO, and EBO
@@ -314,16 +278,6 @@ int main(void)
     glEnableVertexAttribArray(0);
 
     // -------------------------------------------------------
-    // PROJECTION AND VIEW VARIABLES
-
-    OrthoCamera td_camera;
-    PerspectiveCamera tps_camera;
-    PerspectiveCamera fps_camera;
-
-    glm::mat4 projectionMatrix;
-    glm::mat4 viewMatrix;
-
-    // -------------------------------------------------------
     // OTHER VARIABLES
 
     long int    before = 0;
@@ -332,45 +286,22 @@ int main(void)
 
     before = GetTickCount64();
 
-    float theta = 0.0f;
-
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // -----------------------------------------------------------------
-        // CAMERA USE
-
-        if (toggle_tps && !toggle_td) {
-            tps_camera.setCameraPos(tps_cameraPos + glm::vec3(0.1f, 0.0f, 0.0f));   // Slight adjustments to align with playerSub
-            tps_camera.setCameraCenter(playerPos + glm::vec3(0.1f, 0.0f, 0.0f));
-            tps_camera.setWorldUp(worldUp);
-            tps_camera.setView();
-            tps_camera.setProjection(60.0f, screenWidth, screenHeight);
-            projectionMatrix = tps_camera.getProjectionMatrix();
-            viewMatrix = tps_camera.getViewMatrix();
-        }
-        else if (toggle_fps && !toggle_td) {
-            fps_camera.setCameraPos(fps_cameraPos - glm::vec3(0.1f, 0.0f, 1.0f));   // Slight adjustments to align with playerSub
-            fps_camera.setCameraCenter(playerPos - glm::vec3(0.0f, 0.0f, 5.0f));
-            fps_camera.setWorldUp(worldUp);
-            fps_camera.setView();
-            fps_camera.setProjection(100.0f, screenWidth, screenHeight);
-            projectionMatrix = fps_camera.getProjectionMatrix();
-            viewMatrix = fps_camera.getViewMatrix();
-        }
-        else if (toggle_td) {
-            // TODO: Implement Orthographic top-down camera
-        }
-
+        // Initialize projection matrix
+        glm::mat4 projectionMatrix = glm::perspective(glm::radians(90.0f), screenWidth / screenHeight, 0.1f, 100.0f);
         unsigned int projectionLoc = glGetUniformLocation(obj_shaderProgram.getShader(), "projection");
-        unsigned int viewLoc = glGetUniformLocation(obj_shaderProgram.getShader(), "view");
-        
         glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+
+        // Initialize view matrix
+        glm::mat4 viewMatrix = glm::lookAt(tps_cameraPos, playerPos, worldUp);
+        unsigned int viewLoc = glGetUniformLocation(obj_shaderProgram.getShader(), "view");
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(viewMatrix));
-        
+
         // -----------------------------------------------------------------
         // RENDERING SKYBOX
 
@@ -400,70 +331,28 @@ int main(void)
         glDepthFunc(GL_LESS);
 
         // -----------------------------------------------------------------
-
-        theta += 0.05f;
-
-        // -----------------------------------------------------------------
         // RENDERING OBJECTS
-
-        playerSub.draw(
-            playerPos,                      // Object Position
-            obj_shaderProgram.getShader(),  // Shader Program to use
-            0.15f,                          // Scale
-            0.0f, 90.0f, 0.0f               // Rotation values for X, Y, and Z axes, respectively
-        );
         
+        playerSub.draw(
+            playerPos,                          // Object Position
+            obj_shaderProgram.getShader(),      // Shader Program to use
+            0.15f,                              // Scale
+            90.0f, glm::vec3(0.0f, 1.0f, 0.0f)  // Rotation value and axis, respectively
+        );
+
         donut.draw(
-            glm::vec3(0.0f, -5.0f, -10.0f),
+            glm::vec3(0.0f, -10.0f, -5.0f),
             obj_shaderProgram.getShader(),
-            5.0f,
-            theta, 0.0f, 0.0f
+            5.0f,    
+            90.0f, glm::vec3(0.0f, 1.0f, 0.0f)
         );
-
-        sphere.draw(
-            glm::vec3(0.0f, -8.0f, 0.0f),
-            obj_shaderProgram.getShader(),
-            5.0f,
-            0.0f, theta, 0.0f
-        );
-
-        car.draw(
-            glm::vec3(10.0f, -10.0f, -15.0f),
-            obj_shaderProgram.getShader(),
-            0.015f,
-            theta, theta, 0.0f
-        );
-
-
-        chest.draw(
-            glm::vec3(-10.0f, -15.0f, -5.0f),
-            obj_shaderProgram.getShader(),
-            0.01f,
-            0.0f, 0.0f, theta
-        );
-
-        solaire.draw(
-            glm::vec3(5.0f, -10.0f, 5.0f),
-            obj_shaderProgram.getShader(),
-            0.1f,
-            0.0f, theta, theta
-        );
-
-        cube.draw(
-            glm::vec3(15.0f, -3.0f, 10.0f),
-            obj_shaderProgram.getShader(),
-            0.5f,
-            -theta, -theta, theta
-        );
-
-        // -----------------------------------------------------------------
 
         after = GetTickCount64();
         int temp = (after - before) / 1000;
         if (!(elapsed == temp)) {
             elapsed = temp;
-            // Use cout to display playerPos on console
-
+            // Show elapsed time in console (refreshes after object spawn)
+            cout << "Camera Position: (" << fps_cameraPos.x << ", " << fps_cameraPos.y << ", " << fps_cameraPos.z << ")\n";
         }
 
         /* Swap front and back buffers */
