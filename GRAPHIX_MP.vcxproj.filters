@@ -52,6 +52,5 @@
   <ItemGroup>
     <None Include="Shaders\objVert.vert" />
     <None Include="Shaders\objFrag.frag" />
-    <None Include="ClassDiagram.cd" />
   </ItemGroup>
 </Project>
