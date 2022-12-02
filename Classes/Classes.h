@@ -70,6 +70,14 @@ public:
         this->viewMatrix = glm::lookAt(this->cameraPos, this->cameraCenter, this->worldUp);
     }
 
+    glm::vec3 getCameraPos() {
+        return this->cameraPos;
+    }
+
+    glm::vec3 getCameraCenter() {
+        return this->cameraCenter;
+    }
+
     glm::mat4 getProjectionMatrix() {
         return this->projectionMatrix;
     }
@@ -391,14 +399,19 @@ public:
     }
 
     // NOTE: Position tracking for playerSub will be done in main.cpp, using a global variable
-    void draw(glm::vec3 position, GLuint shaderProgram, float scale, float rot_value, glm::vec3 rot_axis) {
+    void draw(glm::vec3 position, GLuint shaderProgram, float scale, float rot_x, float rot_y, float rot_z) {
         glUseProgram(shaderProgram);
         glBindVertexArray(this->VAO);
 
         // Initialize transformation matrix, and assign position, scaling, and rotation
         glm::mat4 transformationMatrix = glm::translate(glm::mat4(1.0f), position);
         transformationMatrix = glm::scale(transformationMatrix, glm::vec3(scale));
-        transformationMatrix = glm::rotate(transformationMatrix, glm::radians(rot_value), glm::normalize(rot_axis));
+        // X axis rotation
+        transformationMatrix = glm::rotate(transformationMatrix, glm::radians(rot_x), glm::normalize(glm::vec3(1.0f, 0.0f, 0.0f)));
+        // Y axis rotation
+        transformationMatrix = glm::rotate(transformationMatrix, glm::radians(rot_y), glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)));
+        // Z axis rotation
+        transformationMatrix = glm::rotate(transformationMatrix, glm::radians(rot_z), glm::normalize(glm::vec3(0.0f, 0.0f, 1.0f)));
 
         // Initialize transformation location, and assign transformation
         unsigned int transformationLoc = glGetUniformLocation(shaderProgram, "transform");
