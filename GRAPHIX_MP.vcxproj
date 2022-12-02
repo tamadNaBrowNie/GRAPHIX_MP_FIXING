@@ -162,7 +162,6 @@
     </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ClassDiagram.cd" />
     <None Include="Shaders\objFrag.frag" />
     <None Include="Shaders\objVert.vert" />
   </ItemGroup>
