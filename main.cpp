@@ -36,7 +36,7 @@ int face = 0;
 float rot_y = 90.0f;
 
 // Player object
-PlayerClass playerSub("3D/submarine/submarine.obj", glm::vec3(0.0f, 0.0f, 0.0f));
+PlayerClass playerSub("3D/sub_alt/alt_sub.obj", glm::vec3(0.0f, 0.0f, 0.0f));
 
 void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {

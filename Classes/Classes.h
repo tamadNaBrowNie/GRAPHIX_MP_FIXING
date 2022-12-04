@@ -88,6 +88,7 @@ public:
 class OrthoCamera : public MyCamera {
 public:
     void setProjection(float left, float right, float bottom, float top, float zNear, float zFar) {
+        //cant we make this a mat4 in player then set it to the base camera class?
         this->projectionMatrix = glm::ortho(left, right, bottom, top, zNear, zFar);
     }
 };
@@ -108,9 +109,7 @@ protected:
     GLuint VAO, VBO;
 
 public:
-    ModelClass(std::string path) : objPath(path) {
-        this->objPath = path;
-    }
+    ModelClass(std::string path) : objPath(path) {}
 
     void loadObj() {
         // Loading .obj file
@@ -406,8 +405,7 @@ private:
     glm::vec3 position;
 
 public:
-    EnemyClass(std::string path, glm::vec3 pos) : ModelClass(path){
-        this->position = pos;
+    EnemyClass(std::string path, glm::vec3 pos) : ModelClass(path),position(pos) {       
     }
 
     void draw(GLuint shaderProgram, float scale, float rot_x, float rot_y, float rot_z) {
@@ -450,9 +448,7 @@ private:
     glm::vec3 playerPos;
 
 public:
-    PlayerClass(std::string path, glm::vec3 pos) : ModelClass(path) {
-        this->playerPos = pos;
-    }
+    PlayerClass(std::string path, glm::vec3 pos) : ModelClass(path),playerPos(pos) {}
 
     void draw(GLuint shaderProgram, float scale, float rot_x, float rot_y, float rot_z) {
         glUseProgram(shaderProgram);
@@ -501,4 +497,64 @@ public:
         this->playerPos.y = Y;
         this->playerPos.z = Z;
     }
+};
+class lightProperties {
+    private:
+        glm::vec3* direction;
+        glm::vec4* RGB;
+        float strength;
+    public:
+        inline float getStrength() {
+            return strength;
+        }
+        inline void setStrength(float str) {
+            strength = str;
+        }
+};
+class ambientProperties {
+private:
+    glm::vec4* rgb;
+    float strength;
+public: 
+    inline float getStrength() {
+        return strength;
+    }
+    inline void setRGB(float r, float g, float b, float a) {
+        rgb = new glm::vec4(r, g, b, a);
+    }
+    inline void setRGB(glm::vec4* rgb) {
+        *(this->rgb) = *rgb;
+    }
+    inline void setambStr(float str) {
+        this->strength = str;
+    }
+    inline glm::vec4* getAmbRGB() {
+        return rgb;
+    }
+   
+};
+class specProperties {
+    private:
+        float strength;
+        float phong;
+public:
+    inline void setSpecStr(float str) {
+        this->strength = str;
+    }
+    inline void setSpecPhong(float phong) {
+        this->phong= phong;
+    }
+    inline float getSpecStr() {
+        return this->strength;
+    }
+    inline float getSpecPhong() {
+        return this->phong;
+    }
+};
+class baseLight {
+private:
+    lightProperties* properties;
+    ambientProperties* amb;
+    specProperties* spec;
+
 };
