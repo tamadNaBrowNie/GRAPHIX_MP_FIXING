@@ -198,8 +198,8 @@ int main(void)
     EnemyClass sphere("3D/sphere/Sphere.obj", glm::vec3(0.0f, -8.0f, 0.0f));
     EnemyClass car("3D/car/PASSAT_OBJ.obj", glm::vec3(10.0f, -10.0f, -15.0f));
     EnemyClass chest("3D/chest/TreasureChestSimple.obj", glm::vec3(-10.0f, -15.0f, -5.0f));
-    EnemyClass solaire("3D/solaire/SOLAIRE.obj", glm::vec3(5.0f, -10.0f, 5.0f));
-    EnemyClass cube("3D/cube/DADO.obj", glm::vec3(15.0f, -3.0f, 10.0f));
+    EnemyClass solaire("3D/pun/solar.obj", glm::vec3(5.0f, -10.0f, 5.0f));
+    EnemyClass cube("3D/cube_alt/cube.obj", glm::vec3(15.0f, -3.0f, 10.0f));
     
     donut.loadObj();
     sphere.loadObj();
