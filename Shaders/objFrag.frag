@@ -67,5 +67,5 @@ void main(){
 	vec3 normal = texture(norm_tex, texCoord).rgb;
 	vec3 sun;
 	dirLight(sun,normal);
-	FragColor = pixelColor*vec4(sun,1);
+	FragColor = pixelColor + vec4(sun,1);
 }

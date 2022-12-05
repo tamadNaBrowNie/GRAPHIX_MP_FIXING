@@ -436,7 +436,7 @@ int main(void)
         ->setSpecPhong(1)
         ->setSpecStr(1)
         ->setLightDirection(new glm::vec3(1))
-        ->setLightColor(new glm::vec4(2));
+        ->setLightColor(new glm::vec4(1,1,0,1));
     ptLight ptLight (new glm::vec3(0));
     ptLight.setAmbColor(new glm::vec4(1))
         ->setAmbStr(1)
