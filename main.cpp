@@ -6,7 +6,7 @@
 // Screen width and height
 float screenWidth = 1000.0f;
 float screenHeight = 1000.0f;
-
+Mode mode = Mode::TPS;
 // Camera Positioning
 OrthoCamera td_camera;
 PerspectiveCamera tps_camera;
@@ -413,6 +413,40 @@ int main(void)
     before = GetTickCount64();
 
     float theta = 0.0f;
+
+
+    /// <summary>
+    /// Uniform ORDER:
+    /// phong,specstr
+    /// ambstr,lumens,
+    /// ambRGBA,lightrgba,
+    /// direction
+    /// </summary>
+    GLint dirUnifs[7]{
+        obj_shaderProgram.findUloc("dir_phong"),obj_shaderProgram.findUloc("dir_spec_str"),
+        obj_shaderProgram.findUloc("dir_amb_str"),obj_shaderProgram.findUloc("dir_lumens"),
+        obj_shaderProgram.findUloc("dir_amb_col"),obj_shaderProgram.findUloc("dir_color"),
+        obj_shaderProgram.findUloc("dir_target"),
+    };
+
+    lightBuilder* dir = new lightBuilder();
+    dir->setAmbColor(new glm::vec4(1))
+        ->setAmbStr(1)
+        ->setLumens(1)
+        ->setSpecPhong(1)
+        ->setSpecStr(1)
+        ->setLightDirection(new glm::vec3(1))
+        ->setLightColor(new glm::vec4(2));
+    ptLight ptLight (new glm::vec3(0));
+    ptLight.setAmbColor(new glm::vec4(1))
+        ->setAmbStr(1)
+        ->setLumens(1)
+        ->setSpecPhong(1)
+        ->setSpecStr(1)
+        ->setLightDirection(new glm::vec3(1))
+        ->setLightColor(new glm::vec4(2));
+
+
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))

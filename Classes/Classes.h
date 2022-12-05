@@ -1,5 +1,8 @@
 #pragma once
 #include "main.h"
+enum class Mode {
+    TPS, FPS, TD
+};
 
 class ShaderClass {
 private:
@@ -40,6 +43,9 @@ public:
 
     GLuint getShader() {
         return this->shaderProgram;
+    }
+    GLint findUloc(const GLchar* src) {
+        return glGetUniformLocation(this->shaderProgram, src);
     }
 };
 
@@ -83,6 +89,9 @@ public:
     glm::mat4 getViewMatrix() {
         return this->viewMatrix;
     }
+    virtual void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
+        std::cout << "error: inaccessible function was accessed \n";
+    };
 };
 
 class OrthoCamera : public MyCamera {
@@ -91,12 +100,19 @@ public:
         //cant we make this a mat4 in player then set it to the base camera class?
         this->projectionMatrix = glm::ortho(left, right, bottom, top, zNear, zFar);
     }
+    void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
+
+    }
 };
 
 class PerspectiveCamera : public MyCamera {
 public:
     void setProjection(float fov, float width, float height) {
         this->projectionMatrix = glm::perspective(glm::radians(fov), width / height, 0.1f, 100.0f);
+    }
+    void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
+        Mode* mode = (Mode*)glfwGetWindowUserPointer(window);
+
     }
 };
 
@@ -501,7 +517,7 @@ public:
 /// <summary>
 /// builder classes allow you to chain methods. similar to java builder classes
 /// </summary>
-class baseLight {
+class lightBuilder {
 private:
     float specPhong;
     float specStr;
@@ -512,35 +528,64 @@ private:
     glm::vec4 lightRGBA;
 
 public:
-    inline baseLight* setSpecStr(float str) {
+    lightBuilder():
+        specPhong(0), specStr(0),ambStr(0),lumens(0),ambRGBA(glm::vec4(0)),
+        target(glm::vec3(0)),lightRGBA(glm::vec4(0))
+    {}
+    lightBuilder(lightBuilder* lb):
+        specPhong(lb->specPhong),specStr(lb->specStr),ambStr(lb->ambStr),lumens(lb->lumens),
+        ambRGBA(lb->ambRGBA),target(lb->target),lightRGBA(lb->lightRGBA) 
+    {}
+    inline lightBuilder* setSpecStr(float str) {
         specStr = str;
         return this;
     }
-    inline baseLight* setSpecPhong(float phong) {
+    inline lightBuilder* setSpecPhong(float phong) {
         specPhong = phong;
         return this;
     }
-    inline baseLight* setAmbStr(float str) {
+    inline lightBuilder* setAmbStr(float str) {
         ambStr = str;
         return this;
     }
-    inline baseLight* setLumens(float str) {
+    inline lightBuilder* setLumens(float str) {
         lumens = str;
         return this;
     }
-    inline baseLight* setAmbColor(glm::vec4* color) {
+    inline lightBuilder* setAmbColor(glm::vec4* color) {
         ambRGBA = *color;
         return this;
     }
-    inline baseLight* setLightColor(glm::vec4* color) {
+    inline lightBuilder* setLightColor(glm::vec4* color) {
 
         lightRGBA = *color;
         return this;
     }
-    inline baseLight* setLightDirection(glm::vec3* dir) {
+    inline lightBuilder* setLightDirection(glm::vec3* dir) {
         target = *dir;
         return this;
     }
-    
+    inline void setUnifs(GLint* uniforms) {
+        glUniform1f(uniforms[0], specPhong);
+        glUniform1f(uniforms[1], specStr);
+        glUniform1f(uniforms[2], ambStr);
+        glUniform1f(uniforms[3], lumens);
+        glUniform4fv(uniforms[4], 0, glm::value_ptr(ambRGBA));
+        glUniform4fv(uniforms[5], 0, glm::value_ptr(lightRGBA));
+        glUniform3fv(uniforms[6], 0, glm::value_ptr(target));
+    }
 
+};
+class ptLight : public lightBuilder {
+    private:
+        glm::vec3 _Src;
+    public:
+        ptLight(glm::vec3 *src):_Src(*src),lightBuilder(){}
+        ptLight(glm::vec3* src,lightBuilder* ptr) :_Src(*src),lightBuilder(ptr) {
+
+        }
+        inline lightBuilder* setSrc(glm::vec3* src) {
+            _Src = *src;
+            return this;
+        }
 };

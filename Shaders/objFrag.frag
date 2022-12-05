@@ -22,9 +22,9 @@ void attenuate(out float val, in float dist){
 
 uniform float dir_lumens;
 uniform float dir_amb_str;
-uniform vec4 dir_amb_col;
+uniform vec3 dir_amb_col;
 uniform vec3 dir_target;
-uniform vec4 dir_color;
+uniform vec3 dir_color;
 uniform float dir_phong;
 uniform float dir_spec_str;
 
@@ -35,9 +35,9 @@ void dirLight(out vec3 sun, in vec3 normals){
 	vec3 viewDir = normalize( eyePos-fragPos);
 	vec3 reflection = reflect(-direction,normals);
 	float spec = pow(min (dot (reflection,viewDir),0.1),dir_phong);
-	vec3 speccol = dir_spec_str *spec;
+	vec3 speccol = dir_spec_str *spec*dir_color;
 	vec3 dAmb = dir_amb_col * dir_amb_str;
-	sun = dir_lumens*(dLight +speccol+dAmb)
+	sun = dir_lumens*(dLight +speccol+dAmb);
 }	
 
 
@@ -45,7 +45,7 @@ void dirLight(out vec3 sun, in vec3 normals){
 uniform vec3 pt_src;
 uniform vec3 pt_target;
 
-void ptLight(out vec3 outLight, in vec3 norms){
+void ptLight(out vec3 bulb, in vec3 norms){
 
 float val;
 float dist = 0;
@@ -65,6 +65,7 @@ void main(){
 	vec4 pixelColor = texture(tex0, texCoord);
 	
 	vec3 normal = texture(norm_tex, texCoord).rgb;
-
-	FragColor = pixelColor;
+	vec3 sun;
+	dirLight(sun,normal);
+	FragColor = pixelColor*vec4(sun,1);
 }
