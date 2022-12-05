@@ -40,12 +40,16 @@ public:
         glAttachShader(this->shaderProgram, fragShader);
         glLinkProgram(this->shaderProgram);
     }
-
+    void use() {
+        glUseProgram(shaderProgram);
+     }
     GLuint getShader() {
         return this->shaderProgram;
     }
     GLint findUloc(const GLchar* src) {
-        return glGetUniformLocation(this->shaderProgram, src);
+        GLint unif = glGetUniformLocation(this->shaderProgram, src);
+        std::cout << glGetError() << src<<'\n';
+        return unif;
     }
 };
 
@@ -523,18 +527,18 @@ private:
     float specStr;
     float ambStr;
     float lumens;
-    glm::vec4 ambRGBA;
+    glm::vec3 ambRGB;
     glm::vec3 target;
-    glm::vec4 lightRGBA;
+    glm::vec3 lightRGB;
 
 public:
     lightBuilder():
-        specPhong(0), specStr(0),ambStr(0),lumens(0),ambRGBA(glm::vec4(0)),
-        target(glm::vec3(0)),lightRGBA(glm::vec4(0))
+        specPhong(0), specStr(0),ambStr(0),lumens(0),ambRGB(glm::vec3(0)),
+        target(glm::vec3(0)),lightRGB(glm::vec3(0))
     {}
     lightBuilder(lightBuilder* lb):
         specPhong(lb->specPhong),specStr(lb->specStr),ambStr(lb->ambStr),lumens(lb->lumens),
-        ambRGBA(lb->ambRGBA),target(lb->target),lightRGBA(lb->lightRGBA) 
+        ambRGB(lb->ambRGB),target(lb->target),lightRGB(lb->lightRGB) 
     {}
     inline lightBuilder* setSpecStr(float str) {
         specStr = str;
@@ -552,27 +556,35 @@ public:
         lumens = str;
         return this;
     }
-    inline lightBuilder* setAmbColor(glm::vec4* color) {
-        ambRGBA = *color;
+    inline lightBuilder* setAmbColor(glm::vec3* color) {
+        ambRGB = *color;
         return this;
     }
-    inline lightBuilder* setLightColor(glm::vec4* color) {
+    inline lightBuilder* setLightColor(glm::vec3* color) {
 
-        lightRGBA = *color;
+        lightRGB = *color;
         return this;
     }
     inline lightBuilder* setLightDirection(glm::vec3* dir) {
         target = *dir;
         return this;
     }
+
     inline void setUnifs(GLint* uniforms) {
-        glUniform1f(uniforms[0], specPhong);
+        glUniform1f(uniforms[0],specPhong);
+  
         glUniform1f(uniforms[1], specStr);
+
         glUniform1f(uniforms[2], ambStr);
-        glUniform1f(uniforms[3], lumens);
-        glUniform4fv(uniforms[4], 0, glm::value_ptr(ambRGBA));
-        glUniform4fv(uniforms[5], 0, glm::value_ptr(lightRGBA));
-        glUniform3fv(uniforms[6], 0, glm::value_ptr(target));
+
+        glUniform1f(uniforms[3],lumens);
+
+        glUniform3fv(uniforms[4], 1, glm::value_ptr(ambRGB));
+
+        glUniform3fv(uniforms[5], 1, glm::value_ptr(lightRGB));
+
+        glUniform3fv(uniforms[6], 1, glm::value_ptr(target));
+
     }
 
 };

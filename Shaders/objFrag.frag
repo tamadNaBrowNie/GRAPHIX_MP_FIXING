@@ -29,15 +29,25 @@ uniform float dir_phong;
 uniform float dir_spec_str;
 
 void dirLight(out vec3 sun, in vec3 normals){
-	vec3 direction = normalize(dir_target);
+	vec3 norm = normalize(normals);
+
+	vec3 direction = normalize(-dir_target);
+
 	float diff = max(dot(normals,direction),0.f);
-	vec3 dLight = diff*dir_color;
-	vec3 viewDir = normalize( eyePos-fragPos);
-	vec3 reflection = reflect(-direction,normals);
-	float spec = pow(min (dot (reflection,viewDir),0.1),dir_phong);
+
+
+	diff = diff+ dir_amb_str;
+	vec3 dAmb = dir_amb_col *diff;
+
+	vec3 viewDir = normalize( fragPos - eyePos);
+
+	vec3 reflection = reflect(-direction,norm);
+
+	float spec = pow(max (dot (reflection,viewDir),0),dir_phong);
+
 	vec3 speccol = dir_spec_str *spec*dir_color;
-	vec3 dAmb = dir_amb_col * dir_amb_str;
-	sun = dir_lumens*(dLight +speccol+dAmb);
+	
+	sun = dir_lumens*(dAmb+speccol);
 }	
 
 
@@ -65,7 +75,9 @@ void main(){
 	vec4 pixelColor = texture(tex0, texCoord);
 	
 	vec3 normal = texture(norm_tex, texCoord).rgb;
+	vec3 norms = normCoord;
 	vec3 sun;
 	dirLight(sun,normal);
-	FragColor = pixelColor + vec4(sun,1);
+	
+	FragColor = pixelColor *vec4(sun,1);
 }

@@ -422,29 +422,35 @@ int main(void)
     /// ambRGBA,lightrgba,
     /// direction
     /// </summary>
+    obj_shaderProgram.use();
     GLint dirUnifs[7]{
-        obj_shaderProgram.findUloc("dir_phong"),obj_shaderProgram.findUloc("dir_spec_str"),
-        obj_shaderProgram.findUloc("dir_amb_str"),obj_shaderProgram.findUloc("dir_lumens"),
-        obj_shaderProgram.findUloc("dir_amb_col"),obj_shaderProgram.findUloc("dir_color"),
-        obj_shaderProgram.findUloc("dir_target"),
+    obj_shaderProgram.findUloc("dir_phong"),
+    obj_shaderProgram.findUloc("dir_spec_str"),
+    obj_shaderProgram.findUloc("dir_amb_str"),
+    obj_shaderProgram.findUloc("dir_lumens"),
+    obj_shaderProgram.findUloc("dir_amb_col"),
+    obj_shaderProgram.findUloc("dir_color"),
+    obj_shaderProgram.findUloc("dir_target")
     };
 
     lightBuilder* dir = new lightBuilder();
-    dir->setAmbColor(new glm::vec4(0,1,1,1))
-        ->setAmbStr(10^5)
-        ->setLumens(10^10)
+    dir->setAmbColor(new glm::vec3(0.2, 0.5, 0.9))
+        ->setAmbStr(1)
+        ->setLumens(1.5)
         ->setSpecPhong(1)
         ->setSpecStr(1)
-        ->setLightDirection(new glm::vec3(1))
-        ->setLightColor(new glm::vec4(1,1,0,1));
+        ->setLightDirection(new glm::vec3(0,-1,0))
+        ->setLightColor(new glm::vec3(0, 0, 0.2));
+        dir->setUnifs(dirUnifs);
+
     ptLight ptLight (new glm::vec3(0));
-    ptLight.setAmbColor(new glm::vec4(1))
+    ptLight.setAmbColor(new glm::vec3(1))
         ->setAmbStr(1)
         ->setLumens(1)
         ->setSpecPhong(1)
         ->setSpecStr(1)
         ->setLightDirection(new glm::vec3(1))
-        ->setLightColor(new glm::vec4(2));
+        ->setLightColor(new glm::vec3(2));
 
 
 
@@ -465,6 +471,7 @@ int main(void)
             tps_camera.setProjection(60.0f, screenWidth, screenHeight);
             projectionMatrix = tps_camera.getProjectionMatrix();
             viewMatrix = tps_camera.getViewMatrix();
+            glUniform3fv(obj_shaderProgram.findUloc("eyePos"), 1,glm::value_ptr(tps_camera.getCameraPos()));
         }
         else if (toggle_fps && !toggle_td) {
             fps_camera.setCameraPos(fps_cameraPos - glm::vec3(0.1f, 0.0f, 1.0f));   // Slight adjustments to align with playerSub
@@ -559,7 +566,7 @@ int main(void)
             0.5f,
             -theta, -theta, theta
         );
-
+        dir->setUnifs(dirUnifs);
         // -----------------------------------------------------------------
 
         after = GetTickCount64();
@@ -574,7 +581,7 @@ int main(void)
         glfwSwapBuffers(window);
 
         /* Poll for and process events */
-        glfwPollEvents();
+        glfwWaitEventsTimeout(0.2);
     }
 
     // Cleanup
