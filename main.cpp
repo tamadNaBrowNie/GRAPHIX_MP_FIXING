@@ -436,10 +436,10 @@ int main(void)
 
     lightBuilder* dir = new lightBuilder();
     dir->setAmbColor(new glm::vec3(0.2, 0.5, 0.9))
-        ->setAmbStr(1)
-        ->setLumens(2)
-        ->setSpecPhong(100^10)
-        ->setSpecStr(1000)
+        ->setAmbStr(0.5)
+        ->setLumens(1)
+        ->setSpecPhong(10^1)
+        ->setSpecStr(10)
         ->setLightVec(new glm::vec3(0,-1,0))
         ->setLightColor(new glm::vec3(0, 0, 0.2))
         ->setUnifs(dirUnifs);
@@ -456,12 +456,12 @@ int main(void)
     lightBuilder* ptLight = new lightBuilder();
 
     ptLight->setAmbColor(new glm::vec3(1))
-        ->setAmbStr(1)
+        ->setAmbStr(0.1)
         ->setLumens(1)
         ->setSpecPhong(1)
         ->setSpecStr(1)
         ->setLightVec(new glm::vec3(playerSub.getPosition()))
-        ->setLightColor(new glm::vec3(2))
+        ->setLightColor(new glm::vec3(0.3,0.5,0))
         ->setUnifs(ptUnifs);
     GLint hasBmp = obj_shaderProgram.findUloc("hasBmp");
     GLint eyePos = obj_shaderProgram.findUloc("eyePos");
@@ -471,10 +471,11 @@ int main(void)
     {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+        glm::vec3 lightPos = playerSub.getPosition();
+        lightPos.z -= 0.5;
         // -----------------------------------------------------------------
         // CAMERA USE
-
+        ptLight->setLightVec(&lightPos)->placeLight(ptUnifs[6]);
         if (toggle_tps && !toggle_td) {
             tps_camera.setCameraPos(tps_cameraPos + glm::vec3(0.1f, 0.0f, 0.0f));   // Slight adjustments to align with playerSub
             tps_camera.setCameraCenter(playerSub.getPosition() + glm::vec3(0.1f, 0.0f, 0.0f));

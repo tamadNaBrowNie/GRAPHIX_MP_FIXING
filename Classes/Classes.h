@@ -569,7 +569,9 @@ public:
         ray = *dir;
         return this;
     }
-
+    inline void placeLight(GLint unif) {
+        glUniform3fv(unif, 1, glm::value_ptr(ray));
+    }
     virtual inline void setUnifs(GLint* uniforms) {
         glUniform1f(uniforms[0],specPhong);
   
@@ -583,7 +585,8 @@ public:
 
         glUniform3fv(uniforms[5], 1, glm::value_ptr(lightRGB));
 
-        glUniform3fv(uniforms[6], 1, glm::value_ptr(ray));
+        placeLight(uniforms[6]);
+        
 
     }
 

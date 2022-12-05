@@ -1,5 +1,5 @@
 #version 330 core
-#define MIN 255
+#define MIN 5
 
 in vec3 fragPos;
 uniform sampler2D tex0;
@@ -57,7 +57,9 @@ uniform float pt_spec_str;
 void ptLight(out vec3 bulb, in vec3 norms){
 vec3 norm = normalize(norms);
 float val;
-vec3 rayVec = pt_src - fragPos;
+vec3 src = pt_src;
+src.z-=0.7;
+vec3 rayVec = src - fragPos;
 float dist =length(rayVec);
 attenuate(val,dist);
 vec3 dir = normalize(rayVec);
