@@ -17,4 +17,5 @@ void main(){
 
 	texCoord = aTex;
 	normCoord = modelMat * vertexNormal;
+	out vec3 fragPos = aPos;
 }
