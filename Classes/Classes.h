@@ -528,17 +528,17 @@ private:
     float ambStr;
     float lumens;
     glm::vec3 ambRGB;
-    glm::vec3 target;
+    glm::vec3 ray;
     glm::vec3 lightRGB;
 
 public:
     lightBuilder():
         specPhong(0), specStr(0),ambStr(0),lumens(0),ambRGB(glm::vec3(0)),
-        target(glm::vec3(0)),lightRGB(glm::vec3(0))
+        ray(glm::vec3(0)),lightRGB(glm::vec3(0))
     {}
     lightBuilder(lightBuilder* lb):
         specPhong(lb->specPhong),specStr(lb->specStr),ambStr(lb->ambStr),lumens(lb->lumens),
-        ambRGB(lb->ambRGB),target(lb->target),lightRGB(lb->lightRGB) 
+        ambRGB(lb->ambRGB),ray(lb->ray),lightRGB(lb->lightRGB) 
     {}
     inline lightBuilder* setSpecStr(float str) {
         specStr = str;
@@ -565,12 +565,12 @@ public:
         lightRGB = *color;
         return this;
     }
-    inline lightBuilder* setLightDirection(glm::vec3* dir) {
-        target = *dir;
+    inline lightBuilder* setLightVec(glm::vec3* dir) {
+        ray = *dir;
         return this;
     }
 
-    inline void setUnifs(GLint* uniforms) {
+    virtual inline void setUnifs(GLint* uniforms) {
         glUniform1f(uniforms[0],specPhong);
   
         glUniform1f(uniforms[1], specStr);
@@ -583,21 +583,8 @@ public:
 
         glUniform3fv(uniforms[5], 1, glm::value_ptr(lightRGB));
 
-        glUniform3fv(uniforms[6], 1, glm::value_ptr(target));
+        glUniform3fv(uniforms[6], 1, glm::value_ptr(ray));
 
     }
 
-};
-class ptLight : public lightBuilder {
-    private:
-        glm::vec3 _Src;
-    public:
-        ptLight(glm::vec3 *src):_Src(*src),lightBuilder(){}
-        ptLight(glm::vec3* src,lightBuilder* ptr) :_Src(*src),lightBuilder(ptr) {
-
-        }
-        inline lightBuilder* setSrc(glm::vec3* src) {
-            _Src = *src;
-            return this;
-        }
 };

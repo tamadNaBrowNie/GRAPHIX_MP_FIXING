@@ -35,34 +35,40 @@ void dirLight(out vec3 sun, in vec3 normals){
 
 	float diff = max(dot(norm,direction),0.f);
 
-
-	vec3 dLight = diff*dir_color;
-	vec3 dAmb = dir_amb_col *dir_amb_str;
-
 	vec3 viewDir = normalize(  eyePos-fragPos );
 
 	vec3 reflection = reflect(-direction,norm);
 
 	float spec = pow(max (dot (reflection,viewDir),0),dir_phong);
-
-	vec3 speccol = dir_spec_str *spec*dir_color;
+			spec *= dir_spec_str;
 	
-	sun = dir_lumens*(dAmb+speccol+dLight);
-}	
-
+	
+	sun = (dir_lumens+dir_amb_str+spec+diff)*(dir_amb_col+dir_color);
+}
 
 
 uniform vec3 pt_src;
-uniform vec3 pt_target;
-
+uniform float pt_lumens;
+uniform float pt_amb_str;
+uniform vec3 pt_amb_col;
+uniform vec3 pt_color;
+uniform float pt_phong;
+uniform float pt_spec_str;
 void ptLight(out vec3 bulb, in vec3 norms){
-
+vec3 norm = normalize(norms);
 float val;
-float dist = 0;
 vec3 rayVec = pt_src - fragPos;
-dist =  length(rayVec);
+float dist =length(rayVec);
 attenuate(val,dist);
-bulb = val*bulb;
+vec3 dir = normalize(rayVec);
+vec3 viewDir = normalize(eyePos-fragPos);
+vec3 reflection = reflect(-dir,norm);
+float diff = max(dot(norm,dir),0.f);
+
+float spec = pow(max (dot (reflection,viewDir),0),pt_phong);
+		spec*=pt_spec_str;
+
+bulb = val*(pt_lumens+pt_amb_str+spec+diff)*(pt_amb_col*pt_color);
 
 }
 uniform bool hasBmp;
@@ -77,7 +83,8 @@ void main(){
 	vec3 normal = texture(norm_tex, texCoord).rgb;
 	vec3 norms = normCoord;
 	vec3 sun;
-		norms = (normal-1)*2;
+		//norms = (normal-1)*2;
+		vec3 bulb;
 /*
 	if(hasBmp)
 	
@@ -86,5 +93,6 @@ void main(){
 */
 //TODO: put normal map into object space
 	dirLight(sun,norms);
-	FragColor = pixelColor *vec4(sun,1);
+	ptLight(bulb,norms);
+	FragColor = pixelColor *vec4(sun+bulb,1);
 }

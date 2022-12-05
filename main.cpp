@@ -271,7 +271,8 @@ int main(void)
     */
 
     playerSub.attachTexture("3D/submarine/submarine_submarine_BaseColor.png", GL_RGB);
-    playerSub.attachNormalTexture("3D/submarine/submarine_submarine_Normal.png", GL_RGB);
+    //playerSub.attachNormalTexture("3D/submarine/submarine_submarine_Normal.png", GL_RGB);
+    playerSub.attachNormalTexture("3D/submarine/brickwall_normal.jpg", GL_RGB);
 
     donut.attachTexture("3D/donut/Gus.png", GL_RGBA);
     sphere.attachTexture("3D/sphere/lost_ark.jpg", GL_RGB);
@@ -436,23 +437,34 @@ int main(void)
     lightBuilder* dir = new lightBuilder();
     dir->setAmbColor(new glm::vec3(0.2, 0.5, 0.9))
         ->setAmbStr(1)
-        ->setLumens(1.5)
-        ->setSpecPhong(1)
-        ->setSpecStr(1)
-        ->setLightDirection(new glm::vec3(0,-1,0))
-        ->setLightColor(new glm::vec3(0, 0, 0.2));
-        dir->setUnifs(dirUnifs);
+        ->setLumens(2)
+        ->setSpecPhong(100^10)
+        ->setSpecStr(1000)
+        ->setLightVec(new glm::vec3(0,-1,0))
+        ->setLightColor(new glm::vec3(0, 0, 0.2))
+        ->setUnifs(dirUnifs);
 
-    ptLight ptLight (new glm::vec3(0));
-    ptLight.setAmbColor(new glm::vec3(1))
+        GLint ptUnifs[7]{
+    obj_shaderProgram.findUloc("pt_phong"),
+    obj_shaderProgram.findUloc("pt_spec_str"),
+    obj_shaderProgram.findUloc("pt_amb_str"),
+    obj_shaderProgram.findUloc("pt_lumens"),
+    obj_shaderProgram.findUloc("pt_amb_col"),
+    obj_shaderProgram.findUloc("pt_color"),
+    obj_shaderProgram.findUloc("pt_src")
+        };
+    lightBuilder* ptLight = new lightBuilder();
+
+    ptLight->setAmbColor(new glm::vec3(1))
         ->setAmbStr(1)
         ->setLumens(1)
         ->setSpecPhong(1)
         ->setSpecStr(1)
-        ->setLightDirection(new glm::vec3(1))
-        ->setLightColor(new glm::vec3(2));
-
-
+        ->setLightVec(new glm::vec3(playerSub.getPosition()))
+        ->setLightColor(new glm::vec3(2))
+        ->setUnifs(ptUnifs);
+    GLint hasBmp = obj_shaderProgram.findUloc("hasBmp");
+    GLint eyePos = obj_shaderProgram.findUloc("eyePos");
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
@@ -471,7 +483,8 @@ int main(void)
             tps_camera.setProjection(60.0f, screenWidth, screenHeight);
             projectionMatrix = tps_camera.getProjectionMatrix();
             viewMatrix = tps_camera.getViewMatrix();
-            glUniform3fv(obj_shaderProgram.findUloc("eyePos"), 1,glm::value_ptr(tps_camera.getCameraPos()));
+            glUniform3fv(eyePos, 1,glm::value_ptr(tps_camera.getCameraPos()));
+            std::cout << "cam" << glGetError() << '\n';
         }
         else if (toggle_fps && !toggle_td) {
             fps_camera.setCameraPos(fps_cameraPos - glm::vec3(0.1f, 0.0f, 1.0f));   // Slight adjustments to align with playerSub
@@ -524,12 +537,19 @@ int main(void)
 
         // -----------------------------------------------------------------
         // RENDERING OBJECTS
+        obj_shaderProgram.use();
+        glUniform1i(hasBmp, GL_TRUE);
+        std::cout << glGetError() << "true" << '\n';
         playerSub.draw(
             obj_shaderProgram.getShader(),  // Shader Program to use
             0.15f,                          // Scale
             0.0f, rot_y, 0.0f               // Rotation values for X, Y, and Z axes, respectively
         );
+        
+       
+        glUniform1i(hasBmp, GL_FALSE);
 
+        std::cout << "false" << glGetError() << '\n';
         donut.draw(
             obj_shaderProgram.getShader(),
             5.0f,
@@ -566,7 +586,7 @@ int main(void)
             0.5f,
             -theta, -theta, theta
         );
-        dir->setUnifs(dirUnifs);
+        
         // -----------------------------------------------------------------
 
         after = GetTickCount64();
