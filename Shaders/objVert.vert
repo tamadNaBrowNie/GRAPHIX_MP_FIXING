@@ -10,12 +10,12 @@ uniform mat4 transform;
 
 out vec2 texCoord;
 out vec3 normCoord;
-
+out vec3 fragPos;
 void main(){
 	gl_Position = projection * view * transform * vec4(aPos, 1.0);
 	mat3 modelMat = mat3(transpose(inverse(transform)));
 
 	texCoord = aTex;
 	normCoord = modelMat * vertexNormal;
-	out vec3 fragPos = aPos;
+	fragPos = vec3(transform* vec4(aPos, 1.0));
 }

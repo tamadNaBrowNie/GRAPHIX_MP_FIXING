@@ -430,9 +430,9 @@ int main(void)
     };
 
     lightBuilder* dir = new lightBuilder();
-    dir->setAmbColor(new glm::vec4(1))
-        ->setAmbStr(1)
-        ->setLumens(1)
+    dir->setAmbColor(new glm::vec4(0,1,1,1))
+        ->setAmbStr(10^5)
+        ->setLumens(10^10)
         ->setSpecPhong(1)
         ->setSpecStr(1)
         ->setLightDirection(new glm::vec3(1))
