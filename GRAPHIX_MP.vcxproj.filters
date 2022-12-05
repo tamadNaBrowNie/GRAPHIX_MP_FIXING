@@ -46,5 +46,45 @@
   <ItemGroup>
     <None Include="Shaders\objVert.vert" />
     <None Include="Shaders\objFrag.frag" />
+    <None Include="3D\[] source zips\2004-volkswagen-passat-18t-obj.zip" />
+    <None Include="3D\[] source zips\dado-obj.zip" />
+    <None Include="3D\[] source zips\solaire-of-astora-obj-no-textures.zip" />
+    <None Include="3D\[] source zips\submarine.zip" />
+    <None Include="3D\[] source zips\treasure-chest-simple-low.zip" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="3D\car\myImage.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="3D\chest\sad_gouba.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="3D\cube\DADO.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="3D\donut\Gus.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="3D\solaire\Peasant.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="3D\sphere\lost_ark.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="3D\submarine\submarine_submarine_BaseColor.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="3D\submarine\submarine_submarine_Normal.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="3D\car\PASSAT_OBJ.obj" />
+    <Object Include="3D\chest\TreasureChestSimple.obj" />
+    <Object Include="3D\cube\DADO.obj" />
+    <Object Include="3D\donut\Donut.obj" />
+    <Object Include="3D\solaire\SOLAIRE.obj" />
+    <Object Include="3D\sphere\Sphere.obj" />
+    <Object Include="3D\submarine\submarine.obj" />
   </ItemGroup>
 </Project>

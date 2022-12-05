@@ -160,8 +160,32 @@
     </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
+    <None Include="3D\[] source zips\2004-volkswagen-passat-18t-obj.zip" />
+    <None Include="3D\[] source zips\dado-obj.zip" />
+    <None Include="3D\[] source zips\solaire-of-astora-obj-no-textures.zip" />
+    <None Include="3D\[] source zips\submarine.zip" />
+    <None Include="3D\[] source zips\treasure-chest-simple-low.zip" />
     <None Include="Shaders\objFrag.frag" />
     <None Include="Shaders\objVert.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="3D\car\myImage.png" />
+    <Image Include="3D\chest\sad_gouba.png" />
+    <Image Include="3D\cube\DADO.jpg" />
+    <Image Include="3D\donut\Gus.png" />
+    <Image Include="3D\solaire\Peasant.jpg" />
+    <Image Include="3D\sphere\lost_ark.jpg" />
+    <Image Include="3D\submarine\submarine_submarine_BaseColor.png" />
+    <Image Include="3D\submarine\submarine_submarine_Normal.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="3D\car\PASSAT_OBJ.obj" />
+    <Object Include="3D\chest\TreasureChestSimple.obj" />
+    <Object Include="3D\cube\DADO.obj" />
+    <Object Include="3D\donut\Donut.obj" />
+    <Object Include="3D\solaire\SOLAIRE.obj" />
+    <Object Include="3D\sphere\Sphere.obj" />
+    <Object Include="3D\submarine\submarine.obj" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
