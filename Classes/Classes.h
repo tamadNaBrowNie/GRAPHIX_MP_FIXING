@@ -498,63 +498,49 @@ public:
         this->playerPos.z = Z;
     }
 };
-class lightProperties {
-    private:
-        glm::vec3* direction;
-        glm::vec4* RGB;
-        float strength;
-    public:
-        inline float getStrength() {
-            return strength;
-        }
-        inline void setStrength(float str) {
-            strength = str;
-        }
-};
-class ambientProperties {
-private:
-    glm::vec4* rgb;
-    float strength;
-public: 
-    inline float getStrength() {
-        return strength;
-    }
-    inline void setRGB(float r, float g, float b, float a) {
-        rgb = new glm::vec4(r, g, b, a);
-    }
-    inline void setRGB(glm::vec4* rgb) {
-        *(this->rgb) = *rgb;
-    }
-    inline void setambStr(float str) {
-        this->strength = str;
-    }
-    inline glm::vec4* getAmbRGB() {
-        return rgb;
-    }
-   
-};
-class specProperties {
-    private:
-        float strength;
-        float phong;
-public:
-    inline void setSpecStr(float str) {
-        this->strength = str;
-    }
-    inline void setSpecPhong(float phong) {
-        this->phong= phong;
-    }
-    inline float getSpecStr() {
-        return this->strength;
-    }
-    inline float getSpecPhong() {
-        return this->phong;
-    }
-};
+/// <summary>
+/// builder classes allow you to chain methods. similar to java builder classes
+/// </summary>
 class baseLight {
 private:
-    lightProperties* properties;
-    ambientProperties* amb;
-    specProperties* spec;
+    float specPhong;
+    float specStr;
+    float ambStr;
+    float lumens;
+    glm::vec4 ambRGBA;
+    glm::vec3 target;
+    glm::vec4 lightRGBA;
+
+public:
+    inline baseLight* setSpecStr(float str) {
+        specStr = str;
+        return this;
+    }
+    inline baseLight* setSpecPhong(float phong) {
+        specPhong = phong;
+        return this;
+    }
+    inline baseLight* setAmbStr(float str) {
+        ambStr = str;
+        return this;
+    }
+    inline baseLight* setLumens(float str) {
+        lumens = str;
+        return this;
+    }
+    inline baseLight* setAmbColor(glm::vec4* color) {
+        ambRGBA = *color;
+        return this;
+    }
+    inline baseLight* setLightColor(glm::vec4* color) {
+
+        lightRGBA = *color;
+        return this;
+    }
+    inline baseLight* setLightDirection(glm::vec3* dir) {
+        target = *dir;
+        return this;
+    }
+    
 
 };
