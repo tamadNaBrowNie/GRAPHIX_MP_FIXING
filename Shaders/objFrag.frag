@@ -96,5 +96,6 @@ void main(){
 //TODO: put normal map into object space
 	dirLight(sun,norms);
 	ptLight(bulb,norms);
-	FragColor = pixelColor *vec4(sun+bulb,1);
+	FragColor = pixelColor *
+						vec4(sun+bulb,1);
 }

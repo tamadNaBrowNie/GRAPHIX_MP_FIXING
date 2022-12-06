@@ -1,5 +1,6 @@
 #include "main.h"
 #include "Classes/Classes.h"
+
 /*
     Global Variables
 */
@@ -77,6 +78,9 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
             fps_cameraPos += glm::vec3(0.0f, 0.0f, 0.1f);
         }
     }
+    glm::vec3 pos = playerSub.playerPos;
+    pos.z -= OFFSET;
+    playerSub.bulb->setLightVec(&pos);
     
     // Submarine Turn Left/Turn Right Movement Controls
     //if (key == GLFW_KEY_A) {
@@ -478,16 +482,7 @@ int main(void)
     obj_shaderProgram.findUloc("pt_color"),
     obj_shaderProgram.findUloc("pt_src")
         };
-    lightBuilder* ptLight = new lightBuilder();
-
-    ptLight->setAmbColor(new glm::vec3(1))
-        ->setAmbStr(0.1)
-        ->setLumens(1)
-        ->setSpecPhong(1)
-        ->setSpecStr(1)
-        ->setLightVec(new glm::vec3(playerSub.playerPos))
-        ->setLightColor(new glm::vec3(0.3,0.5,0))
-        ->placeUnifs(ptUnifs);
+        playerSub.placeUnifs(ptUnifs);
     GLint hasBmp = obj_shaderProgram.findUloc("hasBmp");
     GLint eyePos = obj_shaderProgram.findUloc("eyePos");
 
@@ -496,13 +491,11 @@ int main(void)
     {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glm::vec3 lightPos = playerSub.playerPos;
-        lightPos.z -= 0.5;
+        playerSub.placeLight(ptUnifs[6]);
 
         // -----------------------------------------------------------------
         // CAMERA USE
 
-        ptLight->setLightVec(&lightPos)->placeLight(ptUnifs[6]);
         if (toggle_tps && !toggle_td) {
             tps_camera.setCameraPos(tps_cameraPos + glm::vec3(0.1f, 0.0f, 0.0f));   // Slight adjustments to align with playerSub
             tps_camera.setCameraCenter(playerSub.playerPos + glm::vec3(0.1f, 0.0f, 0.0f));
@@ -595,7 +588,8 @@ int main(void)
             // Use cout to display playerPos on console
             cout << "Player Depth: " << playerSub.getDepth() << "\n";
         }
-
+        
+   
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
 

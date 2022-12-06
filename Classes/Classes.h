@@ -479,71 +479,6 @@ public:
         glDrawArrays(GL_TRIANGLES, 0, this->vertexData.size() / 5);
     }
 };
-
-class PlayerClass : public ModelClass {
-public:
-    glm::vec3 playerPos;
-    glm::vec3 playerRot;
-    float playerScale;
-
-    PlayerClass(std::string path,
-        glm::vec3 pos,
-        glm::vec3 rot,
-        float scale) :
-            ModelClass(path),
-                playerPos(pos),
-                playerRot(rot),
-                playerScale(scale) {}
-
-    void draw(GLuint shaderProgram) {
-        glUseProgram(shaderProgram);
-        glBindVertexArray(this->VAO);
-
-        // Initialize transformation matrix, and assign position, scaling, and rotation
-        glm::mat4 transformationMatrix = glm::translate(glm::mat4(1.0f),
-                                            this->playerPos);
-
-        // Scale
-        transformationMatrix = glm::scale(transformationMatrix, glm::vec3(this->playerScale));
-
-        // X axis rotation
-        transformationMatrix = glm::rotate(transformationMatrix,
-                                    glm::radians(this->playerRot.x),
-                                    glm::normalize(glm::vec3(1.0f, 0.0f, 0.0f)));
-        // Y axis rotation
-        transformationMatrix = glm::rotate(transformationMatrix,
-                                    glm::radians(this->playerRot.y),
-                                    glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)));
-        // Z axis rotation
-        transformationMatrix = glm::rotate(transformationMatrix,
-                                    glm::radians(this->playerRot.z),
-                                    glm::normalize(glm::vec3(0.0f, 0.0f, 1.0f)));
-
-        // Initialize transformation location, and assign transformation
-        unsigned int transformationLoc = glGetUniformLocation(shaderProgram, "transform");
-        glUniformMatrix4fv(transformationLoc, 1, GL_FALSE, glm::value_ptr(transformationMatrix));
-
-        glActiveTexture(GL_TEXTURE0);
-        GLuint tex0Address = glGetUniformLocation(shaderProgram, "tex0");
-        glBindTexture(GL_TEXTURE_2D, this->textures[0]);
-        glUniform1i(tex0Address, 0);
-
-        if (withNormals) {
-            glActiveTexture(GL_TEXTURE1);
-            GLuint tex1Address = glGetUniformLocation(shaderProgram, "norm_tex");
-            glBindTexture(GL_TEXTURE_2D, this->textures[1]);
-            glUniform1i(tex1Address, 1);
-        }
-
-        // Draw
-        glDrawArrays(GL_TRIANGLES, 0, this->vertexData.size() / 5);
-    }
-
-    float getDepth() {
-        return this->playerPos.y;
-    }
-};
-
 /// <summary>
 /// builder classes allow you to chain methods. similar to java builder classes
 /// </summary>
@@ -558,14 +493,14 @@ private:
     glm::vec3 lightRGB;
 
 public:
-    lightBuilder():
-        specPhong(0), specStr(0),ambStr(0),lumens(0),ambRGB(glm::vec3(0)),
-        ray(glm::vec3(0)),lightRGB(glm::vec3(0))
+    lightBuilder() :
+        specPhong(0), specStr(0), ambStr(0), lumens(0), ambRGB(glm::vec3(0)),
+        ray(glm::vec3(0)), lightRGB(glm::vec3(0))
     {}
 
-    lightBuilder(lightBuilder* lb):
-        specPhong(lb->specPhong),specStr(lb->specStr),ambStr(lb->ambStr),lumens(lb->lumens),
-        ambRGB(lb->ambRGB),ray(lb->ray),lightRGB(lb->lightRGB) 
+    lightBuilder(lightBuilder* lb) :
+        specPhong(lb->specPhong), specStr(lb->specStr), ambStr(lb->ambStr), lumens(lb->lumens),
+        ambRGB(lb->ambRGB), ray(lb->ray), lightRGB(lb->lightRGB)
     {}
 
     inline lightBuilder* setSpecStr(float str) {
@@ -641,4 +576,88 @@ public:
         glUniform3fv(uniforms[5], 1, glm::value_ptr(lightRGB));
 
         placeLight(uniforms[6]);
+    }
 };
+
+class PlayerClass : public ModelClass {
+public:
+    glm::vec3 playerPos;
+    glm::vec3 playerRot;
+    float playerScale;
+    lightBuilder* bulb;
+
+    inline PlayerClass(std::string path,
+        glm::vec3 pos,
+        glm::vec3 rot,
+        float scale) :
+            ModelClass(path),
+                playerPos(pos),
+                playerRot(rot),
+                playerScale(scale),bulb(new lightBuilder()) {
+        glm::vec3 src = pos;
+        src.z -= 0.7;
+        bulb
+            ->setLumens(1)
+            ->setAmbStr(1)
+            ->setSpecPhong(10)
+            ->setSpecStr(1)
+            ->setLightVec(&src)
+            ->setLightColor(new glm::vec3(1))
+            ->setAmbColor(new glm::vec3(1));
+    
+    }
+    inline void placeUnifs(GLint* unifs) {
+        bulb->placeUnifs(unifs);
+    }
+    inline void placeLight(GLint unif) {
+        bulb->placeLight(unif);
+    }
+    void draw(GLuint shaderProgram) {
+        glUseProgram(shaderProgram);
+        glBindVertexArray(this->VAO);
+
+        // Initialize transformation matrix, and assign position, scaling, and rotation
+        glm::mat4 transformationMatrix = glm::translate(glm::mat4(1.0f),
+                                            this->playerPos);
+
+        // Scale
+        transformationMatrix = glm::scale(transformationMatrix, glm::vec3(this->playerScale));
+
+        // X axis rotation
+        transformationMatrix = glm::rotate(transformationMatrix,
+                                    glm::radians(this->playerRot.x),
+                                    glm::normalize(glm::vec3(1.0f, 0.0f, 0.0f)));
+        // Y axis rotation
+        transformationMatrix = glm::rotate(transformationMatrix,
+                                    glm::radians(this->playerRot.y),
+                                    glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)));
+        // Z axis rotation
+        transformationMatrix = glm::rotate(transformationMatrix,
+                                    glm::radians(this->playerRot.z),
+                                    glm::normalize(glm::vec3(0.0f, 0.0f, 1.0f)));
+
+        // Initialize transformation location, and assign transformation
+        unsigned int transformationLoc = glGetUniformLocation(shaderProgram, "transform");
+        glUniformMatrix4fv(transformationLoc, 1, GL_FALSE, glm::value_ptr(transformationMatrix));
+
+        glActiveTexture(GL_TEXTURE0);
+        GLuint tex0Address = glGetUniformLocation(shaderProgram, "tex0");
+        glBindTexture(GL_TEXTURE_2D, this->textures[0]);
+        glUniform1i(tex0Address, 0);
+
+        if (withNormals) {
+            glActiveTexture(GL_TEXTURE1);
+            GLuint tex1Address = glGetUniformLocation(shaderProgram, "norm_tex");
+            glBindTexture(GL_TEXTURE_2D, this->textures[1]);
+            glUniform1i(tex1Address, 1);
+        }
+
+        // Draw
+        glDrawArrays(GL_TRIANGLES, 0, this->vertexData.size() / 5);
+    }
+
+    float getDepth() {
+        return this->playerPos.y;
+    }
+};
+
