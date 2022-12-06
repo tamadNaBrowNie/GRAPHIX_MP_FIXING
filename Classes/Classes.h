@@ -608,7 +608,7 @@ public:
         glUniform3fv(unif, 1, glm::value_ptr(ray));
     }
 
-    virtual inline void setUnifs(GLint* uniforms) {
+    virtual inline void placeUnifs(GLint* uniforms) {
         glUniform1f(uniforms[0],specPhong);
   
         glUniform1f(uniforms[1], specStr);
