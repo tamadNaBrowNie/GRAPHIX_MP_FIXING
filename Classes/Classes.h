@@ -424,32 +424,34 @@ public:
 };
 
 class EnemyClass : public ModelClass {
-private:
-    glm::vec3 position;
-
 public:
-    EnemyClass(std::string path, glm::vec3 pos) : ModelClass(path),position(pos) {       
-    }
+    glm::vec3 enemyPos;
+    glm::vec3 enemyRot;
 
-    void draw(GLuint shaderProgram, float scale, float rot_x, float rot_y, float rot_z) {
+    EnemyClass(std::string path, glm::vec3 pos, glm::vec3 rot) :
+        ModelClass(path),
+            enemyPos(pos),
+            enemyRot(rot) {}
+
+    void draw(GLuint shaderProgram, float scale) {
         glUseProgram(shaderProgram);
         glBindVertexArray(this->VAO);
 
         // Initialize transformation matrix, and assign position, scaling, and rotation
-        glm::mat4 transformationMatrix = glm::translate(glm::mat4(1.0f), this->position);
+        glm::mat4 transformationMatrix = glm::translate(glm::mat4(1.0f), this->enemyPos);
         transformationMatrix = glm::scale(transformationMatrix, glm::vec3(scale));
 
         // X axis rotation
         transformationMatrix = glm::rotate(transformationMatrix,
-                                    glm::radians(rot_x),
+                                    glm::radians(enemyRot.x),
                                     glm::normalize(glm::vec3(1.0f, 0.0f, 0.0f)));
         // Y axis rotation
         transformationMatrix = glm::rotate(transformationMatrix,
-                                    glm::radians(rot_y),
+                                    glm::radians(enemyRot.y),
                                     glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)));
         // Z axis rotation
         transformationMatrix = glm::rotate(transformationMatrix,
-                                    glm::radians(rot_z),
+                                    glm::radians(enemyRot.z),
                                     glm::normalize(glm::vec3(0.0f, 0.0f, 1.0f)));
 
         // Initialize transformation location, and assign transformation
@@ -474,31 +476,37 @@ public:
 };
 
 class PlayerClass : public ModelClass {
-private:
-    glm::vec3 playerPos;
-
 public:
-    PlayerClass(std::string path, glm::vec3 pos) : ModelClass(path),playerPos(pos) {}
+    glm::vec3 playerPos;
+    glm::vec3 playerRot;
 
-    void draw(GLuint shaderProgram, float scale, float rot_x, float rot_y, float rot_z) {
+    PlayerClass(std::string path, glm::vec3 pos, glm::vec3 rot) :
+        ModelClass(path),
+            playerPos(pos),
+            playerRot(rot) {}
+
+    void draw(GLuint shaderProgram, float scale) {
         glUseProgram(shaderProgram);
         glBindVertexArray(this->VAO);
 
         // Initialize transformation matrix, and assign position, scaling, and rotation
-        glm::mat4 transformationMatrix = glm::translate(glm::mat4(1.0f), this->playerPos);
+        glm::mat4 transformationMatrix = glm::translate(glm::mat4(1.0f),
+                                            this->playerPos);
+
+        // Scale
         transformationMatrix = glm::scale(transformationMatrix, glm::vec3(scale));
 
         // X axis rotation
         transformationMatrix = glm::rotate(transformationMatrix,
-                                    glm::radians(rot_x),
+                                    glm::radians(playerRot.x),
                                     glm::normalize(glm::vec3(1.0f, 0.0f, 0.0f)));
         // Y axis rotation
         transformationMatrix = glm::rotate(transformationMatrix,
-                                    glm::radians(rot_y),
+                                    glm::radians(playerRot.y),
                                     glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)));
         // Z axis rotation
         transformationMatrix = glm::rotate(transformationMatrix,
-                                    glm::radians(rot_z),
+                                    glm::radians(playerRot.z),
                                     glm::normalize(glm::vec3(0.0f, 0.0f, 1.0f)));
 
         // Initialize transformation location, and assign transformation
@@ -521,18 +529,8 @@ public:
         glDrawArrays(GL_TRIANGLES, 0, this->vertexData.size() / 5);
     }
 
-    glm::vec3 getPosition() {
-        return this->playerPos;
-    }
-
     float getDepth() {
         return this->playerPos.y;
-    }
-
-    void updatePosition(float X, float Y, float Z) {
-        this->playerPos.x = X;
-        this->playerPos.y = Y;
-        this->playerPos.z = Z;
     }
 };
 
