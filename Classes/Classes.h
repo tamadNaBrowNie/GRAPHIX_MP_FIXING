@@ -40,12 +40,15 @@ public:
         glAttachShader(this->shaderProgram, fragShader);
         glLinkProgram(this->shaderProgram);
     }
+
     void use() {
         glUseProgram(shaderProgram);
-     }
+    }
+
     GLuint getShader() {
         return this->shaderProgram;
     }
+
     GLint findUloc(const GLchar* src) {
         GLint unif = glGetUniformLocation(this->shaderProgram, src);
         std::cout << glGetError() << src<<'\n';
@@ -435,12 +438,19 @@ public:
         // Initialize transformation matrix, and assign position, scaling, and rotation
         glm::mat4 transformationMatrix = glm::translate(glm::mat4(1.0f), this->position);
         transformationMatrix = glm::scale(transformationMatrix, glm::vec3(scale));
+
         // X axis rotation
-        transformationMatrix = glm::rotate(transformationMatrix, glm::radians(rot_x), glm::normalize(glm::vec3(1.0f, 0.0f, 0.0f)));
+        transformationMatrix = glm::rotate(transformationMatrix,
+                                    glm::radians(rot_x),
+                                    glm::normalize(glm::vec3(1.0f, 0.0f, 0.0f)));
         // Y axis rotation
-        transformationMatrix = glm::rotate(transformationMatrix, glm::radians(rot_y), glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)));
+        transformationMatrix = glm::rotate(transformationMatrix,
+                                    glm::radians(rot_y),
+                                    glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)));
         // Z axis rotation
-        transformationMatrix = glm::rotate(transformationMatrix, glm::radians(rot_z), glm::normalize(glm::vec3(0.0f, 0.0f, 1.0f)));
+        transformationMatrix = glm::rotate(transformationMatrix,
+                                    glm::radians(rot_z),
+                                    glm::normalize(glm::vec3(0.0f, 0.0f, 1.0f)));
 
         // Initialize transformation location, and assign transformation
         unsigned int transformationLoc = glGetUniformLocation(shaderProgram, "transform");
@@ -477,12 +487,19 @@ public:
         // Initialize transformation matrix, and assign position, scaling, and rotation
         glm::mat4 transformationMatrix = glm::translate(glm::mat4(1.0f), this->playerPos);
         transformationMatrix = glm::scale(transformationMatrix, glm::vec3(scale));
+
         // X axis rotation
-        transformationMatrix = glm::rotate(transformationMatrix, glm::radians(rot_x), glm::normalize(glm::vec3(1.0f, 0.0f, 0.0f)));
+        transformationMatrix = glm::rotate(transformationMatrix,
+                                    glm::radians(rot_x),
+                                    glm::normalize(glm::vec3(1.0f, 0.0f, 0.0f)));
         // Y axis rotation
-        transformationMatrix = glm::rotate(transformationMatrix, glm::radians(rot_y), glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)));
+        transformationMatrix = glm::rotate(transformationMatrix,
+                                    glm::radians(rot_y),
+                                    glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)));
         // Z axis rotation
-        transformationMatrix = glm::rotate(transformationMatrix, glm::radians(rot_z), glm::normalize(glm::vec3(0.0f, 0.0f, 1.0f)));
+        transformationMatrix = glm::rotate(transformationMatrix,
+                                    glm::radians(rot_z),
+                                    glm::normalize(glm::vec3(0.0f, 0.0f, 1.0f)));
 
         // Initialize transformation location, and assign transformation
         unsigned int transformationLoc = glGetUniformLocation(shaderProgram, "transform");
@@ -518,6 +535,7 @@ public:
         this->playerPos.z = Z;
     }
 };
+
 /// <summary>
 /// builder classes allow you to chain methods. similar to java builder classes
 /// </summary>
@@ -536,42 +554,52 @@ public:
         specPhong(0), specStr(0),ambStr(0),lumens(0),ambRGB(glm::vec3(0)),
         ray(glm::vec3(0)),lightRGB(glm::vec3(0))
     {}
+
     lightBuilder(lightBuilder* lb):
         specPhong(lb->specPhong),specStr(lb->specStr),ambStr(lb->ambStr),lumens(lb->lumens),
         ambRGB(lb->ambRGB),ray(lb->ray),lightRGB(lb->lightRGB) 
     {}
+
     inline lightBuilder* setSpecStr(float str) {
         specStr = str;
         return this;
     }
+
     inline lightBuilder* setSpecPhong(float phong) {
         specPhong = phong;
         return this;
     }
+
     inline lightBuilder* setAmbStr(float str) {
         ambStr = str;
         return this;
     }
+
     inline lightBuilder* setLumens(float str) {
         lumens = str;
         return this;
     }
+
     inline lightBuilder* setAmbColor(glm::vec3* color) {
         ambRGB = *color;
         return this;
     }
+
     inline lightBuilder* setLightColor(glm::vec3* color) {
 
         lightRGB = *color;
         return this;
     }
+
     inline lightBuilder* setLightVec(glm::vec3* dir) {
         ray = *dir;
         return this;
     }
+
     inline void placeLight(GLint unif) {
         glUniform3fv(unif, 1, glm::value_ptr(ray));
     }
+
     virtual inline void setUnifs(GLint* uniforms) {
         glUniform1f(uniforms[0],specPhong);
   
@@ -589,5 +617,4 @@ public:
         
 
     }
-
 };

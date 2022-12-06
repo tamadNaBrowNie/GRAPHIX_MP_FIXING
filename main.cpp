@@ -479,8 +479,10 @@ int main(void)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glm::vec3 lightPos = playerSub.getPosition();
         lightPos.z -= 0.5;
+
         // -----------------------------------------------------------------
         // CAMERA USE
+
         ptLight->setLightVec(&lightPos)->placeLight(ptUnifs[6]);
         if (toggle_tps && !toggle_td) {
             tps_camera.setCameraPos(tps_cameraPos + glm::vec3(0.1f, 0.0f, 0.0f));   // Slight adjustments to align with playerSub
@@ -544,9 +546,12 @@ int main(void)
 
         // -----------------------------------------------------------------
         // RENDERING OBJECTS
+
         obj_shaderProgram.use();
         glUniform1i(hasBmp, GL_TRUE);
+
         std::cout << glGetError() << "true" << '\n';
+
         playerSub.draw(
             obj_shaderProgram.getShader(),  // Shader Program to use
             0.15f,                          // Scale
@@ -557,6 +562,7 @@ int main(void)
         glUniform1i(hasBmp, GL_FALSE);
 
         std::cout << "false" << glGetError() << '\n';
+
         donut.draw(
             obj_shaderProgram.getShader(),
             5.0f,
