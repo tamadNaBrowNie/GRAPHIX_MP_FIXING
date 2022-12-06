@@ -62,6 +62,7 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
         }
     }
 
+    // Submarine Forward/Backward Movement Controls
     if (key == GLFW_KEY_W) {
         if ((toggle_fps || toggle_tps) && !toggle_td) {
             moveZ -= 0.1f;
@@ -70,9 +71,7 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
             playerSub.updatePosition(moveX, moveY, moveZ);
         }
-    }
-
-    if (key == GLFW_KEY_S) {
+    } else if (key == GLFW_KEY_S) {
         if ((toggle_fps || toggle_tps) && !toggle_td) {
             moveZ += 0.1f;
             tps_cameraPos += glm::vec3(0.0f, 0.0f, 0.1f);
@@ -81,7 +80,8 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
             playerSub.updatePosition(moveX, moveY, moveZ);
         }
     }
-
+    
+    // Submarine Turn Left/Turn Right Movement Controls
     if (key == GLFW_KEY_A) {
         if ((toggle_fps || toggle_tps) && !toggle_td) {
             moveX -= 0.1f;
@@ -90,9 +90,7 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
             playerSub.updatePosition(moveX, moveY, moveZ);
         }
-    }
-
-    if (key == GLFW_KEY_D) {
+    } else if (key == GLFW_KEY_D) {
         if ((toggle_fps || toggle_tps) && !toggle_td) {
             moveX += 0.1f;
             tps_cameraPos += glm::vec3(0.1f, 0.0f, 0.0f);
@@ -102,6 +100,7 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
         }
     }
 
+    // Submarine Ascend/Descend Movement Controls
     if (key == GLFW_KEY_Q) {
         if ((toggle_fps || toggle_tps) && !toggle_td) {
             if (moveY + 0.1f <= 0) {
@@ -112,9 +111,7 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
                 playerSub.updatePosition(moveX, moveY, moveZ);
             }
         }
-    }
-
-    if (key == GLFW_KEY_E) {
+    } else if (key == GLFW_KEY_E) {
         if ((toggle_fps || toggle_tps) && !toggle_td) {
             moveY -= 0.1f;
             tps_cameraPos -= glm::vec3(0.0f, 0.1f, 0.0f);
@@ -122,6 +119,15 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
             playerSub.updatePosition(moveX, moveY, moveZ);
         }
+    }
+
+    /*
+     * Since the Program will be capturing the mouse, ensure
+     * that there is a way to conveniently close the program.
+     */
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS ||
+        glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, true);
     }
 }
 
