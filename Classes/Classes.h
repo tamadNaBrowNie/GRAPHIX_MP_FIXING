@@ -427,31 +427,36 @@ class EnemyClass : public ModelClass {
 public:
     glm::vec3 enemyPos;
     glm::vec3 enemyRot;
+    float enemyScale;
 
-    EnemyClass(std::string path, glm::vec3 pos, glm::vec3 rot) :
-        ModelClass(path),
-            enemyPos(pos),
-            enemyRot(rot) {}
+    EnemyClass(std::string path,
+        glm::vec3 pos,
+        glm::vec3 rot,
+        float scale) :
+            ModelClass(path),
+                enemyPos(pos),
+                enemyRot(rot),
+                enemyScale(scale) {}
 
-    void draw(GLuint shaderProgram, float scale) {
+    void draw(GLuint shaderProgram) {
         glUseProgram(shaderProgram);
         glBindVertexArray(this->VAO);
 
         // Initialize transformation matrix, and assign position, scaling, and rotation
         glm::mat4 transformationMatrix = glm::translate(glm::mat4(1.0f), this->enemyPos);
-        transformationMatrix = glm::scale(transformationMatrix, glm::vec3(scale));
+        transformationMatrix = glm::scale(transformationMatrix, glm::vec3(this->enemyScale));
 
         // X axis rotation
         transformationMatrix = glm::rotate(transformationMatrix,
-                                    glm::radians(enemyRot.x),
+                                    glm::radians(this->enemyRot.x),
                                     glm::normalize(glm::vec3(1.0f, 0.0f, 0.0f)));
         // Y axis rotation
         transformationMatrix = glm::rotate(transformationMatrix,
-                                    glm::radians(enemyRot.y),
+                                    glm::radians(this->enemyRot.y),
                                     glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)));
         // Z axis rotation
         transformationMatrix = glm::rotate(transformationMatrix,
-                                    glm::radians(enemyRot.z),
+                                    glm::radians(this->enemyRot.z),
                                     glm::normalize(glm::vec3(0.0f, 0.0f, 1.0f)));
 
         // Initialize transformation location, and assign transformation
@@ -479,13 +484,18 @@ class PlayerClass : public ModelClass {
 public:
     glm::vec3 playerPos;
     glm::vec3 playerRot;
+    float playerScale;
 
-    PlayerClass(std::string path, glm::vec3 pos, glm::vec3 rot) :
-        ModelClass(path),
-            playerPos(pos),
-            playerRot(rot) {}
+    PlayerClass(std::string path,
+        glm::vec3 pos,
+        glm::vec3 rot,
+        float scale) :
+            ModelClass(path),
+                playerPos(pos),
+                playerRot(rot),
+                playerScale(scale) {}
 
-    void draw(GLuint shaderProgram, float scale) {
+    void draw(GLuint shaderProgram) {
         glUseProgram(shaderProgram);
         glBindVertexArray(this->VAO);
 
@@ -494,19 +504,19 @@ public:
                                             this->playerPos);
 
         // Scale
-        transformationMatrix = glm::scale(transformationMatrix, glm::vec3(scale));
+        transformationMatrix = glm::scale(transformationMatrix, glm::vec3(this->playerScale));
 
         // X axis rotation
         transformationMatrix = glm::rotate(transformationMatrix,
-                                    glm::radians(playerRot.x),
+                                    glm::radians(this->playerRot.x),
                                     glm::normalize(glm::vec3(1.0f, 0.0f, 0.0f)));
         // Y axis rotation
         transformationMatrix = glm::rotate(transformationMatrix,
-                                    glm::radians(playerRot.y),
+                                    glm::radians(this->playerRot.y),
                                     glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)));
         // Z axis rotation
         transformationMatrix = glm::rotate(transformationMatrix,
-                                    glm::radians(playerRot.z),
+                                    glm::radians(this->playerRot.z),
                                     glm::normalize(glm::vec3(0.0f, 0.0f, 1.0f)));
 
         // Initialize transformation location, and assign transformation

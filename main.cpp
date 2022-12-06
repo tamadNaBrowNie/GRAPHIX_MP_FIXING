@@ -30,12 +30,12 @@ bool toggle_td = false;
 
 // Player positioning
 int face = 0;
-float rot_y = 90.0f;
 
 // Player object
 PlayerClass playerSub("3D/submarine/submarine.obj",
     glm::vec3(0.0f, 0.0f, 0.0f),
-    glm::vec3(0.0f, 90.0f, 0.0f));
+    glm::vec3(0.0f, 90.0f, 0.0f),
+    0.15f);
 
 void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -197,27 +197,33 @@ int main(void)
 
     EnemyClass donut("3D/donut/Donut.obj",
         glm::vec3(0.0f, -5.0f, -10.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f)
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        5.0f
     );
     EnemyClass sphere("3D/sphere/Sphere.obj",
         glm::vec3(0.0f, -8.0f, 0.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f)
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        5.0f
     );
     EnemyClass car("3D/car/PASSAT_OBJ.obj",
         glm::vec3(10.0f, -10.0f, -15.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f)
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        0.015f
     );
     EnemyClass chest("3D/chest/TreasureChestSimple.obj",
         glm::vec3(-10.0f, -15.0f, -5.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f)
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        0.01f
     );
     EnemyClass solaire("3D/solaire/SOLAIRE.obj",
         glm::vec3(5.0f, -10.0f, 5.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f)
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        0.1f
     );
     EnemyClass cube("3D/cube/DADO.obj",
         glm::vec3(15.0f, -3.0f, 10.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f)
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        0.5f
     );
     
     donut.loadObj();
@@ -229,10 +235,11 @@ int main(void)
 
     // -------------------------------------------------------
     // SETTING SKYBOX VERTICES AND INDICES
+    
     /*
-        These vertices and indices were taken from previous individual submissions
-        and class hands-on activities
-    */
+     *   These vertices and indices were taken from previous individual submissions
+     *   and class hands-on activities
+     */
     // Vertices for the cube
     float skyboxVertices[]{
         -1.f, -1.f, 1.f, 
@@ -565,43 +572,19 @@ int main(void)
         std::cout << glGetError() << "true" << '\n';
 
         playerSub.draw(
-            obj_shaderProgram.getShader(),  // Shader Program to use
-            0.15f);                         // Scale
+            obj_shaderProgram.getShader()   // Shader Program to use
+        );
        
         glUniform1i(hasBmp, GL_FALSE);
 
         std::cout << "false" << glGetError() << '\n';
 
-        donut.draw(
-            obj_shaderProgram.getShader(),
-            5.0f
-        );
-
-        sphere.draw(
-            obj_shaderProgram.getShader(),
-            5.0f
-        );
-
-        car.draw(
-            obj_shaderProgram.getShader(),
-            0.015f
-        );
-
-
-        chest.draw(
-            obj_shaderProgram.getShader(),
-            0.01f
-        );
-
-        solaire.draw(
-            obj_shaderProgram.getShader(),
-            0.1f
-        );
-
-        cube.draw(
-            obj_shaderProgram.getShader(),
-            0.5f
-        );
+        donut.draw(obj_shaderProgram.getShader());
+        sphere.draw(obj_shaderProgram.getShader());
+        car.draw(obj_shaderProgram.getShader());
+        chest.draw(obj_shaderProgram.getShader());
+        solaire.draw(obj_shaderProgram.getShader());
+        cube.draw(obj_shaderProgram.getShader());
         
         // -----------------------------------------------------------------
 
