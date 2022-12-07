@@ -117,10 +117,13 @@ public:
     }
     void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
         // make 0.1 a constant
-        if(GLFW_KEY_W == key)
-            this->cameraPos.z -= 0.1f;
-        if (key == GLFW_KEY_S)
-            this->cameraPos.z += 0.1f;
+        if (GLFW_KEY_W == key) {
+            this->cameraPos -= glm::vec3(0.0f, 0.0f, 0.1f) + glm::vec3(0.1f, 0.0f, 0.0f);
+            this->cameraCenter -= glm::vec3(0.0f, 0.0f, 0.1f) + glm::vec3(0.1f, 0.0f, 0.0f);
+        }
+            
+        else if (key == GLFW_KEY_S)
+            this->cameraPos += glm::vec3(0.0f, 0.0f, 0.1f) + glm::vec3(0.1f, 0.0f, 0.0f);
     }
 };
 

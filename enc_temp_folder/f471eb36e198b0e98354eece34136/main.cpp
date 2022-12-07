@@ -77,28 +77,31 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 
     //use the virtual callback here
-
+    Handler* hand = (Handler*)glfwGetWindowUserPointer(window);
+    glfwSetWindowUserPointer(window, &mode);
+    hand->cam->kbCallBack(window, key, scancode, action, mods);
+    hand->player->kbCallBack(window, key, scancode, action, mods);
 
 
     // Submarine Forward/Backward Movement Controls
-    if (key == GLFW_KEY_W) {
-        if (mode != Mode::TD) {
-            playerSub.playerPos.z -= 0.1f;
+    //if (key == GLFW_KEY_W) {
+    //    if (mode != Mode::TD) {
+    //        playerSub.playerPos.z -= 0.1f;
 
-            tps_cameraPos -= glm::vec3(0.0f, 0.0f, 0.1f);
-            fps_cameraPos -= glm::vec3(0.0f, 0.0f, 0.1f);
-        }
-    } else if (key == GLFW_KEY_S) {
-        if (mode != Mode::TD) {
-            playerSub.playerPos.z += 0.1f;
+    //        tps_cameraPos -= glm::vec3(0.0f, 0.0f, 0.1f);
+    //        fps_cameraPos -= glm::vec3(0.0f, 0.0f, 0.1f);
+    //    }
+    //} else if (key == GLFW_KEY_S) {
+    //    if (mode != Mode::TD) {
+    //        playerSub.playerPos.z += 0.1f;
 
-            tps_cameraPos += glm::vec3(0.0f, 0.0f, 0.1f);
-            fps_cameraPos += glm::vec3(0.0f, 0.0f, 0.1f);
-        }
-    }
-    glm::vec3 pos = playerSub.playerPos;
-    pos.z -= OFFSET;
-    playerSub.bulb->setLightVec(&pos);
+    //        tps_cameraPos += glm::vec3(0.0f, 0.0f, 0.1f);
+    //        fps_cameraPos += glm::vec3(0.0f, 0.0f, 0.1f);
+    //    }
+    //}
+    //glm::vec3 pos = playerSub.playerPos;
+    //pos.z -= OFFSET;
+    //playerSub.bulb->setLightVec(&pos);
     
     // Submarine Turn Left/Turn Right Movement Controls
     //if (key == GLFW_KEY_A) {
