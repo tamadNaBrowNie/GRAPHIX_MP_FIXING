@@ -663,18 +663,43 @@ public:
     float getDepth() {
         return this->playerPos.y;
     }
-    void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    void forward() {
+        this->playerPos.z -= 0.1;
+    }
+    void back() {
+        this->playerPos.z += 0.1;
+    }
+    void up() {
+        playerPos.y += 0.1f;
+
+    }
+    void down() {
+        playerPos.y -= 0.1f;
+    }
+void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
         Mode* mode = (Mode*)glfwGetWindowUserPointer(window);
         if (*mode == Mode::TD) {
             return;
         }
-        if (key == GLFW_KEY_W)
-            this->playerPos.z -= 0.1;
-        if (key == GLFW_KEY_S)
-            this->playerPos.z += 0.1;
-        glm::vec3 pos = this->playerPos;
-        pos.z -= 0.7;
-        bulb->setLightVec(&pos);
+        this;
+
+            if (key == GLFW_KEY_W)
+                forward();
+            else if (key == GLFW_KEY_S)
+                back();
+            if (key == GLFW_KEY_Q)
+            {
+
+                if (playerPos.y + 0.1f <= 0) {
+                    up();
+                }
+            }
+            else if (key == GLFW_KEY_E) down();
+
+
+
+        
+        
     }
 };
 /// handler class holds pointers for classes that need to use callbacks
