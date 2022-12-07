@@ -116,14 +116,37 @@ public:
         this->projectionMatrix = glm::perspective(glm::radians(fov), width / height, 0.1f, 100.0f);
     }
     void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
+
+
+        
         // make 0.1 a constant
-        if (GLFW_KEY_W == key) {
-            this->cameraPos -= glm::vec3(0.0f, 0.0f, 0.1f) + glm::vec3(0.1f, 0.0f, 0.0f);
-            this->cameraCenter -= glm::vec3(0.0f, 0.0f, 0.1f) + glm::vec3(0.1f, 0.0f, 0.0f);
+        if (GLFW_KEY_W == key ) {
+
+                this->cameraPos.z -= 0.1f;
+                this->cameraCenter.z -= 0.1f;
+
+            
+            //this->cameraPos.x += 0.1f;
         }
             
-        else if (key == GLFW_KEY_S)
-            this->cameraPos += glm::vec3(0.0f, 0.0f, 0.1f) + glm::vec3(0.1f, 0.0f, 0.0f);
+        else if (key == GLFW_KEY_S )
+        {
+            this->cameraPos.z += 0.1f;
+            this->cameraCenter.z += 0.1f;
+            //this->cameraPos.x += 0.1f;
+        }
+
+        if (key == GLFW_KEY_Q) {
+            if (this->cameraPos.y <= 0) {
+                this->cameraPos.y += 0.1f;
+                this->cameraCenter.y += 0.1f;
+            }
+        }
+        else if (key == GLFW_KEY_E) {
+            this->cameraPos.y -= 0.1f;
+            this->cameraCenter.y -= 0.1f;
+        }
+
     }
 };
 
@@ -687,14 +710,14 @@ void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods)
                 forward();
             else if (key == GLFW_KEY_S)
                 back();
-            if (key == GLFW_KEY_Q)
+            if (key ==GLFW_KEY_Q)
             {
 
                 if (playerPos.y + 0.1f <= 0) {
                     up();
                 }
             }
-            else if (key == GLFW_KEY_E) down();
+            else if (key ==  GLFW_KEY_E) down();
 
 
 
