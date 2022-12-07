@@ -96,9 +96,7 @@ public:
     glm::mat4 getViewMatrix() {
         return this->viewMatrix;
     }
-    virtual void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
-        std::cout << "error: inaccessible function was accessed \n";
-    };
+    virtual void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) = 0;
 };
 
 class OrthoCamera : public MyCamera {
@@ -118,7 +116,16 @@ public:
         this->projectionMatrix = glm::perspective(glm::radians(fov), width / height, 0.1f, 100.0f);
     }
     void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
-        Mode* mode = (Mode*)glfwGetWindowUserPointer(window);
+        Mode state = *(Mode*)glfwGetWindowUserPointer(window);
+        switch (state)
+        {
+        case Mode::TPS:
+            break;
+        case Mode::FPS:
+            break;
+        default:
+            break;
+        }
 
     }
 };

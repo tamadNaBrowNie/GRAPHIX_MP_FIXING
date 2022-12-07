@@ -7,7 +7,7 @@
 // Screen width and height
 float screenWidth = 1000.0f;
 float screenHeight = 1000.0f;
-Mode mode = Mode::TPS;
+
 // Camera Positioning
 OrthoCamera td_camera;
 PerspectiveCamera tps_camera;
@@ -38,40 +38,53 @@ PlayerClass playerSub("3D/submarine/submarine.obj",
     glm::vec3(0.0f, 90.0f, 0.0f),
     0.15f);
 
+
+Mode mode;
+Mode pre;
+
+
 void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     // Toggle TPS and FPS Camera
     if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
-        if (toggle_tps && !toggle_td) {
-            toggle_tps = false;
-            toggle_fps = true;
+        switch (mode)
+        {
+        case Mode::TPS:           
+            mode = Mode::FPS;
+            break;
+        case Mode::FPS: 
+            mode = Mode::TPS;
+            break;
         }
-        else if (toggle_fps && !toggle_td) {
-            toggle_fps = false;
-            toggle_tps = true;
-        }
+        //if (toggle_tps && !toggle_td) {
+
+        //}
+        //else if (toggle_fps && !toggle_td) {
+        //   
+        //}
     }
 
     // Toggle TD Camera
     if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
-        if (toggle_td) {
-            toggle_td = false;
+        if (mode != Mode::TD) {
+            pre = mode;
+            mode = Mode::TD;
         }
         else {
-            toggle_td = true;
+            mode = pre;
         }
     }
 
     // Submarine Forward/Backward Movement Controls
     if (key == GLFW_KEY_W) {
-        if ((toggle_fps || toggle_tps) && !toggle_td) {
+        if (mode != Mode::TD) {
             playerSub.playerPos.z -= 0.1f;
 
             tps_cameraPos -= glm::vec3(0.0f, 0.0f, 0.1f);
             fps_cameraPos -= glm::vec3(0.0f, 0.0f, 0.1f);
         }
     } else if (key == GLFW_KEY_S) {
-        if ((toggle_fps || toggle_tps) && !toggle_td) {
+        if (mode != Mode::TD) {
             playerSub.playerPos.z += 0.1f;
 
             tps_cameraPos += glm::vec3(0.0f, 0.0f, 0.1f);
@@ -103,16 +116,14 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
     // Submarine Ascend/Descend Movement Controls
     if (key == GLFW_KEY_Q) {
-        if ((toggle_fps || toggle_tps) && !toggle_td) {
-            if (playerSub.playerPos.y + 0.1f <= 0) {
+        if (mode != Mode::TD && playerSub.playerPos.y + 0.1f <= 0) {  
                 playerSub.playerPos.y += 0.1f; 
 
                 tps_cameraPos += glm::vec3(0.0f, 0.1f, 0.0f);
                 fps_cameraPos += glm::vec3(0.0f, 0.1f, 0.0f);
-            }
         }
     } else if (key == GLFW_KEY_E) {
-        if ((toggle_fps || toggle_tps) && !toggle_td) {
+        if (mode != Mode::TD) {
             playerSub.playerPos.y -= 0.1f;
 
             tps_cameraPos -= glm::vec3(0.0f, 0.1f, 0.0f);
