@@ -116,17 +116,11 @@ public:
         this->projectionMatrix = glm::perspective(glm::radians(fov), width / height, 0.1f, 100.0f);
     }
     void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
-        Mode state = *(Mode*)glfwGetWindowUserPointer(window);
-        switch (state)
-        {
-        case Mode::TPS:
-            break;
-        case Mode::FPS:
-            break;
-        default:
-            break;
-        }
-
+        // make 0.1 a constant
+        if(GLFW_KEY_W == key)
+            this->cameraPos.z -= 0.1f;
+        if (key == GLFW_KEY_S)
+            this->cameraPos.z += 0.1f;
     }
 };
 
@@ -666,5 +660,23 @@ public:
     float getDepth() {
         return this->playerPos.y;
     }
+    void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
+        Mode* mode = (Mode*)glfwGetWindowUserPointer(window);
+        if (*mode == Mode::TD) {
+            return;
+        }
+        if (key == GLFW_KEY_W)
+            this->playerPos.z -= 0.1;
+        if (key == GLFW_KEY_S)
+            this->playerPos.z += 0.1;
+        glm::vec3 pos = this->playerPos;
+        pos.z -= 0.7;
+        bulb->setLightVec(&pos);
+    }
 };
-
+/// handler class holds pointers for classes that need to use callbacks
+class Handler {
+public:
+    PlayerClass* player;
+    MyCamera* cam;
+};

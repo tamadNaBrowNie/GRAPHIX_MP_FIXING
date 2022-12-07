@@ -75,25 +75,33 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
         }
     }
 
+
+    //use the virtual callback here
+    Handler* hand = (Handler*)glfwGetWindowUserPointer(window);
+    glfwSetWindowUserPointer(window, &mode);
+    hand->cam->kbCallBack(window, key, scancode, action, mods);
+    hand->player->kbCallBack(window, key, scancode, action, mods);
+
+
     // Submarine Forward/Backward Movement Controls
-    if (key == GLFW_KEY_W) {
-        if (mode != Mode::TD) {
-            playerSub.playerPos.z -= 0.1f;
+    //if (key == GLFW_KEY_W) {
+    //    if (mode != Mode::TD) {
+    //        playerSub.playerPos.z -= 0.1f;
 
-            tps_cameraPos -= glm::vec3(0.0f, 0.0f, 0.1f);
-            fps_cameraPos -= glm::vec3(0.0f, 0.0f, 0.1f);
-        }
-    } else if (key == GLFW_KEY_S) {
-        if (mode != Mode::TD) {
-            playerSub.playerPos.z += 0.1f;
+    //        tps_cameraPos -= glm::vec3(0.0f, 0.0f, 0.1f);
+    //        fps_cameraPos -= glm::vec3(0.0f, 0.0f, 0.1f);
+    //    }
+    //} else if (key == GLFW_KEY_S) {
+    //    if (mode != Mode::TD) {
+    //        playerSub.playerPos.z += 0.1f;
 
-            tps_cameraPos += glm::vec3(0.0f, 0.0f, 0.1f);
-            fps_cameraPos += glm::vec3(0.0f, 0.0f, 0.1f);
-        }
-    }
-    glm::vec3 pos = playerSub.playerPos;
-    pos.z -= OFFSET;
-    playerSub.bulb->setLightVec(&pos);
+    //        tps_cameraPos += glm::vec3(0.0f, 0.0f, 0.1f);
+    //        fps_cameraPos += glm::vec3(0.0f, 0.0f, 0.1f);
+    //    }
+    //}
+    //glm::vec3 pos = playerSub.playerPos;
+    //pos.z -= OFFSET;
+    //playerSub.bulb->setLightVec(&pos);
     
     // Submarine Turn Left/Turn Right Movement Controls
     //if (key == GLFW_KEY_A) {
@@ -135,8 +143,8 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
      * Since the Program will be capturing the mouse, ensure
      * that there is a way to conveniently close the program.
      */
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS ||
-        glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
+    if (key == GLFW_KEY_ESCAPE ||
+        key == GLFW_KEY_ENTER) {
         glfwSetWindowShouldClose(window, true);
     }
 }
@@ -496,18 +504,23 @@ int main(void)
         playerSub.placeUnifs(ptUnifs);
     GLint hasBmp = obj_shaderProgram.findUloc("hasBmp");
     GLint eyePos = obj_shaderProgram.findUloc("eyePos");
-
+    GLint projectionLoc = obj_shaderProgram.findUloc("projection");
+    GLint viewLoc = obj_shaderProgram.findUloc("view");
+    Handler hand;
+    hand.player = &playerSub;
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
         playerSub.placeLight(ptUnifs[6]);
 
         // -----------------------------------------------------------------
         // CAMERA USE
-
-        if (toggle_tps && !toggle_td) {
+        switch (mode)
+        {
+        case Mode::TPS:
             tps_camera.setCameraPos(tps_cameraPos + glm::vec3(0.1f, 0.0f, 0.0f));   // Slight adjustments to align with playerSub
             tps_camera.setCameraCenter(playerSub.playerPos + glm::vec3(0.1f, 0.0f, 0.0f));
             tps_camera.setWorldUp(worldUp);
@@ -515,10 +528,10 @@ int main(void)
             tps_camera.setProjection(60.0f, screenWidth, screenHeight);
             projectionMatrix = tps_camera.getProjectionMatrix();
             viewMatrix = tps_camera.getViewMatrix();
-            glUniform3fv(eyePos, 1,glm::value_ptr(tps_camera.getCameraPos()));
-            std::cout << "cam" << glGetError() << '\n';
-        }
-        else if (toggle_fps && !toggle_td) {
+            glUniform3fv(eyePos, 1, glm::value_ptr(tps_camera.getCameraPos()));
+            hand.cam = &tps_camera;
+            break;
+        case Mode::FPS:
             fps_camera.setCameraPos(fps_cameraPos - glm::vec3(0.1f, 0.0f, 1.0f));   // Slight adjustments to align with playerSub
             fps_camera.setCameraCenter(playerSub.playerPos - glm::vec3(0.0f, 0.0f, 5.0f));
             fps_camera.setWorldUp(worldUp);
@@ -526,14 +539,26 @@ int main(void)
             fps_camera.setProjection(100.0f, screenWidth, screenHeight);
             projectionMatrix = fps_camera.getProjectionMatrix();
             viewMatrix = fps_camera.getViewMatrix();
+            hand.cam = &fps_camera;
+            break;
+        case Mode::TD:
+            hand.cam = &td_camera;
+            break;
+        default:
+            break;
         }
-        else if (toggle_td) {
-            // TODO: Implement Orthographic top-down camera
-        }
+        glfwSetWindowUserPointer(window, &hand);
+        //if (toggle_tps && !toggle_td) {
+        //  
+        //}
+        //else if (toggle_fps && !toggle_td) {
+        // 
+        //}
+        //else if (toggle_td) {
+        //    // TODO: Implement Orthographic top-down camera
+        //}
 
-        unsigned int projectionLoc = glGetUniformLocation(obj_shaderProgram.getShader(), "projection");
-        unsigned int viewLoc = glGetUniformLocation(obj_shaderProgram.getShader(), "view");
-        
+
         glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(viewMatrix));
         
