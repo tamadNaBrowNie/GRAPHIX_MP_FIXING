@@ -15,7 +15,7 @@ PerspectiveCamera fps_camera;
 
 glm::vec3 tps_cameraPos = glm::vec3(0.0f, 0.0f, 1.0f);
 glm::vec3 fps_cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
-glm::vec3 td_cameraPos = glm::vec3(0.0f, 1.f, 0.0f);
+glm::vec3 td_cameraPos = glm::vec3(0.0f, 3.f, 0.0f);
 const glm::vec3 worldUp = glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f));
 
 // Camera Rotation (yaw and pitch)
@@ -23,11 +23,6 @@ bool    firstMouse = true;
 float   lastX = 500.0f, lastY = 500.0f,
 yaw = -90.0f, pitch = 0.0f,
 sensitivity = 0.1f;
-
-// Camera Toggle
-bool toggle_tps = true;
-bool toggle_fps = false;
-bool toggle_td = false;
 
 // Player positioning
 int face = 0;
@@ -40,7 +35,7 @@ PlayerClass playerSub("3D/submarine/submarine.obj",
 
 
 Mode mode;
-Mode pre;
+
 
 
 void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -58,11 +53,11 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
     if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
         if (mode != Mode::TD) {
-            pre = hand->cam->getMode();;
+            
             mode = Mode::TD;
         }
         else {
-            mode = pre;
+            mode = mode = hand->cam->getMode();;
         }
     }
     if (mode != Mode::TD)
@@ -124,10 +119,9 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
     //        playerSub.updatePosition(moveX, moveY, moveZ);
     //    }
     //}
-    glm::vec3 pos = playerSub.playerPos;
-    pos.z -= OFFSET;
-    playerSub.bulb->setLightVec(&pos);
-
+    //glm::vec3 pos = playerSub.playerPos;
+    //pos.z -= OFFSET;
+    //playerSub.bulb->setLightVec(&pos);
 
     /*
      * Since the Program will be capturing the mouse, ensure
@@ -184,7 +178,7 @@ void Mouse_Callback(GLFWwindow* window, double xpos, double ypos)
         (sin(glm::radians(yaw)) * cos(glm::radians(pitch)))
     );
 
-    tps_camera.setCameraPos(playerSub.playerPos - glm::normalize(direction));
+    tps_cameraPos = playerSub.playerPos - glm::normalize(direction);
 }
 
 int main(void)
@@ -473,13 +467,13 @@ int main(void)
     };
 
     lightBuilder* dir = new lightBuilder();
-    dir->setAmbColor(new glm::vec3(0.2, 0.5, 0.9))
+    dir->setAmbColor(new glm::vec3(0.2, 0.5, 0.0))
         ->setAmbStr(0.5)
         ->setLumens(1)
         ->setSpecPhong(10 ^ 1)
         ->setSpecStr(10)
         ->setLightVec(new glm::vec3(0, -1, 0))
-        ->setLightColor(new glm::vec3(0, 0, 0.2))
+        ->setLightColor(new glm::vec3(0, 0, 0.5))
         ->placeUnifs(dirUnifs);
 
     GLint ptUnifs[7]{
@@ -514,7 +508,7 @@ obj_shaderProgram.findUloc("pt_src")
     td_camera.setCameraPos(td_cameraPos);
     td_camera.setCameraCenter(glm::vec3(0));
     td_camera.setWorldUp(glm::vec3(0,0,1));
-    td_camera.setProjection(-1.f, 1.f, -1.0f, 1.0f, -1.0f, 1.0f);
+    td_camera.setProjection(-1.f, 1.f, -1.0f, 1.0f, -4.0f, 4.0f);
     td_camera.setView();
     while (!glfwWindowShouldClose(window))
     {
@@ -528,7 +522,7 @@ obj_shaderProgram.findUloc("pt_src")
         switch (mode)
         {
         case Mode::TPS:
-            tps_camera.setCameraPos(playerSub.playerPos - glm::vec3(0, 0.0f, 0.1));
+            tps_camera.setCameraPos(tps_cameraPos - glm::vec3(0, 0.0f, 0.1));
             tps_camera.setCameraCenter(playerSub.playerPos + glm::vec3(0.1f, 0.0f, 0.0f));
             tps_camera.setView();
 
@@ -539,11 +533,11 @@ obj_shaderProgram.findUloc("pt_src")
             break;
         case Mode::FPS:
 
-            tps_camera.setCameraPos(playerSub.playerPos - glm::vec3(0.f, 0.0f, 1.0f));
-            tps_camera.setCameraCenter(playerSub.playerPos - glm::vec3(0.f, 0.0f, 5.0f));
-            tps_camera.setView();
+            fps_camera.setCameraPos(playerSub.playerPos - glm::vec3(0.f, 0.0f, 1.0f));
+            fps_camera.setCameraCenter(playerSub.playerPos - glm::vec3(0.f, 0.0f, 2.0f));
+            fps_camera.setView();
             projectionMatrix = fps_camera.getProjectionMatrix();
-            viewMatrix = tps_camera.getViewMatrix();
+            viewMatrix = fps_camera.getViewMatrix();
             glUniform3fv(eyePos, 1, glm::value_ptr(tps_camera.getCameraPos()));
             hand->cam = &tps_camera;
             break;

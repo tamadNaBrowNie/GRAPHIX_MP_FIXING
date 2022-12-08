@@ -730,7 +730,9 @@ void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods)
             if (key == GLFW_KEY_Q && playerPos.y + 0.1f <= 0)up();
             else if (key == GLFW_KEY_E) down();
             if (key == GLFW_KEY_A) this->transformationMatrix = glm::rotate(this->transformationMatrix,glm::radians(90.f),glm::vec3(1,1,0));
-
+            glm::vec3 pos =playerPos;
+            pos.z -= OFFSET;
+            bulb->setLightVec(&pos);
         
     }
 };
