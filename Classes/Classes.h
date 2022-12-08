@@ -589,7 +589,7 @@ public:
     glm::vec3 playerRot;
     float playerScale;
     lightBuilder* bulb;
-
+    glm::mat4 transformationMatrix;
     inline PlayerClass(std::string path,
         glm::vec3 pos,
         glm::vec3 rot,
@@ -597,7 +597,7 @@ public:
             ModelClass(path),
                 playerPos(pos),
                 playerRot(rot),
-                playerScale(scale),bulb(new lightBuilder()) {
+                playerScale(scale),bulb(new lightBuilder()), transformationMatrix(glm::mat4(1.0)) {
         glm::vec3 src = pos;
         src.z -= 0.7;
         bulb
@@ -621,7 +621,7 @@ public:
         glBindVertexArray(this->VAO);
 
         // Initialize transformation matrix, and assign position, scaling, and rotation
-        glm::mat4 transformationMatrix = glm::translate(glm::mat4(1.0f),
+        transformationMatrix = glm::translate(glm::mat4(1.0f),
                                             this->playerPos);
 
         // Scale
@@ -683,20 +683,12 @@ void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods)
         }
         this;
 
-            if (key == GLFW_KEY_W)
-                forward();
-            else if (key == GLFW_KEY_S)
-                back();
-            if (key == GLFW_KEY_Q)
-            {
-
-                if (playerPos.y + 0.1f <= 0) {
-                    up();
-                }
-            }
+            if (key == GLFW_KEY_W)forward();
+            else if (key == GLFW_KEY_S)back();
+            if (key == GLFW_KEY_Q && playerPos.y + 0.1f <= 0)up();
             else if (key == GLFW_KEY_E) down();
-
-
+            if (key == GLFW_KEY_A) this->transformationMatrix = glm::rotate(this->transformationMatrix,glm::radians(90.f),glm::vec3(1,1,0));
+            
 
         
         

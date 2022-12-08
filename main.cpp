@@ -76,7 +76,7 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
         }
     }
     glfwSetWindowUserPointer(window, &mode);
-    //hand->cam->kbCallBack(window, key, scancode, action, mods);
+    hand->cam->kbCallBack(window, key, scancode, action, mods);
    // hand->player->kbCallBack(window, key, scancode, action, mods);
 
     //use the virtual callback here
