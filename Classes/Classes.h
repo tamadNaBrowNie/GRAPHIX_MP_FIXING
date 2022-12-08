@@ -63,6 +63,7 @@ protected:
 	glm::vec3 worldUp;
 	glm::mat4 projectionMatrix;
 	glm::mat4 viewMatrix;
+	glm::vec3 dir;
 	Mode mode;
 public:
 	void setMode(Mode mode) {
@@ -82,7 +83,14 @@ public:
 	void setWorldUp(glm::vec3 w_Up) {
 		this->worldUp = w_Up;
 	}
+	void setDir() {
+		dir = glm::normalize(cameraPos - cameraCenter);
+	}
 
+	void setDir(glm::vec3* vecD) {
+		dir = *vecD;
+	}
+	glm::vec3 getDir() { return this->dir; }
 	void setView() {
 		this->viewMatrix = glm::lookAt(this->cameraPos, this->cameraCenter, this->worldUp);
 	}

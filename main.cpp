@@ -81,38 +81,40 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
      //Submarine Forward/Backward Movement Controls
 
-    if (key == GLFW_KEY_W) {
-        if (mode != Mode::TD) {
-            //playerSub.playerPos.z -= 0.1f;
-            //tps_cameraPos -= glm::vec3(0.0f, 0.0f, 0.1f);
-            tps_cameraPos.z -= 0.1f;
-            fps_cameraPos -= glm::vec3(0.0f, 0.0f, 0.1f);
-        }
-    } else if (key == GLFW_KEY_S) {
-        if (mode != Mode::TD) {
-            //playerSub.playerPos.z += 0.1f;
-            tps_cameraPos += glm::vec3(0.0f, 0.0f, 0.1f);
-            fps_cameraPos += glm::vec3(0.0f, 0.0f, 0.1f);
-        }
-    }
+    //if (key == GLFW_KEY_W) {
+    //    if (mode != Mode::TD) {
+    //        //playerSub.playerPos.z -= 0.1f;
+    //        //tps_cameraPos -= glm::vec3(0.0f, 0.0f, 0.1f);
+    //        tps_cameraPos.z -= 0.1f;
+    //        fps_cameraPos -= glm::vec3(0.0f, 0.0f, 0.1f);
+    //    }
+    //} else if (key == GLFW_KEY_S) {
+    //    if (mode != Mode::TD) {
+    //        //playerSub.playerPos.z += 0.1f;
+    //        tps_cameraPos += glm::vec3(0.0f, 0.0f, 0.1f);
+    //        fps_cameraPos += glm::vec3(0.0f, 0.0f, 0.1f);
+    //    }
+    //}
 
     // Submarine Ascend/Descend Movement Controls
-    if (key == GLFW_KEY_Q) {
-        if (mode != Mode::TD && playerSub.playerPos.y + 0.1f <= 0) {
-            //playerSub.playerPos.y += 0.1f;
+    //if (key == GLFW_KEY_Q) {
+    //    if (mode != Mode::TD && playerSub.playerPos.y + 0.1f <= 0) {
+    //        //playerSub.playerPos.y += 0.1f;
 
-            tps_cameraPos += glm::vec3(0.0f, 0.1f, 0.0f);
-            fps_cameraPos += glm::vec3(0.0f, 0.1f, 0.0f);
-        }
-    }
-    else if (key == GLFW_KEY_E) {
-        if (mode != Mode::TD) {
-            //playerSub.playerPos.y -= 0.1f;
+    //        tps_cameraPos += glm::vec3(0.0f, 0.1f, 0.0f);
+    //        fps_cameraPos += glm::vec3(0.0f, 0.1f, 0.0f);
+    //    }
+    //}
+    //else if (key == GLFW_KEY_E) {
+    //    if (mode != Mode::TD) {
+    //        //playerSub.playerPos.y -= 0.1f;
 
-            tps_cameraPos -= glm::vec3(0.0f, 0.1f, 0.0f);
-            fps_cameraPos -= glm::vec3(0.0f, 0.1f, 0.0f);
-        }
-    }
+    //        tps_cameraPos -= glm::vec3(0.0f, 0.1f, 0.0f);
+    //        fps_cameraPos -= glm::vec3(0.0f, 0.1f, 0.0f);
+    //    }
+    //}
+    tps_camera.setCameraCenter(playerSub.playerPos + glm::vec3(0.1f, 0.0f, 0.0f));
+    tps_cameraPos = tps_camera.getCameraCenter() + tps_camera.getDir();
      //Submarine Turn Left/Turn Right Movement Controls
     /*if (key == GLFW_KEY_A) {
         if ((toggle_fps || toggle_tps) && !toggle_td) {
@@ -190,7 +192,8 @@ void Mouse_Callback(GLFWwindow* window, double xpos, double ypos)
         (sin(glm::radians(yaw)) * cos(glm::radians(pitch)))
     );
 
-    tps_cameraPos = playerSub.playerPos - glm::normalize(direction);
+    tps_camera.setDir(new glm::vec3(-glm::normalize(direction)));
+    tps_cameraPos = tps_camera.getCameraCenter()+tps_camera.getDir();
 }
 
 int main(void)
@@ -521,6 +524,9 @@ obj_shaderProgram.findUloc("pt_src")
     td_camera.setWorldUp(glm::vec3(0,0,1));
     td_camera.setProjection(-1.f, 1.f, -1.0f, 1.0f, -4.0f, 4.0f);
     td_camera.setView();
+    tps_camera.setDir();
+    fps_camera.setDir();
+    td_camera.setDir();
     while (!glfwWindowShouldClose(window))
     {
         /* Render here */
