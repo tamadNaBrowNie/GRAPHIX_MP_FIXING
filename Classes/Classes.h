@@ -211,7 +211,10 @@ protected:
 	GLuint VAO, VBO;
 
 public:
-	ModelClass(std::string path) : objPath(path) {}
+    ModelClass(std::string path) :
+        objPath(path),
+        VAO(NULL),
+        VBO(NULL) {}
 
 	void loadObj() {
 		// Loading .obj file
