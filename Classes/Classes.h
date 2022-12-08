@@ -308,6 +308,7 @@ public:
 
             // ---------------------------------------------------
             // TANGENTS
+
             this->vertexData.push_back(
                 tangents[i].x
             );
@@ -320,6 +321,7 @@ public:
 
             // ---------------------------------------------------
             // BITANGENTS
+
             this->vertexData.push_back(
                 bitangents[i].x
             );

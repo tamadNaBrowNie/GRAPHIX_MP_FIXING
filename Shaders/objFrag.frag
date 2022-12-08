@@ -2,9 +2,11 @@
 #define MIN 5
 
 in vec3 fragPos;
+
 uniform sampler2D tex0;
 uniform sampler2D norm_tex;
 uniform vec3 eyePos;
+
 void attenuate(out float val, in float dist){
 	//calculating attenuation modifier along with safeguards to prevent math error
 	if(abs(dist)==0)
@@ -73,7 +75,9 @@ float spec = pow(max (dot (reflection,viewDir),0),pt_phong);
 bulb = val*(pt_lumens+pt_amb_str+spec+diff)*(pt_amb_col*pt_color);
 
 }
+
 uniform bool hasBmp;
+in mat3 TBN;
 in vec2 texCoord;
 in vec3 normCoord;
 
@@ -83,6 +87,9 @@ void main(){
 	vec4 pixelColor = texture(tex0, texCoord);
 	
 	vec3 normal = texture(norm_tex, texCoord).rgb;
+	normal = normalize(normal * 2.0 - 1.0);
+	normal = normalize(TBN * normal); 
+
 	vec3 norms = normCoord;
 	vec3 sun;
 		//norms = (normal-1)*2;
