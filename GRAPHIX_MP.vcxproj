@@ -143,45 +143,6 @@
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="tiny_obj_loader.h" />
   </ItemGroup>
-  <ItemGroup>
-    <CopyFileToFolders Include="Shaders\skybox.frag">
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
-      <FileType>Document</FileType>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
-      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)Shaders</DestinationFolders>
-      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)Shaders</DestinationFolders>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="Shaders\skybox.vert">
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
-      <FileType>Document</FileType>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
-      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)Shaders</DestinationFolders>
-      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)Shaders</DestinationFolders>
-    </CopyFileToFolders>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Shaders\objFrag.frag" />
-    <None Include="Shaders\objVert.vert" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="3D\enemy_submarine\enemy_sub_1.png" />
-    <Image Include="3D\enemy_submarine\enemy_sub_2.png" />
-    <Image Include="3D\enemy_submarine\enemy_sub_3.png" />
-    <Image Include="3D\enemy_submarine\enemy_sub_4.jpg" />
-    <Image Include="3D\enemy_submarine\enemy_sub_5.png" />
-    <Image Include="3D\enemy_submarine\enemy_sub_6.jpg" />
-    <Image Include="3D\submarine\submarine_submarine_BaseColor.png" />
-    <Image Include="3D\submarine\submarine_submarine_Normal.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Object Include="3D\enemy_submarine\enemy_sub_1.obj" />
-    <Object Include="3D\enemy_submarine\enemy_sub_2.obj" />
-    <Object Include="3D\enemy_submarine\enemy_sub_3.obj" />
-    <Object Include="3D\enemy_submarine\enemy_sub_4.obj" />
-    <Object Include="3D\enemy_submarine\enemy_sub_5.obj" />
-    <Object Include="3D\enemy_submarine\enemy_sub_6.obj" />
-    <Object Include="3D\submarine\submarine.obj" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -45,7 +45,7 @@ void dirLight(out vec3 sun, in vec3 normals){
 			spec *= dir_spec_str;
 	
 	
-	sun = (dir_lumens+dir_amb_str+spec+diff)*(dir_amb_col+dir_color);
+	sun = dir_lumens*(dir_amb_str+spec+diff)*(dir_amb_col+dir_color);
 }
 
 
@@ -72,7 +72,7 @@ float diff = max(dot(norm,dir),0.f);
 float spec = pow(max (dot (reflection,viewDir),0),pt_phong);
 		spec*=pt_spec_str;
 
-bulb = val*(pt_lumens+pt_amb_str+spec+diff)*(pt_amb_col*pt_color);
+bulb = val*pt_lumens*(pt_amb_str+spec+diff)*(pt_amb_col*pt_color);
 
 }
 

@@ -90,69 +90,22 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
     if (mode != Mode::TD)
     {
         hand->player->kbCallBack(window, key, scancode, action, mods);
-        tps_camera.setCameraCenter(playerSub.playerPos + glm::vec3(0.1f, 0.0f, 0.0f));
-        tps_cameraPos = tps_camera.getCameraCenter() + tps_camera.getDir();
+        switch (mode)
+        {
+        case Mode::TPS:
+            hand->cam->setCameraCenter(playerSub.playerPos + glm::vec3(0.1f, 0.0f, 0.0f));
+            break;
+        case Mode::FPS:
+            hand->cam->setCameraCenter(playerSub.playerPos + glm::vec3(0.0f, 0.0f, 5.0f));
+            break;
+        case Mode::TD:
+            break;
+        default:
+            break;
+        }
+        //I am tearing my hair out. will virtualize this shit again
+        hand->cam->movePos();
     }
-    //use the virtual callback here
-
-
-
-     //Submarine Forward/Backward Movement Controls
-
-    //if (key == GLFW_KEY_W) {
-    //    if (mode != Mode::TD) {
-    //        //playerSub.playerPos.z -= 0.1f;
-    //        //tps_cameraPos -= glm::vec3(0.0f, 0.0f, 0.1f);
-    //        tps_cameraPos.z -= 0.1f;
-    //        fps_cameraPos -= glm::vec3(0.0f, 0.0f, 0.1f);
-    //    }
-    //} else if (key == GLFW_KEY_S) {
-    //    if (mode != Mode::TD) {
-    //        //playerSub.playerPos.z += 0.1f;
-    //        tps_cameraPos += glm::vec3(0.0f, 0.0f, 0.1f);
-    //        fps_cameraPos += glm::vec3(0.0f, 0.0f, 0.1f);
-    //    }
-    //}
-
-    // Submarine Ascend/Descend Movement Controls
-    //if (key == GLFW_KEY_Q) {
-    //    if (mode != Mode::TD && playerSub.playerPos.y + 0.1f <= 0) {
-    //        //playerSub.playerPos.y += 0.1f;
-
-    //        tps_cameraPos += glm::vec3(0.0f, 0.1f, 0.0f);
-    //        fps_cameraPos += glm::vec3(0.0f, 0.1f, 0.0f);
-    //    }
-    //}
-    //else if (key == GLFW_KEY_E) {
-    //    if (mode != Mode::TD) {
-    //        //playerSub.playerPos.y -= 0.1f;
-
-    //        tps_cameraPos -= glm::vec3(0.0f, 0.1f, 0.0f);
-    //        fps_cameraPos -= glm::vec3(0.0f, 0.1f, 0.0f);
-    //    }
-    //}
-
-     //Submarine Turn Left/Turn Right Movement Controls
-    /*if (key == GLFW_KEY_A) {
-        if ((toggle_fps || toggle_tps) && !toggle_td) {
-            moveX -= 0.1f;
-            tps_cameraPos -= glm::vec3(0.1f, 0.0f, 0.0f);
-            fps_cameraPos -= glm::vec3(0.1f, 0.0f, 0.0f);
-
-            playerSub.updatePosition(moveX, moveY, moveZ);
-        }
-    } else if (key == GLFW_KEY_D) {
-        if ((toggle_fps || toggle_tps) && !toggle_td) {
-            moveX += 0.1f;
-            tps_cameraPos += glm::vec3(0.1f, 0.0f, 0.0f);
-            fps_cameraPos += glm::vec3(0.1f, 0.0f, 0.0f);
-
-            playerSub.updatePosition(moveX, moveY, moveZ);
-        }
-    }*/
-    //glm::vec3 pos = playerSub.playerPos;
-    //pos.z -= OFFSET;
-    //playerSub.bulb->setLightVec(&pos);
 
     /*
     Handling exit keys
@@ -209,7 +162,7 @@ void Mouse_Callback(GLFWwindow* window, double xpos, double ypos)
     Updating the position of the camera.
     */
     tps_camera.setDir(new glm::vec3(glm::normalize(direction)));
-    tps_cameraPos = tps_camera.getCameraCenter()-tps_camera.getDir();
+    tps_camera.setCameraPos(tps_camera.getCameraCenter()-tps_camera.getDir());
 }
 
 int main(void)
@@ -493,13 +446,13 @@ int main(void)
     };
     //creatig point light pointing down
     lightBuilder* dir = new lightBuilder();
-    dir->setAmbColor(new glm::vec3(0.2, 0.5, 0.0))
+    dir->setAmbColor(new glm::vec3(0.6))
         ->setAmbStr(0.5)
         ->setLumens(1)
         ->setSpecPhong(10)
         ->setSpecStr(10)
         ->setLightVec(new glm::vec3(0, -1, 0))
-        ->setLightColor(new glm::vec3(0, 0, 1))
+        ->setLightColor(new glm::vec3(0, 0, 0.3))
         ->placeUnifs(dirUnifs);
 
     GLint ptUnifs[7]{
@@ -511,7 +464,7 @@ obj_shaderProgram.findUloc("pt_amb_col"),
 obj_shaderProgram.findUloc("pt_color"),
 obj_shaderProgram.findUloc("pt_src")
     };
-    playerSub.placeUnifs(ptUnifs);
+
 
     GLint hasBmp = obj_shaderProgram.findUloc("hasBmp");
     GLint eyePos = obj_shaderProgram.findUloc("eyePos");
@@ -539,7 +492,7 @@ obj_shaderProgram.findUloc("pt_src")
     td_camera.setCameraPos(td_cameraPos);
     td_camera.setCameraCenter(glm::vec3(0));
     td_camera.setWorldUp(glm::vec3(0,0,1));
-    td_camera.setProjection(-1.f, 1.f, -1.0f, 1.0f, -4.0f, 4.0f);
+    td_camera.setProjection(-0.1f, 1.f, -0.1f, 1.0f, -1.0f, 1.0f);
     td_camera.setView();
     tps_camera.setDir();
     fps_camera.setDir();
@@ -549,15 +502,15 @@ obj_shaderProgram.findUloc("pt_src")
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        playerSub.placeLight(ptUnifs[6]);
+        playerSub.placeUnifs(ptUnifs);
 
         // -----------------------------------------------------------------
         // CAMERA USE
         switch (mode)
         {
         case Mode::TPS:
-            tps_camera.setCameraPos(tps_cameraPos - glm::vec3(0, 0.0f, 0.1));
-            tps_camera.setCameraCenter(playerSub.playerPos + glm::vec3(0.1f, 0.0f, 0.0f));
+            //tps_camera.setCameraPos(tps_cameraPos - glm::vec3(0, 0.0f, 0.1));
+            //tps_camera.setCameraCenter(playerSub.playerPos + glm::vec3(0.1f, 0.0f, 0.0f));
             tps_camera.setView();
 
             projectionMatrix = tps_camera.getProjectionMatrix();
@@ -567,13 +520,13 @@ obj_shaderProgram.findUloc("pt_src")
             break;
         case Mode::FPS:
 
-            fps_camera.setCameraPos(playerSub.playerPos - glm::vec3(0.f, 0.0f, 1.0f));
-            fps_camera.setCameraCenter(playerSub.playerPos - glm::vec3(0.f, 0.0f, 2.0f));
+            //fps_camera.setCameraPos(playerSub.playerPos - glm::vec3(0.f, 0.0f, 1.0f));
+            //fps_camera.setCameraCenter(playerSub.playerPos - glm::vec3(0.f, 0.0f, 2.0f));
             fps_camera.setView();
             projectionMatrix = fps_camera.getProjectionMatrix();
             viewMatrix = fps_camera.getViewMatrix();
             glUniform3fv(eyePos, 1, glm::value_ptr(tps_camera.getCameraPos()));
-            hand->cam = &tps_camera;
+            hand->cam = &fps_camera;
             break;
         case Mode::TD:
             td_camera.setView();
