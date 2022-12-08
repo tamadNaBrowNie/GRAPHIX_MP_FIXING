@@ -677,7 +677,7 @@ public:
 		glBindVertexArray(this->VAO);
 
 		// Initialize transformation matrix, and assign position, scaling, and rotation
-		transformationMatrix = glm::translate(glm::mat4(1.0f),
+		transformationMatrix = glm::translate(glm::mat4(1),
 			this->playerPos);
 
 		// Scale
@@ -739,7 +739,8 @@ public:
 		else if (key == GLFW_KEY_S)back();
 		if (key == GLFW_KEY_Q && playerPos.y + 0.1f <= 0)up();
 		else if (key == GLFW_KEY_E) down();
-		if (key == GLFW_KEY_A) this->transformationMatrix = glm::rotate(this->transformationMatrix, glm::radians(90.f), glm::vec3(1, 1, 0));
+		if (key == GLFW_KEY_A) this->playerRot.y += 1;
+		if (key == GLFW_KEY_D) this->playerRot.y -= 1;
 		glm::vec3 pos = playerPos;
 		pos.z -= OFFSET;
 		bulb->setLightVec(&pos);
