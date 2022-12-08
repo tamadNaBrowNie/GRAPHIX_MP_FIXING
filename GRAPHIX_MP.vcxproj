@@ -163,6 +163,25 @@
     <None Include="Shaders\objFrag.frag" />
     <None Include="Shaders\objVert.vert" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="3D\enemy_submarine\enemy_sub_1.png" />
+    <Image Include="3D\enemy_submarine\enemy_sub_2.png" />
+    <Image Include="3D\enemy_submarine\enemy_sub_3.png" />
+    <Image Include="3D\enemy_submarine\enemy_sub_4.jpg" />
+    <Image Include="3D\enemy_submarine\enemy_sub_5.png" />
+    <Image Include="3D\enemy_submarine\enemy_sub_6.jpg" />
+    <Image Include="3D\submarine\submarine_submarine_BaseColor.png" />
+    <Image Include="3D\submarine\submarine_submarine_Normal.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="3D\enemy_submarine\enemy_sub_1.obj" />
+    <Object Include="3D\enemy_submarine\enemy_sub_2.obj" />
+    <Object Include="3D\enemy_submarine\enemy_sub_3.obj" />
+    <Object Include="3D\enemy_submarine\enemy_sub_4.obj" />
+    <Object Include="3D\enemy_submarine\enemy_sub_5.obj" />
+    <Object Include="3D\enemy_submarine\enemy_sub_6.obj" />
+    <Object Include="3D\submarine\submarine.obj" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

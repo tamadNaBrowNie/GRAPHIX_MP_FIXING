@@ -47,4 +47,39 @@
     <None Include="Shaders\objVert.vert" />
     <None Include="Shaders\objFrag.frag" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="3D\submarine\submarine_submarine_Normal.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="3D\submarine\submarine_submarine_BaseColor.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="3D\enemy_submarine\enemy_sub_1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="3D\enemy_submarine\enemy_sub_2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="3D\enemy_submarine\enemy_sub_3.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="3D\enemy_submarine\enemy_sub_4.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="3D\enemy_submarine\enemy_sub_5.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="3D\enemy_submarine\enemy_sub_6.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="3D\submarine\submarine.obj" />
+    <Object Include="3D\enemy_submarine\enemy_sub_1.obj" />
+    <Object Include="3D\enemy_submarine\enemy_sub_2.obj" />
+    <Object Include="3D\enemy_submarine\enemy_sub_3.obj" />
+    <Object Include="3D\enemy_submarine\enemy_sub_4.obj" />
+    <Object Include="3D\enemy_submarine\enemy_sub_5.obj" />
+    <Object Include="3D\enemy_submarine\enemy_sub_6.obj" />
+  </ItemGroup>
 </Project>
