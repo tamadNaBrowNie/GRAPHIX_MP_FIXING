@@ -316,31 +316,33 @@ public:
 				attributes.texcoords[uvIndex + 1]
 			);
 
-			// ---------------------------------------------------
-			// TANGENTS
-			this->vertexData.push_back(
-				tangents[i].x
-			);
-			this->vertexData.push_back(
-				tangents[i].y
-			);
-			this->vertexData.push_back(
-				tangents[i].z
-			);
+            // ---------------------------------------------------
+            // TANGENTS
 
-			// ---------------------------------------------------
-			// BITANGENTS
-			this->vertexData.push_back(
-				bitangents[i].x
-			);
-			this->vertexData.push_back(
-				bitangents[i].y
-			);
-			this->vertexData.push_back(
-				bitangents[i].z
-			);
-		}
-	}
+            this->vertexData.push_back(
+                tangents[i].x
+            );
+            this->vertexData.push_back(
+                tangents[i].y
+            );
+            this->vertexData.push_back(
+                tangents[i].z
+            );
+
+            // ---------------------------------------------------
+            // BITANGENTS
+
+            this->vertexData.push_back(
+                bitangents[i].x
+            );
+            this->vertexData.push_back(
+                bitangents[i].y
+            );
+            this->vertexData.push_back(
+                bitangents[i].z
+            );
+        }
+    }
 
 	void attachTexture(std::string texPath, GLint format) {
 		// Flip image vertically on load

@@ -316,8 +316,7 @@ int main(void)
     */
 
     playerSub.attachTexture("3D/submarine/submarine_submarine_BaseColor.png", GL_RGB);
-    //playerSub.attachNormalTexture("3D/submarine/submarine_submarine_Normal.png", GL_RGB);
-    playerSub.attachNormalTexture("3D/submarine/brickwall_normal.jpg", GL_RGB);
+    playerSub.attachNormalTexture("3D/submarine/submarine_submarine_Normal.png", GL_RGB);
 
     donut.attachTexture("3D/donut/Gus.png", GL_RGBA);
     sphere.attachTexture("3D/sphere/lost_ark.jpg", GL_RGB);
@@ -606,7 +605,7 @@ obj_shaderProgram.findUloc("pt_src")
 
         // -----------------------------------------------------------------
 
-        // theta += 0.05f;
+        playerSub.playerRot.x -= 0.3f;
 
         // -----------------------------------------------------------------
         // RENDERING OBJECTS
