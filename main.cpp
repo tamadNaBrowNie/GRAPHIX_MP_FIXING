@@ -1,9 +1,16 @@
 #include "main.h"
 #include "Classes/Classes.h"
 
-/*
-    Global Variables
-*/
+// -------------------------------------------------------
+// MODEL & TEXTURE REFERENCES
+// 
+// Player Submarine  : https://sketchfab.com/3d-models/submarine-27477e4ea05940ec9902a1484e54cf65
+// Enemy Submarine 1 : https://sketchfab.com/3d-models/the-project-941-akula-typhoon-submarine-b7aef99dcf9f4252887a02a7afb3b75e
+// 
+
+// -------------------------------------------------------
+// GLOBAL VARIABLES
+
 // Screen width and height
 float screenWidth = 1000.0f;
 float screenHeight = 1000.0f;
@@ -217,20 +224,21 @@ int main(void)
 
     playerSub.loadObj();
 
-    EnemyClass donut("3D/donut/Donut.obj",
+    EnemyClass enemySub1("3D/enemySub1/Enemy_sub_1.obj",
         glm::vec3(0.0f, -5.0f, -10.0f),
         glm::vec3(0.0f, 0.0f, 0.0f),
-        5.0f
+        0.05f
+    );
+    EnemyClass enemySub2("3D/enemySub2/Enemy_sub_2.obj",
+        //glm::vec3(10.0f, -10.0f, -15.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        0.015f
     );
     EnemyClass sphere("3D/sphere/Sphere.obj",
         glm::vec3(0.0f, -8.0f, 0.0f),
         glm::vec3(0.0f, 0.0f, 0.0f),
         5.0f
-    );
-    EnemyClass car("3D/car/PASSAT_OBJ.obj",
-        glm::vec3(10.0f, -10.0f, -15.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        0.015f
     );
     EnemyClass chest("3D/chest/TreasureChestSimple.obj",
         glm::vec3(-10.0f, -15.0f, -5.0f),
@@ -247,10 +255,10 @@ int main(void)
         glm::vec3(0.0f, 0.0f, 0.0f),
         0.5f
     );
-
-    donut.loadObj();
+    
+    enemySub1.loadObj();
     sphere.loadObj();
-    car.loadObj();
+    enemySub2.loadObj();
     chest.loadObj();
     solaire.loadObj();
     cube.loadObj();
@@ -321,9 +329,9 @@ int main(void)
     playerSub.attachTexture("3D/submarine/submarine_submarine_BaseColor.png", GL_RGB);
     playerSub.attachNormalTexture("3D/submarine/submarine_submarine_Normal.png", GL_RGB);
 
-    donut.attachTexture("3D/donut/Gus.png", GL_RGBA);
+    enemySub1.attachTexture("3D/enemySub1/Enemy_sub_1.png", GL_RGBA);
     sphere.attachTexture("3D/sphere/lost_ark.jpg", GL_RGB);
-    car.attachTexture("3D/car/myImage.png", GL_RGBA);
+    enemySub2.attachTexture("3D/enemySub2/Enemy_sub_2.jpg", GL_RGB);
     chest.attachTexture("3D/chest/sad_gouba.png", GL_RGBA);
     solaire.attachTexture("3D/solaire/Peasant.jpg", GL_RGB);
     cube.attachTexture("3D/cube/DADO.jpg", GL_RGB);
@@ -403,9 +411,9 @@ int main(void)
 
     playerSub.createVAO_VBO();
 
-    donut.createVAO_VBO();
+    enemySub1.createVAO_VBO();
     sphere.createVAO_VBO();
-    car.createVAO_VBO();
+    enemySub2.createVAO_VBO();
     chest.createVAO_VBO();
     solaire.createVAO_VBO();
     cube.createVAO_VBO();
@@ -629,9 +637,9 @@ obj_shaderProgram.findUloc("pt_src")
 
         std::cout << "false" << glGetError() << '\n';
 
-        donut.draw(obj_shaderProgram.getShader());
+        enemySub1.draw(obj_shaderProgram.getShader());
         sphere.draw(obj_shaderProgram.getShader());
-        car.draw(obj_shaderProgram.getShader());
+        enemySub2.draw(obj_shaderProgram.getShader());
         chest.draw(obj_shaderProgram.getShader());
         solaire.draw(obj_shaderProgram.getShader());
         cube.draw(obj_shaderProgram.getShader());
