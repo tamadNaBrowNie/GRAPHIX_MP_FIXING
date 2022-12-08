@@ -742,7 +742,10 @@ public:
 		if (key == GLFW_KEY_A) this->playerRot.y += 1;
 		if (key == GLFW_KEY_D) this->playerRot.y -= 1;
 		glm::vec3 pos = playerPos;
-		pos.z -= OFFSET;
+
+		pos.z += glm::cos(glm::radians(this->playerRot.y));
+		//pos.z -= OFFSET;
+		pos.x += glm::sin(glm::radians(this->playerRot.y));
 		bulb->setLightVec(&pos);
 
 	}
