@@ -15,7 +15,7 @@ PerspectiveCamera fps_camera;
 
 glm::vec3 tps_cameraPos = glm::vec3(0.0f, 0.0f, 1.0f);
 glm::vec3 fps_cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
-glm::vec3 td_cameraPos = glm::vec3(0.0f, 20.0f, 0.0f);
+glm::vec3 td_cameraPos = glm::vec3(0.0f, 1.f, 0.0f);
 const glm::vec3 worldUp = glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f));
 
 // Camera Rotation (yaw and pitch)
@@ -47,36 +47,24 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
 {
     Handler* hand =(Handler*) glfwGetWindowUserPointer(window);
     // Toggle TPS and FPS Camera
-    if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
-        switch (mode)
-        {
-        case Mode::TPS:           
-            mode = Mode::FPS;
-            break;
-        case Mode::FPS: 
-            mode = Mode::TPS;
-            break;
-        }
-        //if (toggle_tps && !toggle_td) {
-
-        //}
-        //else if (toggle_fps && !toggle_td) {
-        //   
-        //}
-    }
 
     // Toggle TD Camera
+    
+    
+    hand->cam->kbCallBack(window, key, scancode, action, mods);
+    if (key == GLFW_KEY_1 && action == GLFW_PRESS &&  mode != Mode::TD) {
+        mode = hand->cam->getMode();
+    }
+
     if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
         if (mode != Mode::TD) {
-            pre = mode;
+            pre = hand->cam->getMode();;
             mode = Mode::TD;
         }
         else {
             mode = pre;
         }
     }
-    
-    hand->cam->kbCallBack(window, key, scancode, action, mods);
     if (mode != Mode::TD)
         hand->player->kbCallBack(window, key, scancode, action, mods);
 
@@ -515,13 +503,19 @@ obj_shaderProgram.findUloc("pt_src")
     tps_camera.setCameraCenter(playerSub.playerPos + glm::vec3(0.1f, 0.0f, 0.0f));
     tps_camera.setWorldUp(worldUp);
     tps_camera.setProjection(60.0f, screenWidth, screenHeight);
-    glm::vec3 tFwd = tps_camera.getCameraPos()- tps_camera.getCameraCenter();
+    tps_camera.setMode(Mode::TPS);
+    
     
     fps_camera.setCameraPos(fps_cameraPos - glm::vec3(0.1f, 0.0f, 1.0f));   // Slight adjustments to align with playerSub
     fps_camera.setCameraCenter(playerSub.playerPos - glm::vec3(0.0f, 0.0f, 5.0f));
     fps_camera.setWorldUp(worldUp);
     fps_camera.setProjection(100.0f, screenWidth, screenHeight);
-    glm::vec3 fFwd = fps_camera.getCameraPos() - fps_camera.getCameraCenter();
+
+    td_camera.setCameraPos(td_cameraPos);
+    td_camera.setCameraCenter(glm::vec3(0));
+    td_camera.setWorldUp(glm::vec3(0,0,1));
+    td_camera.setProjection(-1.f, 1.f, -1.0f, 1.0f, -1.0f, 1.0f);
+    td_camera.setView();
     while (!glfwWindowShouldClose(window))
     {
         /* Render here */
@@ -534,6 +528,8 @@ obj_shaderProgram.findUloc("pt_src")
         switch (mode)
         {
         case Mode::TPS:
+            tps_camera.setCameraPos(playerSub.playerPos - glm::vec3(0, 0.0f, 0.1));
+            tps_camera.setCameraCenter(playerSub.playerPos + glm::vec3(0.1f, 0.0f, 0.0f));
             tps_camera.setView();
 
             projectionMatrix = tps_camera.getProjectionMatrix();
@@ -542,12 +538,20 @@ obj_shaderProgram.findUloc("pt_src")
             hand->cam = &tps_camera;
             break;
         case Mode::FPS:
-         fps_camera.setView();
+
+            tps_camera.setCameraPos(playerSub.playerPos - glm::vec3(0.f, 0.0f, 1.0f));
+            tps_camera.setCameraCenter(playerSub.playerPos - glm::vec3(0.f, 0.0f, 5.0f));
+            tps_camera.setView();
             projectionMatrix = fps_camera.getProjectionMatrix();
-            viewMatrix = fps_camera.getViewMatrix();
-            hand->cam = &fps_camera;
+            viewMatrix = tps_camera.getViewMatrix();
+            glUniform3fv(eyePos, 1, glm::value_ptr(tps_camera.getCameraPos()));
+            hand->cam = &tps_camera;
             break;
         case Mode::TD:
+            td_camera.setView();
+            viewMatrix = td_camera.getViewMatrix();
+            projectionMatrix = td_camera.getProjectionMatrix();
+            glUniform3fv(eyePos, 1, glm::value_ptr(tps_camera.getCameraPos()));
             hand->cam = &td_camera;
             break;
         default:

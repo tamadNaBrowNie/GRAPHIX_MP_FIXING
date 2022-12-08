@@ -63,8 +63,14 @@ protected:
     glm::vec3 worldUp;
     glm::mat4 projectionMatrix;
     glm::mat4 viewMatrix;
-
-public:
+    Mode mode;
+public:  
+    void setMode(Mode mode) {
+        this->mode = mode;
+    }
+    Mode getMode() {
+        return mode;
+    }
     void setCameraPos(glm::vec3 c_Pos) {
         this->cameraPos = c_Pos;
     }
@@ -112,12 +118,28 @@ public:
 
 class PerspectiveCamera : public MyCamera {
 public:
+    
     void setProjection(float fov, float width, float height) {
         this->projectionMatrix = glm::perspective(glm::radians(fov), width / height, 0.1f, 100.0f);
     }
     void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
 
+        if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
+            switch (mode)
+            {
+            case Mode::TPS:
 
+                mode = Mode::FPS;
+                //manipulate center and position here
+                break;
+            case Mode::FPS:
+
+                mode = Mode::TPS;
+                //manipulate center and position here
+                break;
+            }
+
+        }
         
         // make 0.1 a constant
         if (GLFW_KEY_W == key ) {
@@ -613,6 +635,7 @@ public:
     float playerScale;
     lightBuilder* bulb;
     glm::mat4 transformationMatrix;
+
     inline PlayerClass(std::string path,
         glm::vec3 pos,
         glm::vec3 rot,
@@ -700,15 +723,14 @@ public:
         playerPos.y -= 0.1f;
     }
 void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
-        
+     
+
             if (key == GLFW_KEY_W)forward();
             else if (key == GLFW_KEY_S)back();
             if (key == GLFW_KEY_Q && playerPos.y + 0.1f <= 0)up();
             else if (key == GLFW_KEY_E) down();
             if (key == GLFW_KEY_A) this->transformationMatrix = glm::rotate(this->transformationMatrix,glm::radians(90.f),glm::vec3(1,1,0));
-            
 
-        
         
     }
 };
