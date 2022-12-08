@@ -10,8 +10,8 @@ float screenHeight = 1000.0f;
 
 // Camera Positioning
 OrthoCamera td_camera;
-PerspectiveCamera tps_camera;
-PerspectiveCamera fps_camera;
+cam3p tps_camera;
+cam1p fps_camera;
 
 glm::vec3 tps_cameraPos = glm::vec3(0.0f, 0.0f, 1.0f);
 glm::vec3 fps_cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -46,7 +46,9 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
     // Toggle TD Camera
     
     
-    //hand->cam->kbCallBack(window, key, scancode, action, mods);
+    //input handling for mode switching
+
+    //toggle between 1st person and 3rd
     if (key == GLFW_KEY_1 && action == GLFW_PRESS &&  mode != Mode::TD) {
         switch (mode)
         {
@@ -56,25 +58,30 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
         case Mode::FPS:
             mode = Mode::TPS;
             break;
-        case Mode::TD:
-            break;
         default:
             break;
         }
     }
-
+    //toggle top-down
     if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
         if (mode != Mode::TD) {
+
             pre = mode;
             mode = Mode::TD;
+            hand->cam->setCameraCenter(hand->player->playerPos);
+            hand->cam->movePos();
         }
         else {
             mode = pre;
         }
     }
+    //handles submarine controls
     if (mode != Mode::TD)
+    {
         hand->player->kbCallBack(window, key, scancode, action, mods);
-
+        tps_camera.setCameraCenter(playerSub.playerPos + glm::vec3(0.1f, 0.0f, 0.0f));
+        tps_cameraPos = tps_camera.getCameraCenter() + tps_camera.getDir();
+    }
     //use the virtual callback here
 
 
@@ -113,8 +120,7 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
     //        fps_cameraPos -= glm::vec3(0.0f, 0.1f, 0.0f);
     //    }
     //}
-    tps_camera.setCameraCenter(playerSub.playerPos + glm::vec3(0.1f, 0.0f, 0.0f));
-    tps_cameraPos = tps_camera.getCameraCenter() + tps_camera.getDir();
+
      //Submarine Turn Left/Turn Right Movement Controls
     /*if (key == GLFW_KEY_A) {
         if ((toggle_fps || toggle_tps) && !toggle_td) {
@@ -138,8 +144,7 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
     //playerSub.bulb->setLightVec(&pos);
 
     /*
-     * Since the Program will be capturing the mouse, ensure
-     * that there is a way to conveniently close the program.
+    Handling exit keys
      */
     if (key == GLFW_KEY_ESCAPE ||
         key == GLFW_KEY_ENTER) {
