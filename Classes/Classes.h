@@ -94,7 +94,9 @@ public:
 	void setView() {
 		this->viewMatrix = glm::lookAt(this->cameraPos, this->cameraCenter, this->worldUp);
 	}
-
+	void movePos() {
+		this->cameraPos = cameraCenter + dir;
+	}
 	glm::vec3 getCameraPos() {
 		return this->cameraPos;
 	}
@@ -132,64 +134,74 @@ public:
 	void setProjection(float fov, float width, float height) {
 		this->projectionMatrix = glm::perspective(glm::radians(fov), width / height, 0.1f, 100.0f);
 	}
-	void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
+	//void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
 
-		if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
-			switch (mode)
-			{
-			case Mode::TPS:
+	//	if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
+	//		switch (mode)
+	//		{
+	//		case Mode::TPS:
 
-				mode = Mode::FPS;
-				//manipulate center and position here
-				break;
-			case Mode::FPS:
+	//			mode = Mode::FPS;
+	//			//manipulate center and position here
+	//			break;
+	//		case Mode::FPS:
 
-				mode = Mode::TPS;
-				//manipulate center and position here
-				break;
-			}
+	//			mode = Mode::TPS;
+	//			//manipulate center and position here
+	//			break;
+	//		}
 
-		}
+	//	}
 
-		// make 0.1 a constant
-		if (GLFW_KEY_W == key) {
+	//	// make 0.1 a constant
+	//	if (GLFW_KEY_W == key) {
 
-			this->cameraPos.z -= 0.1f;
-			this->cameraCenter.z -= 0.1f;
+	//		this->cameraPos.z -= 0.1f;
+	//		this->cameraCenter.z -= 0.1f;
 
 
-			//this->cameraPos.x += 0.1f;
-		}
+	//		//this->cameraPos.x += 0.1f;
+	//	}
 
-		else if (key == GLFW_KEY_S)
-		{
-			this->cameraPos.z += 0.1f;
-			this->cameraCenter.z += 0.1f;
-			//this->cameraPos.x += 0.1f;
-		}
+	//	else if (key == GLFW_KEY_S)
+	//	{
+	//		this->cameraPos.z += 0.1f;
+	//		this->cameraCenter.z += 0.1f;
+	//		//this->cameraPos.x += 0.1f;
+	//	}
 
-		if (key == GLFW_KEY_Q) {
-			if (this->cameraPos.y <= 0) {
-				this->cameraPos.y += 0.1f;
-				this->cameraCenter.y += 0.1f;
-			}
-		}
-		else if (key == GLFW_KEY_E) {
-			this->cameraPos.y -= 0.1f;
-			this->cameraCenter.y -= 0.1f;
-		}
+	//	if (key == GLFW_KEY_Q) {
+	//		if (this->cameraPos.y <= 0) {
+	//			this->cameraPos.y += 0.1f;
+	//			this->cameraCenter.y += 0.1f;
+	//		}
+	//	}
+	//	else if (key == GLFW_KEY_E) {
+	//		this->cameraPos.y -= 0.1f;
+	//		this->cameraCenter.y -= 0.1f;
+	//	}
 
-	}
+	//}
 
-	void ptrCallBack(GLFWwindow* win, double x, double y) {
-		glm::vec3 axes;
-		if (mode != Mode::TPS) {
-			return;
-		}
 	
+};
+class cam3p : public PerspectiveCamera {
+	void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
+		this->cameraPos = this->cameraCenter + this->dir +glm::vec3(0,0,0.1);
+	}
+	void ptrCallBack(GLFWwindow* win, double x, double y) {
+				
 	}
 };
 
+class cam1p : public PerspectiveCamera {
+	void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
+		this->cameraPos = this->cameraCenter + this->dir;
+	}
+	void ptrCallBack(GLFWwindow* win, double x, double y) {
+
+	}
+};
 class ModelClass {
 protected:
 	std::string objPath;

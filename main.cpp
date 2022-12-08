@@ -21,8 +21,8 @@ float screenHeight = 1000.0f;
 
 // Camera Positioning
 OrthoCamera td_camera;
-PerspectiveCamera tps_camera;
-PerspectiveCamera fps_camera;
+cam3p tps_camera;
+cam1p fps_camera;
 
 glm::vec3 tps_cameraPos = glm::vec3(0.0f, 0.0f, 1.0f);
 glm::vec3 fps_cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -57,7 +57,9 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
     // Toggle TD Camera
     
     
-    //hand->cam->kbCallBack(window, key, scancode, action, mods);
+    //input handling for mode switching
+
+    //toggle between 1st person and 3rd
     if (key == GLFW_KEY_1 && action == GLFW_PRESS &&  mode != Mode::TD) {
         switch (mode)
         {
@@ -67,25 +69,30 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
         case Mode::FPS:
             mode = Mode::TPS;
             break;
-        case Mode::TD:
-            break;
         default:
             break;
         }
     }
-
+    //toggle top-down
     if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
         if (mode != Mode::TD) {
+
             pre = mode;
             mode = Mode::TD;
+            hand->cam->setCameraCenter(hand->player->playerPos);
+            hand->cam->movePos();
         }
         else {
             mode = pre;
         }
     }
+    //handles submarine controls
     if (mode != Mode::TD)
+    {
         hand->player->kbCallBack(window, key, scancode, action, mods);
-
+        tps_camera.setCameraCenter(playerSub.playerPos + glm::vec3(0.1f, 0.0f, 0.0f));
+        tps_cameraPos = tps_camera.getCameraCenter() + tps_camera.getDir();
+    }
     //use the virtual callback here
 
 
@@ -124,8 +131,7 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
     //        fps_cameraPos -= glm::vec3(0.0f, 0.1f, 0.0f);
     //    }
     //}
-    tps_camera.setCameraCenter(playerSub.playerPos + glm::vec3(0.1f, 0.0f, 0.0f));
-    tps_cameraPos = tps_camera.getCameraCenter() + tps_camera.getDir();
+
      //Submarine Turn Left/Turn Right Movement Controls
     /*if (key == GLFW_KEY_A) {
         if ((toggle_fps || toggle_tps) && !toggle_td) {
@@ -149,8 +155,7 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
     //playerSub.bulb->setLightVec(&pos);
 
     /*
-     * Since the Program will be capturing the mouse, ensure
-     * that there is a way to conveniently close the program.
+    Handling exit keys
      */
     if (key == GLFW_KEY_ESCAPE ||
         key == GLFW_KEY_ENTER) {
@@ -193,18 +198,18 @@ void Mouse_Callback(GLFWwindow* window, double xpos, double ypos)
     if (pitch < -89.0f) {
         pitch = -89.0f;
     }
+    //getting the forward vector
 
-    /*
-        Updating the position of the camera.
-    */
     glm::vec3 direction = glm::vec3(
         (cos(glm::radians(yaw)) * cos(glm::radians(pitch))),
         (sin(glm::radians(pitch))),
         (sin(glm::radians(yaw)) * cos(glm::radians(pitch)))
     );
-
-    tps_camera.setDir(new glm::vec3(-glm::normalize(direction)));
-    tps_cameraPos = tps_camera.getCameraCenter()+tps_camera.getDir();
+    /*
+    Updating the position of the camera.
+    */
+    tps_camera.setDir(new glm::vec3(glm::normalize(direction)));
+    tps_cameraPos = tps_camera.getCameraCenter()-tps_camera.getDir();
 }
 
 int main(void)
@@ -469,6 +474,7 @@ int main(void)
     float theta = 0.0f;
 
     /// <summary>
+    /// Getting uniforms for directional light and storing in a array
     /// Uniform ORDER:
     /// phong,specstr
     /// ambstr,lumens,
@@ -485,15 +491,15 @@ int main(void)
     obj_shaderProgram.findUloc("dir_color"),
     obj_shaderProgram.findUloc("dir_target")
     };
-
+    //creatig point light pointing down
     lightBuilder* dir = new lightBuilder();
     dir->setAmbColor(new glm::vec3(0.2, 0.5, 0.0))
         ->setAmbStr(0.5)
         ->setLumens(1)
-        ->setSpecPhong(10 ^ 1)
+        ->setSpecPhong(10)
         ->setSpecStr(10)
         ->setLightVec(new glm::vec3(0, -1, 0))
-        ->setLightColor(new glm::vec3(0, 0, 0.5))
+        ->setLightColor(new glm::vec3(0, 0, 1))
         ->placeUnifs(dirUnifs);
 
     GLint ptUnifs[7]{
@@ -506,14 +512,19 @@ obj_shaderProgram.findUloc("pt_color"),
 obj_shaderProgram.findUloc("pt_src")
     };
     playerSub.placeUnifs(ptUnifs);
+
     GLint hasBmp = obj_shaderProgram.findUloc("hasBmp");
     GLint eyePos = obj_shaderProgram.findUloc("eyePos");
     GLint projectionLoc = obj_shaderProgram.findUloc("projection");
     GLint viewLoc = obj_shaderProgram.findUloc("view");
     Handler* hand = new Handler();
     hand->player = &playerSub;
-    /* Loop until the user closes the window */
-    tps_camera.setCameraPos(tps_cameraPos + glm::vec3(0.1f, 0.0f, 0.0f));    // Slight adjustments to align with playerSub
+    
+    /// <summary>
+/// Setting up cameras
+/// </summary>
+    
+    tps_camera.setCameraPos(tps_cameraPos);    // Slight adjustments to align with playerSub
     tps_camera.setCameraCenter(playerSub.playerPos + glm::vec3(0.1f, 0.0f, 0.0f));
     tps_camera.setWorldUp(worldUp);
     tps_camera.setProjection(60.0f, screenWidth, screenHeight);
@@ -575,15 +586,7 @@ obj_shaderProgram.findUloc("pt_src")
             break;
         }
         glfwSetWindowUserPointer(window, hand);
-        //if (toggle_tps && !toggle_td) {
-        //  
-        //}
-        //else if (toggle_fps && !toggle_td) {
-        // 
-        //}
-        //else if (toggle_td) {
-        //    // TODO: Implement Orthographic top-down camera
-        //}
+
 
 
         glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
