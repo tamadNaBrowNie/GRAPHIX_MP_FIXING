@@ -6,7 +6,11 @@
 // 
 // Player Submarine  : https://sketchfab.com/3d-models/submarine-27477e4ea05940ec9902a1484e54cf65
 // Enemy Submarine 1 : https://sketchfab.com/3d-models/the-project-941-akula-typhoon-submarine-b7aef99dcf9f4252887a02a7afb3b75e
-// 
+// Enemy Submarine 2 : https://sketchfab.com/3d-models/ohio-class-submarine-ssbn-315be00711a24dce9f0fa6657df7521e
+// Enemy Submarine 3 : https://sketchfab.com/3d-models/u-boat-eae3d9b194f542f29cd80b6a1e9504a6
+// Enemy Submarine 4 : https://free3d.com/3d-model/seaview-submarine-78646.html
+// Enemy Submarine 5 : https://sketchfab.com/3d-models/koreanavy-jang-bogo-classtype209-submarine-abd6a2cd5fe14f6baa16e64c2d20f317
+// Enemy Submarine 6 : https://sketchfab.com/3d-models/strange-shape-930fe8641f25480cba0d44f9047d553c
 
 // -------------------------------------------------------
 // GLOBAL VARIABLES
@@ -224,44 +228,43 @@ int main(void)
 
     playerSub.loadObj();
 
-    EnemyClass enemySub1("3D/enemySub1/Enemy_sub_1.obj",
+    EnemyClass enemySub1("3D/enemy_submarine/enemy_sub_1.obj",
         glm::vec3(0.0f, -5.0f, -10.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        0.05f
+        glm::vec3(20.0f, 5.0f, 6.0f),
+        0.08f
     );
-    EnemyClass enemySub2("3D/enemySub2/Enemy_sub_2.obj",
-        //glm::vec3(10.0f, -10.0f, -15.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        0.015f
-    );
-    EnemyClass sphere("3D/sphere/Sphere.obj",
-        glm::vec3(0.0f, -8.0f, 0.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        5.0f
-    );
-    EnemyClass chest("3D/chest/TreasureChestSimple.obj",
-        glm::vec3(-10.0f, -15.0f, -5.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        0.01f
-    );
-    EnemyClass solaire("3D/solaire/SOLAIRE.obj",
-        glm::vec3(5.0f, -10.0f, 5.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        0.1f
-    );
-    EnemyClass cube("3D/cube/DADO.obj",
+    EnemyClass enemySub2("3D/enemy_submarine/enemy_sub_2.obj",
         glm::vec3(15.0f, -3.0f, 10.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        0.5f
+        glm::vec3(10.0f, 8.0f, 3.0f),
+        0.025f
+    );
+    EnemyClass enemySub3("3D/enemy_submarine/enemy_sub_3.obj",
+        glm::vec3(-15.0f, -8.0f, 20.0f),
+        glm::vec3(9.0f, 7.0f, 3.0f),
+        0.165f
+    );
+    EnemyClass enemySub4("3D/enemy_submarine/enemy_sub_4.obj",
+        glm::vec3(-20.0f, -25.0f, -15.0f),
+        glm::vec3(0.0f, 120.0f, 11.0f),
+        0.03f
+    );
+    EnemyClass enemySub5("3D/enemy_submarine/enemy_sub_5.obj",
+        glm::vec3(15.0f, -5.0f, 15.0f),
+        glm::vec3(-5.0f, 30.0f, 4.0f),
+        0.12f
+    );
+    EnemyClass enemySub6("3D/enemy_submarine/enemy_sub_6.obj",
+        glm::vec3(10.0f, -0.5f, -15.0f),
+        glm::vec3(9.0f, 0.0f, 10.0f),
+        1.0f
     );
     
     enemySub1.loadObj();
-    sphere.loadObj();
     enemySub2.loadObj();
-    chest.loadObj();
-    solaire.loadObj();
-    cube.loadObj();
+    enemySub3.loadObj();
+    enemySub4.loadObj();
+    enemySub5.loadObj();
+    enemySub6.loadObj();
 
     // -------------------------------------------------------
     // SETTING SKYBOX VERTICES AND INDICES
@@ -319,22 +322,17 @@ int main(void)
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // -------------------------------------------------------
-    // LOADING TEXTURES
-    /*
-        In calling the attachTexture() and attachNormalTexture() function, take note of the order:
-            1st - base textures
-            2nd - normal textures
-    */
+    // LOADING TEXTURES & NORMALS
 
     playerSub.attachTexture("3D/submarine/submarine_submarine_BaseColor.png", GL_RGB);
-    playerSub.attachNormalTexture("3D/submarine/submarine_submarine_Normal.png", GL_RGB);
+    enemySub1.attachTexture("3D/enemy_submarine/enemy_sub_1.png", GL_RGBA);
+    enemySub2.attachTexture("3D/enemy_submarine/enemy_sub_2.png", GL_RGB);
+    enemySub3.attachTexture("3D/enemy_submarine/enemy_sub_3.png", GL_RGB);
+    enemySub4.attachTexture("3D/enemy_submarine/enemy_sub_4.jpg", GL_RGB);
+    enemySub5.attachTexture("3D/enemy_submarine/enemy_sub_5.png", GL_RGBA);
+    enemySub6.attachTexture("3D/enemy_submarine/enemy_sub_6.jpg", GL_RGB);
 
-    enemySub1.attachTexture("3D/enemySub1/Enemy_sub_1.png", GL_RGBA);
-    sphere.attachTexture("3D/sphere/lost_ark.jpg", GL_RGB);
-    enemySub2.attachTexture("3D/enemySub2/Enemy_sub_2.jpg", GL_RGB);
-    chest.attachTexture("3D/chest/sad_gouba.png", GL_RGBA);
-    solaire.attachTexture("3D/solaire/Peasant.jpg", GL_RGB);
-    cube.attachTexture("3D/cube/DADO.jpg", GL_RGB);
+    playerSub.attachNormalTexture("3D/submarine/submarine_submarine_Normal.png", GL_RGB);
 
     // Enable depth test
     glEnable(GL_DEPTH_TEST);
@@ -412,11 +410,11 @@ int main(void)
     playerSub.createVAO_VBO();
 
     enemySub1.createVAO_VBO();
-    sphere.createVAO_VBO();
+    enemySub3.createVAO_VBO();
     enemySub2.createVAO_VBO();
-    chest.createVAO_VBO();
-    solaire.createVAO_VBO();
-    cube.createVAO_VBO();
+    enemySub4.createVAO_VBO();
+    enemySub5.createVAO_VBO();
+    enemySub6.createVAO_VBO();
 
     // -------------------------------------------------------
     // CREATING SKYBOX VAO, VBO, and EBO
@@ -638,11 +636,11 @@ obj_shaderProgram.findUloc("pt_src")
         std::cout << "false" << glGetError() << '\n';
 
         enemySub1.draw(obj_shaderProgram.getShader());
-        sphere.draw(obj_shaderProgram.getShader());
+        enemySub3.draw(obj_shaderProgram.getShader());
         enemySub2.draw(obj_shaderProgram.getShader());
-        chest.draw(obj_shaderProgram.getShader());
-        solaire.draw(obj_shaderProgram.getShader());
-        cube.draw(obj_shaderProgram.getShader());
+        enemySub4.draw(obj_shaderProgram.getShader());
+        enemySub5.draw(obj_shaderProgram.getShader());
+        enemySub6.draw(obj_shaderProgram.getShader());
 
         // -----------------------------------------------------------------
 
