@@ -645,7 +645,7 @@ public:
 	float playerScale;
 	lightBuilder* bulb;
 	glm::mat4 transformationMatrix;
-
+	glm::vec3 front;
 	inline PlayerClass(std::string path,
 		glm::vec3 pos,
 		glm::vec3 rot,
@@ -653,7 +653,7 @@ public:
 		ModelClass(path),
 		playerPos(pos),
 		playerRot(rot),
-		playerScale(scale), bulb(new lightBuilder()), transformationMatrix(glm::mat4(1.0)) {
+		playerScale(scale), bulb(new lightBuilder()), front(glm::vec3(0, 0, 0.1)), transformationMatrix(glm::mat4(1.0)) {
 		glm::vec3 src = pos;
 		src.z -= 0.7;
 		bulb
@@ -720,10 +720,10 @@ public:
 		return this->playerPos.y;
 	}
 	void forward() {
-		this->playerPos.z -= 0.1;
+		this->playerPos.z += -0.1;
 	}
 	void back() {
-		this->playerPos.z += 0.1;
+		this->playerPos.z -= -0.1;
 	}
 	void up() {
 		playerPos.y += 0.1f;
@@ -743,9 +743,10 @@ public:
 		if (key == GLFW_KEY_D) this->playerRot.y -= 1;
 		glm::vec3 pos = playerPos;
 
-		pos.z += glm::cos(glm::radians(this->playerRot.y));
-		//pos.z -= OFFSET;
-		pos.x += glm::sin(glm::radians(this->playerRot.y));
+		front.x = glm::sin(glm::radians(playerRot.y));
+		front.z = glm::cos(glm::radians(playerRot.y));
+		pos.z -= OFFSET;
+		pos += glm::normalize(front);
 		bulb->setLightVec(&pos);
 
 	}
