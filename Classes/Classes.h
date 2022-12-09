@@ -157,10 +157,10 @@ public:
 			break;
 		case GLFW_KEY_S: viewMatrix = glm::translate(viewMatrix, speed*this->worldUp);
 			break;
-		case GLFW_KEY_A: viewMatrix = glm::translate(viewMatrix, speed * glm::normalize(right));
+		case GLFW_KEY_A: viewMatrix = glm::translate(viewMatrix, -speed * glm::normalize(right));
 			break;
 
-		case GLFW_KEY_D: viewMatrix = glm::translate(viewMatrix, -speed * glm::normalize(right));
+		case GLFW_KEY_D: viewMatrix = glm::translate(viewMatrix, speed * glm::normalize(right));
 			break;
 		default:
 			break;
