@@ -95,7 +95,7 @@ public:
 		this->viewMatrix = glm::lookAt(this->cameraPos, this->cameraCenter, this->worldUp);
 	}
 	void movePos() {
-		this->cameraPos = cameraCenter + dir;
+		this->cameraPos = cameraCenter - dir;
 	}
 	glm::vec3 getCameraPos() {
 		return this->cameraPos;
@@ -196,7 +196,7 @@ class cam3p : public PerspectiveCamera {
 
 class cam1p : public PerspectiveCamera {
 	void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
-		this->cameraPos = this->cameraCenter + this->dir;
+		this->cameraPos = this->cameraCenter + this->dir + glm::vec3(0, 0, 0.5);
 	}
 	void ptrCallBack(GLFWwindow* win, double x, double y) {
 
@@ -664,6 +664,10 @@ public:
 };
 
 class PlayerClass : public ModelClass {
+private: enum class Intensity {
+	LOW,MED,HI
+};
+	   Intensity str = Intensity::LOW;
 public:
 	glm::vec3 playerPos;
 	glm::vec3 playerRot;
@@ -692,12 +696,27 @@ public:
 
 	}
 	inline void placeUnifs(GLint* unifs) {
+		switch (this->str)
+		{
+		case Intensity::LOW:
+			bulb->setLumens(2);
+			break;
+		case Intensity::MED:
+			bulb->setLumens(4);
+			break;
+		case Intensity::HI:
+			bulb->setLumens(8);
+			break;
+		default:
+			break;
+		}
 		bulb->placeUnifs(unifs);
 	}
 	inline void placeLight(GLint unif) {
 		bulb->placeLight(unif);
 	}
 	void draw(GLuint shaderProgram) {
+
 		glUseProgram(shaderProgram);
 		glBindVertexArray(this->VAO);
 
@@ -766,6 +785,22 @@ public:
 		else if (key == GLFW_KEY_E) down();
 		if (key == GLFW_KEY_A) this->playerRot.y += 1;
 		if (key == GLFW_KEY_D) this->playerRot.y -= 1;
+		if (key == GLFW_KEY_F) {
+			switch (this->str)
+			{
+			case Intensity::LOW:
+				this->str = Intensity::MED;
+				break;
+			case Intensity::MED:
+				this->str = Intensity::HI;
+				break;
+			case Intensity::HI:
+				this->str = Intensity::LOW;
+				break;
+			default:
+				break;
+			}
+		}
 		glm::vec3 pos = playerPos;
 
 		front.x = glm::sin(glm::radians(playerRot.y));
