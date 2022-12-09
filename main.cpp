@@ -415,18 +415,16 @@ int main(void)
     glm::mat4 viewMatrix;
 
     // -------------------------------------------------------
-    // OTHER VARIABLES
+    // Time VARIABLES
 
-    long int    before = 0;
-    long int    after;
-    int         elapsed = 0;
 
-    before = GetTickCount64();
+    double  tick = 0.1;
 
+    //Theta
     float theta = 0.0f;
 
     /// <summary>
-    /// Getting uniforms for directional light and storing in a array
+    /// Getting uniforms for directional light then storing in a array
     /// Uniform ORDER:
     /// phong,specstr
     /// ambstr,lumens,
@@ -444,7 +442,7 @@ int main(void)
     obj_shaderProgram.findUloc("dir_target")
     };
 
-    //creatig point light pointing down
+    //creatig directional light pointing down
     lightBuilder* dir = new lightBuilder();
     dir->setAmbColor(new glm::vec3(0.6))
         ->setAmbStr(0.5)
@@ -455,6 +453,15 @@ int main(void)
         ->setLightColor(new glm::vec3(0, 0, 0.3))
         ->placeUnifs(dirUnifs);
 
+
+    /// <summary>
+    /// Getting uniforms for point light then storing in a array
+    /// Uniform ORDER:
+    /// phong,specstr
+    /// ambstr,lumens,
+    /// ambRGBA,lightrgba,
+    /// direction
+    /// </summary>
     GLint ptUnifs[7]{
         obj_shaderProgram.findUloc("pt_phong"),
         obj_shaderProgram.findUloc("pt_spec_str"),
@@ -464,29 +471,34 @@ int main(void)
         obj_shaderProgram.findUloc("pt_color"),
         obj_shaderProgram.findUloc("pt_src")
     };
-
+    //getting uniforms for if object has normals
     GLint hasBmp = obj_shaderProgram.findUloc("hasBmp");
+    //uniform location for camera position
     GLint eyePos = obj_shaderProgram.findUloc("eyePos");
+    //uniform for projection matrix
     GLint projectionLoc = obj_shaderProgram.findUloc("projection");
+    //uniform for projection matrix
     GLint viewLoc = obj_shaderProgram.findUloc("view");
+    //instantiating handler object hand
     Handler* hand = new Handler();
+    //setting player to be handled
     hand->player = &playerSub;
     
     /// <summary>
     /// Setting up cameras
     /// </summary>
-    
+    //3rd person
     tps_camera.setCameraPos(tps_cameraPos);    // Slight adjustments to align with playerSub
     tps_camera.setCameraCenter(playerSub.playerPos + glm::vec3(0.1f, 0.0f, 0.0f));
     tps_camera.setWorldUp(worldUp);
     tps_camera.setProjection(60.0f, screenWidth, screenHeight);
     tps_camera.setMode(Mode::TPS);
-    
+    //1st person
     fps_camera.setCameraPos(fps_cameraPos - glm::vec3(0.1f, 0.0f, 1.0f));   // Slight adjustments to align with playerSub
     fps_camera.setCameraCenter(playerSub.playerPos - glm::vec3(0.0f, 0.0f, 5.0f));
     fps_camera.setWorldUp(worldUp);
     fps_camera.setProjection(100.0f, screenWidth, screenHeight);
-
+    //Ortho
     td_camera.setCameraPos(td_cameraPos);
     td_camera.setCameraCenter(glm::vec3(0));
     td_camera.setWorldUp(glm::vec3(0,0,1));
@@ -504,7 +516,7 @@ int main(void)
         playerSub.placeUnifs(ptUnifs);
 
         // -----------------------------------------------------------------
-        // CAMERA USE
+        // TOGGLING CAMERAS BASED ON MODE
 
         switch (mode)
         {
@@ -578,7 +590,6 @@ int main(void)
         obj_shaderProgram.use();
         glUniform1i(hasBmp, GL_TRUE);
 
-        std::cout << glGetError() << "true" << '\n';
 
         playerSub.draw(
             obj_shaderProgram.getShader()   // Shader Program to use
@@ -586,7 +597,6 @@ int main(void)
 
         glUniform1i(hasBmp, GL_FALSE);
 
-        std::cout << "false" << glGetError() << '\n';
 
         enemySub1.draw(obj_shaderProgram.getShader());
         enemySub3.draw(obj_shaderProgram.getShader());
@@ -597,11 +607,10 @@ int main(void)
 
         // -----------------------------------------------------------------
 
-        after = GetTickCount64();
-        int temp = (after - before) / 1000;
 
-        if (!(elapsed == temp)) {
-            elapsed = temp;
+        //logic for when to display depth based on tick
+        if (tick <= glfwGetTime()) {
+            glfwSetTime(0);
             // Use cout to display playerPos on console
             cout << "Player Depth: " << playerSub.getDepth() << "\n";
         }
