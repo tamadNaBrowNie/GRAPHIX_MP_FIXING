@@ -636,6 +636,7 @@ public:
 
 class PlayerClass : public ModelClass {
 private:
+	float timeOfLastLightStrengthSwap = 0.0f;
 	enum class Intensity {
 		LOW, MED, HI
 	};
@@ -737,11 +738,6 @@ public:
 
 		// Draw
 		glDrawArrays(GL_TRIANGLES, 0, this->vertexData.size() / 5);
-
-		// TODO remove test
-		cout << "Front " << this->front.x << " " << this->front.y << " " << this->front.z << "\n";
-		cout << "Rotation " << this->playerRot.x << " " << this->playerRot.y << " " << this->playerRot.z << "\n";
-		cout << "Position " << this->playerPos.x << " " << this->playerPos.y << " " << this->playerPos.z << "\n";
 	}
 
 	float getDepth() {
@@ -752,6 +748,7 @@ public:
 		const float FORWARD_BACKWARD_MOVEMENT_SPEED = 0.3f;
 		const float ASCEND_DESCEND_MOVEMENT_SPEED = 0.3f;
 		const float LEFT_RIGHT_ROTATION_SPEED = 2.0f;
+		const float LIGHT_SWAP_COOLDOWN = 0.2f;
 
 		// Submarine Forward/Backward movement
 		if (key == GLFW_KEY_W) {
@@ -779,34 +776,42 @@ public:
 			this->playerRot.y -= LEFT_RIGHT_ROTATION_SPEED;
 		}
 
-		if (key == GLFW_KEY_F) {
+		if (key == GLFW_KEY_F &&
+				(timeOfLastLightStrengthSwap == 0 ||
+				 glfwGetTime() - timeOfLastLightStrengthSwap > LIGHT_SWAP_COOLDOWN)) {
 			switch (this->str)
 			{
-			case Intensity::LOW:
-				this->str = Intensity::MED;
-				break;
-			case Intensity::MED:
-				this->str = Intensity::HI;
-				break;
-			case Intensity::HI:
-				this->str = Intensity::LOW;
-				break;
-			default:
-				break;
+				case Intensity::LOW:
+					this->str = Intensity::MED;
+					break;
+				case Intensity::MED:
+					this->str = Intensity::HI;
+					break;
+				case Intensity::HI:
+					this->str = Intensity::LOW;
+					break;
+				default:
+					break;
 			}
-		}
 
-		glm::vec3 pos = playerPos;
+			timeOfLastLightStrengthSwap = glfwGetTime();
+		}
 
 		front.x = playerRot.y == 90? 0 : glm::cos(glm::radians(playerRot.y));
 		front.z = playerRot.y == 90? 1 : glm::sin(glm::radians(playerRot.y));
 
-		front = normalize(front);
+		front = glm::normalize(front);
 
-		pos.z -= OFFSET;
-		pos += glm::normalize(front);
+		glm::vec3 lightPos = playerPos;
 
-		bulb->setLightVec(&pos);
+		const float OFFSET = 0.8f;
+
+		lightPos.z -= OFFSET;
+		lightPos += front;
+
+		cout << "LightPosFront " << lightPos.x << " " << lightPos.y << " " << lightPos.z << "\n";
+
+		bulb->setLightVec(&lightPos);
 	}
 };
 

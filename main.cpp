@@ -16,19 +16,18 @@
 // GLOBAL VARIABLES
 
 // Screen width and height
-const float screenWidth = 1000.0f;
-const float screenHeight = 1000.0f;
-
-
-
-
-
+const float SCREEN_WIDTH = 1000.0f;
+const float SCREEN_HEIGHT = 1000.0f;
 
 // Camera Rotation (yaw and pitch)
 bool    firstMouse = true;
-float   lastX = 500.0f, lastY = 500.0f,
-yaw = -90.0f, pitch = 0.0f,
-sensitivity = 0.1f;
+float   lastX = 500.0f,
+		lastY = 500.0f,
+		yaw = -90.0f,
+		pitch = 0.0f,
+		sensitivity = 0.1f,
+		timeOfLastCameraPerspectiveSwap = 0.0f,
+		timeOfLastDepthPrint = 0.0f;
 
 //camera offsets for alignment
 const glm::vec3 fps_off = -glm::vec3(0.1f, 0.0f, 1.0f);
@@ -46,66 +45,72 @@ Mode pre = mode;
 
 void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+	const float PERSPECTIVE_SWAP_COOLDOWN = 0.1f;
 	Handler* hand = (Handler*)glfwGetWindowUserPointer(window);
 	glm::vec3* delta = new glm::vec3(0);
-	// Toggle TPS and FPS Camera
 
-	// Toggle TD Camera
+	/*
+	* Only allow to swap camera perspective, once that
+	* the camera swap cooldown is done.
+	*/
+ 	if (glfwGetTime() - timeOfLastCameraPerspectiveSwap > PERSPECTIVE_SWAP_COOLDOWN ||
+		timeOfLastCameraPerspectiveSwap == 0.0f) {
+		// Toggle Top-Down view
+		if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
+			if (mode != Mode::TD) {
+				pre = mode;
+				mode = Mode::TD;
+			}
+			else {
+				mode = pre;
+			}
 
-
-	//input handling for mode switching
-	//toggle Top-Down view
-	if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
-		if (mode != Mode::TD) {
-
-			pre = mode;
-			mode = Mode::TD;
-
+			timeOfLastCameraPerspectiveSwap = glfwGetTime();
 		}
-		else {
-			mode = pre;
+
+		// Toggle between First-Person View (FPS) and Third-Person View (TPS)
+		if (key == GLFW_KEY_1 && mode != Mode::TD) {
+			switch (mode)
+			{
+				case Mode::TPS:
+					mode = Mode::FPS;
+					timeOfLastCameraPerspectiveSwap = glfwGetTime();
+					break;
+				case Mode::FPS:
+					mode = Mode::TPS;
+					timeOfLastCameraPerspectiveSwap = glfwGetTime();
+					break;
+				default:
+					break;
+			}
 		}
 	}
-	//toggle between 1st person and 3rd
-	if (key == GLFW_KEY_1&& mode != Mode::TD) {
-		switch (mode)
-		{
-		case Mode::TPS:
-			mode = Mode::FPS;
-			break;
-		case Mode::FPS:
-			mode = Mode::TPS;
-			break;
-		default:
-			break;
-		}
-	}
 
-
-	//handles submarine controls
+	// Handles submarine controls
 	if (mode != Mode::TD)
 	{
 		hand->player->kbCallBack(window, key, scancode, action, mods);
 	}
-	//gets the vector to move camera
+
+	// Gets the vector to move camera
 	switch (mode)
 	{
-	case Mode::TPS:
-		delta = new glm::vec3(playerSub.playerPos + tps_off);
-		break;
-	case Mode::FPS:
-		delta = new glm::vec3(playerSub.playerPos + fps_off);
-		break;
-	case Mode::TD: *delta = hand->player->playerPos + tps_off;
-		break;
-	default:
-		break;
+		case Mode::TPS:
+			delta = new glm::vec3(playerSub.playerPos + tps_off);
+			break;
+		case Mode::FPS:
+			delta = new glm::vec3(playerSub.playerPos + fps_off);
+			break;
+		case Mode::TD: *delta = hand->player->playerPos + tps_off;
+			break;
+		default:
+			break;
 	}
-	//moves camera
+
+	// Moves camera
 	hand->cam->moveCam(delta);
-	/*
-	Handling exit keys
-	 */
+	
+	// Handling exit keys
 	if (key == GLFW_KEY_ESCAPE ||
 		key == GLFW_KEY_ENTER) {
 		glfwSetWindowShouldClose(window, true);
@@ -179,7 +184,7 @@ int main(void)
 	cam3p tps_camera;
 	cam1p fps_camera;
 	/* Create a windowed mode window and its OpenGL context */
-	window = glfwCreateWindow(screenWidth, screenHeight, "No Man's Submarine", NULL, NULL);
+	window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "No Man's Submarine", NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
@@ -426,15 +431,6 @@ int main(void)
 	glm::mat4 projectionMatrix;
 	glm::mat4 viewMatrix;
 
-	// -------------------------------------------------------
-	// Time VARIABLES
-
-
-	double  tick = 0.1;
-
-	//Theta
-	float theta = 0.0f;
-
 	/// <summary>
 	/// Getting uniforms for directional light then storing in a array
 	/// Uniform ORDER:
@@ -503,13 +499,13 @@ int main(void)
 	tps_camera.setCameraPos(tps_cameraPos);    // Slight adjustments to align with playerSub
 	tps_camera.setCameraCenter(playerSub.playerPos + tps_off);
 	tps_camera.setWorldUp(worldUp);
-	tps_camera.setProjection(60.0f, screenWidth, screenHeight);
+	tps_camera.setProjection(60.0f, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	//1st person
 	fps_camera.setCameraPos(fps_cameraPos);   // Slight adjustments to align with playerSub
 	fps_camera.setCameraCenter(playerSub.playerPos - glm::vec3(0.0f, 0.0f, 5.0f));
 	fps_camera.setWorldUp(worldUp);
-	fps_camera.setProjection(100.0f, screenWidth, screenHeight);
+	fps_camera.setProjection(100.0f, SCREEN_WIDTH, SCREEN_HEIGHT);
 	//Ortho
 	td_camera.setCameraPos(td_cameraPos);
 	td_camera.setCameraCenter(glm::vec3(0));
@@ -602,13 +598,11 @@ int main(void)
 		obj_shaderProgram.use();
 		glUniform1i(hasBmp, GL_TRUE);
 
-
 		playerSub.draw(
 			obj_shaderProgram.getShader()   // Shader Program to use
 		);
 
 		glUniform1i(hasBmp, GL_FALSE);
-
 
 		enemySub1.draw(obj_shaderProgram.getShader());
 		enemySub3.draw(obj_shaderProgram.getShader());
@@ -618,13 +612,15 @@ int main(void)
 		enemySub6.draw(obj_shaderProgram.getShader());
 
 		// -----------------------------------------------------------------
+		// MISC
+		
+		// Display player's depth every second
+		const float PRINT_DEPTH_COOLDOWN = 1.0f;
 
-
-		//logic for when to display depth based on tick
-		if (tick <= glfwGetTime()) {
-			glfwSetTime(0);
-			// Use cout to display playerPos on console
+		if (timeOfLastDepthPrint == 0 ||
+			glfwGetTime() - timeOfLastDepthPrint > PRINT_DEPTH_COOLDOWN) {
 			cout << "Player Depth: " << playerSub.getDepth() << "\n";
+			timeOfLastDepthPrint = glfwGetTime();
 		}
 
 		/* Swap front and back buffers */
