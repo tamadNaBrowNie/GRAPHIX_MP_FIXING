@@ -186,9 +186,6 @@ public:
 		cameraCenter = cameraPos + forward;
 		setView();
 	}
-	void rotateCam(float deg) {
-		viewMatrix = glm::rotate(viewMatrix, glm::radians(deg), glm::vec3(0, 1, 0));
-	}
 
 };
 

@@ -184,7 +184,7 @@ int main(void)
 	// LOADING OBJECTS
 
 	
-	PlayerClass playerSub("3D/submarine/sub2.obj",
+	PlayerClass playerSub("3D/submarine/submarine.obj",
 		glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3(0.0f, 90.0f, 0.0f),
 		0.15f);
@@ -525,8 +525,8 @@ int main(void)
 		case Mode::TPS:
 			//tps_camera.setCameraPos(tps_cameraPos - glm::vec3(0, 0.0f, 0.1));
 			//tps_camera.setCameraCenter(playerSub.playerPos + glm::vec3(0.1f, 0.0f, 0.0f));
-			*delta = glm::vec3(playerSub.playerPos + tps_off);
-			tps_camera.moveCam(delta);
+	
+			tps_camera.moveCam(&playerSub.playerPos);
 			tps_camera.setView();
 
 			projectionMatrix = tps_camera.getProjectionMatrix();
