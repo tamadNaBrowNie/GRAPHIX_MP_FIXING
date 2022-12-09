@@ -182,7 +182,7 @@ public:
 
 
 	void moveCam(glm::vec3* pos) {
-		/*viewMatrix = glm::translate(viewMatrix,*pos);*/
+
 		cameraPos += *pos;
 		
 		cameraCenter = cameraPos + forward;
