@@ -52,7 +52,7 @@ public:
 	//gets uniform location
 	GLint findUloc(const GLchar* src) {
 		GLint unif = glGetUniformLocation(this->shaderProgram, src);
-		std::cout << glGetError() << src << '\n';
+		
 		return unif;
 	}
 };
@@ -848,7 +848,7 @@ public:
 		lightPos.z -= OFFSET;
 		lightPos += front;
 
-		cout << "LightPosFront " << lightPos.x << " " << lightPos.y << " " << lightPos.z << "\n";
+		
 
 		bulb->setLightVec(&lightPos);
 
