@@ -64,7 +64,7 @@ protected:
 	glm::vec3 worldUp;
 	glm::mat4 projectionMatrix;
 	glm::mat4 viewMatrix;
-	glm::vec3 dir;
+	glm::vec3 forward;
 
 
 public:
@@ -81,16 +81,16 @@ public:
 	void setWorldUp(glm::vec3 w_Up) {
 		this->worldUp = w_Up;
 	}
-	void setDir() {
-		dir = glm::normalize(cameraCenter - cameraPos);
+	void setForward() {
+		forward = glm::normalize(cameraCenter - cameraPos);
 	}
 
-	void setDir(glm::vec3* vecD) {
-		dir = -*vecD;
+	void setForward(glm::vec3* vecD) {
+		forward = -*vecD;
 	}
 
-	glm::vec3 getDir() {
-		return this->dir;
+	glm::vec3 getForward() {
+		return this->forward;
 	}
 
 	void setView() {
@@ -115,7 +115,7 @@ public:
 		return this->viewMatrix;
 	}
 
-	virtual void kbCallBack(GLFWwindow*, int, int, int, int) = 0;
+
 
 };
 
@@ -131,14 +131,14 @@ public:
 	void moveCam(glm::vec3* center) {
 
 		cameraCenter = *center;
-		cameraPos = *center - dir;
-		cameraPos.y = dir.y;
+		cameraPos = *center - forward;
+		cameraPos.y = forward.y;
 		setView();
 	}
 	void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
 		const float speed = 0.1;
-		const float denom = 1 / glm::dot(dir, dir);;
-		glm::vec3 numer = glm::cross(this->worldUp,this->dir);
+		const float denom = 1 / glm::dot(forward, forward);;
+		glm::vec3 numer = glm::cross(this->worldUp,this->forward);
 		glm::vec3 right = numer * denom;
 		
 		switch (key)
@@ -168,27 +168,22 @@ public:
 
 class cam3p : public PerspectiveCamera {
 public:
-	void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {}
 
 	void moveCam(glm::vec3* center) {
 	
 		cameraCenter = *center;
-		cameraPos = cameraCenter - dir;
+		cameraPos = cameraCenter - forward;
 	}
 
 };
 
 class cam1p : public PerspectiveCamera {
 public:
-	void kbCallBack(GLFWwindow* window, 
-					int key,
-					int scancode,
-					int action,
-					int mods){}
+
 
 	void moveCam(glm::vec3* pos) {
 		cameraPos = *pos;
-		cameraCenter = cameraPos + dir;
+		cameraCenter = cameraPos + forward;
 	}
 
 };
@@ -663,6 +658,7 @@ public:
 
 class PlayerClass : public ModelClass {
 private:
+	float timeOfLastLightStrengthSwap = 0.0f;
 	enum class Intensity {
 		LOW, MED, HI
 	};
@@ -764,11 +760,6 @@ public:
 
 		// Draw
 		glDrawArrays(GL_TRIANGLES, 0, this->vertexData.size() / 5);
-
-		// TODO remove test
-		cout << "Front " << this->front.x << " " << this->front.y << " " << this->front.z << "\n";
-		cout << "Rotation " << this->playerRot.x << " " << this->playerRot.y << " " << this->playerRot.z << "\n";
-		cout << "Position " << this->playerPos.x << " " << this->playerPos.y << " " << this->playerPos.z << "\n";
 	}
 
 	float getDepth() {
@@ -779,6 +770,7 @@ public:
 		const float FORWARD_BACKWARD_MOVEMENT_SPEED = 0.3f;
 		const float ASCEND_DESCEND_MOVEMENT_SPEED = 0.3f;
 		const float LEFT_RIGHT_ROTATION_SPEED = 2.0f;
+		const float LIGHT_SWAP_COOLDOWN = 0.2f;
 
 		// Submarine Forward/Backward movement
 		if (key == GLFW_KEY_W) {
@@ -806,9 +798,12 @@ public:
 			this->playerRot.y -= LEFT_RIGHT_ROTATION_SPEED;
 		}
 
-		if (key == GLFW_KEY_F) {
+		if (key == GLFW_KEY_F &&
+				(timeOfLastLightStrengthSwap == 0 ||
+				 glfwGetTime() - timeOfLastLightStrengthSwap > LIGHT_SWAP_COOLDOWN)) {
 			switch (this->str)
 			{
+
 			case Intensity::LOW:
 				this->str = Intensity::MED;
 				break;
@@ -820,20 +815,34 @@ public:
 				break;
 			default:this->str = Intensity::LOW;
 				break;
-			}
-		}
 
-		glm::vec3 pos = playerPos;
+			}
+
+			timeOfLastLightStrengthSwap = glfwGetTime();
+		}
 
 		front.x = playerRot.y == 90? 0 : glm::cos(glm::radians(playerRot.y));
 		front.z = playerRot.y == 90? 1 : glm::sin(glm::radians(playerRot.y));
 
-		front = normalize(front);
+		front = glm::normalize(front);
 
+		glm::vec3 pos = playerPos;
 
 		pos += glm::normalize(front);//we need to add an x offset because sub is not centered.
 		
 		bulb->setLightVec(&pos);
+
+		glm::vec3 lightPos = playerPos;
+
+		const float OFFSET = 0.8f;
+
+		lightPos.z -= OFFSET;
+		lightPos += front;
+
+		cout << "LightPosFront " << lightPos.x << " " << lightPos.y << " " << lightPos.z << "\n";
+
+		bulb->setLightVec(&lightPos);
+
 	}
 };
 

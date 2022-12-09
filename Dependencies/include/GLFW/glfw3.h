@@ -5398,7 +5398,7 @@ GLFWAPI double glfwGetTime(void);
  *
  *  @ingroup input
  */
-GLFWAPI void glfwSetTime(double time);
+GLFWAPI void glfwSetTime(double programTime);
 
 /*! @brief Returns the current value of the raw timer.
  *

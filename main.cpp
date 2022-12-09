@@ -16,19 +16,18 @@
 // GLOBAL VARIABLES
 
 // Screen width and height
-const float screenWidth = 1000.0f;
-const float screenHeight = 1000.0f;
-
-
-
-
-
+const float SCREEN_WIDTH = 1000.0f;
+const float SCREEN_HEIGHT = 1000.0f;
 
 // Camera Rotation (yaw and pitch)
 bool    firstMouse = true;
-float   lastX = 500.0f, lastY = 500.0f,
-yaw = -90.0f, pitch = 0.0f,
-sensitivity = 0.1f;
+float   lastX = 500.0f,
+		lastY = 500.0f,
+		yaw = -90.0f,
+		pitch = 0.0f,
+		sensitivity = 0.1f,
+		timeOfLastCameraPerspectiveSwap = 0.0f,
+		timeOfLastDepthPrint = 0.0f;
 
 //camera offsets for alignment
 const glm::vec3 fps_off = -glm::vec3(0.1f, 0.0f, 1.0f);
@@ -46,6 +45,7 @@ Mode pre = mode;
 
 void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+	const float PERSPECTIVE_SWAP_COOLDOWN = 0.1f;
 	Handler* hand = (Handler*)glfwGetWindowUserPointer(window);
 	
 
@@ -54,41 +54,48 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	{
 		hand->player->kbCallBack(window, key, scancode, action, mods);
 	}
-
-
-	//input handling for mode switching
-	//toggle Top-Down view
-	if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
-		
-		if (mode != Mode::TD) {
-			pre = mode;
-			mode = Mode::TD;
-		}
-		else {	
-			mode = pre;
-		}
-	}
-	//toggle between 1st person and 3rd
-	if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
-		switch (mode)
-		{
-		case Mode::TPS:
-			mode = Mode::FPS;
-			break;
-		case Mode::FPS:
-			mode = Mode::TPS;
-			break;
-		default:
-			break;
-		}
+	else {
+		OrthoCamera* orth = (OrthoCamera*)hand->cam;
+		orth->kbCallBack(window, key, scancode, action, mods);
 	}
 
-	//handle inputs for camera
-	hand->cam->kbCallBack(window, key, scancode, action, mods);
-	
+
 	/*
-	Handling exit keys
-	 */
+	* Only allow to swap camera perspective, once that
+	* the camera swap cooldown is done.
+	*/
+	if (glfwGetTime() - timeOfLastCameraPerspectiveSwap > PERSPECTIVE_SWAP_COOLDOWN ||
+		timeOfLastCameraPerspectiveSwap == 0.0f) {
+		if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
+			// Toggle Top-Down view
+			if (mode != Mode::TD) {
+				pre = mode;
+				mode = Mode::TD;
+			}
+			else {
+				mode = pre;
+			}
+		}
+
+		// Toggle between First-Person View (FPS) and Third-Person View (TPS)
+		if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
+			switch (mode)
+			{
+			case Mode::TPS:
+				mode = Mode::FPS;
+				timeOfLastCameraPerspectiveSwap = glfwGetTime();
+				break;
+			case Mode::FPS:
+				mode = Mode::TPS;
+				timeOfLastCameraPerspectiveSwap = glfwGetTime();
+				break;
+			default:
+				break;
+			}
+		}
+	}
+	
+	// Handling exit keys
 	if (key == GLFW_KEY_ESCAPE ||
 		key == GLFW_KEY_ENTER) {
 		glfwSetWindowShouldClose(window, true);
@@ -139,15 +146,15 @@ void Mouse_Callback(GLFWwindow* window, double xpos, double ypos)
 
 	glm::vec3 direction = glm::vec3(
 		(cos(glm::radians(yaw)) * cos(glm::radians(pitch))),
-		(sin(glm::radians(pitch))),
+		-(sin(glm::radians(pitch))),
 		(sin(glm::radians(yaw)) * cos(glm::radians(pitch)))
 	);
 	/*
 	Updating the position of the camera.
 	*/
 
-	handler->cam->setDir(new glm::vec3(glm::normalize(direction)));
-	handler->cam->setCameraPos(handler->cam->getCameraCenter() - handler->cam->getDir());
+	handler->cam->setForward(new glm::vec3(glm::normalize(direction)));
+	handler->cam->setCameraPos(handler->cam->getCameraCenter() - handler->cam->getForward());
 }
 
 int main(void)
@@ -163,7 +170,7 @@ int main(void)
 	cam1p fps_camera;
 	glm::vec3* delta = new glm::vec3(0);
 	/* Create a windowed mode window and its OpenGL context */
-	window = glfwCreateWindow(screenWidth, screenHeight, "No Man's Submarine", NULL, NULL);
+	window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "No Man's Submarine", NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
@@ -410,15 +417,6 @@ int main(void)
 	glm::mat4 projectionMatrix;
 	glm::mat4 viewMatrix;
 
-	// -------------------------------------------------------
-	// Time VARIABLES
-
-
-	double  tick = 0.1;
-
-	//Theta
-	float theta = 0.0f;
-
 	/// <summary>
 	/// Getting uniforms for directional light then storing in a array
 	/// Uniform ORDER:
@@ -487,24 +485,24 @@ int main(void)
 	tps_camera.setCameraPos(tps_cameraPos);    // Slight adjustments to align with playerSub
 	tps_camera.setCameraCenter(playerSub.playerPos + tps_off);
 	tps_camera.setWorldUp(worldUp);
-	tps_camera.setProjection(60.0f, screenWidth, screenHeight);
-	tps_camera.setDir();
+	tps_camera.setProjection(60.0f, SCREEN_WIDTH, SCREEN_HEIGHT);
+	tps_camera.setForward();
 	tps_camera.setView();
+
 	//1st person
 	fps_camera.setCameraPos(fps_cameraPos);   // Slight adjustments to align with playerSub
 	fps_camera.setCameraCenter(playerSub.playerPos - glm::vec3(0.0f, 0.0f, 5.0f));
 	fps_camera.setWorldUp(worldUp);
-	fps_camera.setProjection(100.0f, screenWidth, screenHeight);
-	fps_camera.setDir();
+	fps_camera.setProjection(100.0f, SCREEN_WIDTH, SCREEN_HEIGHT);
+	fps_camera.setForward();
 	fps_camera.setView();
-
 	//Ortho
 	td_camera.setCameraPos(td_cameraPos);
 	td_camera.setCameraCenter(glm::vec3(0));
 	td_camera.setWorldUp(glm::vec3(0, 0, -1));
 	td_camera.setProjection(-1, 1, -1, 1, -1.f, 255.0f);
 	td_camera.setView();
-	td_camera.setDir();
+	td_camera.setForward();
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -602,13 +600,11 @@ int main(void)
 		obj_shaderProgram.use();
 		glUniform1i(hasBmp, GL_TRUE);
 
-
 		playerSub.draw(
 			obj_shaderProgram.getShader()   // Shader Program to use
 		);
 
 		glUniform1i(hasBmp, GL_FALSE);
-
 
 		enemySub1.draw(obj_shaderProgram.getShader());
 		enemySub3.draw(obj_shaderProgram.getShader());
@@ -618,13 +614,15 @@ int main(void)
 		enemySub6.draw(obj_shaderProgram.getShader());
 
 		// -----------------------------------------------------------------
+		// MISC
+		
+		// Display player's depth every second
+		const float PRINT_DEPTH_COOLDOWN = 1.0f;
 
-
-		//logic for when to display depth based on tick
-		if (tick <= glfwGetTime()) {
-			glfwSetTime(0);
-			// Use cout to display playerPos on console
+		if (timeOfLastDepthPrint == 0 ||
+			glfwGetTime() - timeOfLastDepthPrint > PRINT_DEPTH_COOLDOWN) {
 			cout << "Player Depth: " << playerSub.getDepth() << "\n";
+			timeOfLastDepthPrint = glfwGetTime();
 		}
 
 		/* Swap front and back buffers */
