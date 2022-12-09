@@ -739,31 +739,34 @@ public:
 		return this->playerPos.y;
 	}
 
-	void forward() {
-		this->playerPos.z += -0.1;
-	}
-
-	void back() {
-		this->playerPos.z -= -0.1;
-	}
-
-	void up() {
-		playerPos.y += 0.1f;
-	}
-
-	void down() {
-		playerPos.y -= 0.1f;
-	}
-
 	void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
-		if (key == GLFW_KEY_W)forward();
-		else if (key == GLFW_KEY_S)back();
+		const float FORWARD_BACKWARD_MOVEMENT_SPEED = 0.1f;
+		const float ASCEND_DESCEND_MOVEMENT_SPEED = 0.1f;
+		const float LEFT_RIGHT_ROTATION_SPEED = 1.0f;
 
-		if (key == GLFW_KEY_Q && playerPos.y + 0.1f <= 0)up();
-		else if (key == GLFW_KEY_E) down();
+		// Submarine Forward/Backward movement
+		if (key == GLFW_KEY_W) {
+			this->playerPos.z -= FORWARD_BACKWARD_MOVEMENT_SPEED;
+		}
+		else if (key == GLFW_KEY_S) {
+			this->playerPos.z += FORWARD_BACKWARD_MOVEMENT_SPEED;
+		}
 
-		if (key == GLFW_KEY_A) this->playerRot.y += 1;
-		else if (key == GLFW_KEY_D) this->playerRot.y -= 1;
+		// Submarine Ascend/Descend movement
+		if (key == GLFW_KEY_Q && playerPos.y + 0.1f <= 0) {
+			this->playerPos.y += ASCEND_DESCEND_MOVEMENT_SPEED;
+		}
+		else if (key == GLFW_KEY_E) {
+			this->playerPos.y -= ASCEND_DESCEND_MOVEMENT_SPEED;
+		}
+
+		// Submarine Left/Right rotation movement
+		if (key == GLFW_KEY_A) {
+			this->playerRot.y += LEFT_RIGHT_ROTATION_SPEED;
+		}
+		else if (key == GLFW_KEY_D) {
+			this->playerRot.y -= LEFT_RIGHT_ROTATION_SPEED;
+		}
 
 		if (key == GLFW_KEY_F) {
 			switch (this->str)
