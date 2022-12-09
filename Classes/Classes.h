@@ -688,16 +688,16 @@ public:
 	glm::vec3 front;
 
 	inline PlayerClass(std::string path,
-		glm::vec3 pos,
-		glm::vec3 rot,
-		float scale) :
-		ModelClass(path),
-		playerPos(pos),
-		playerRot(rot),
-		playerScale(scale),
-		bulb(new lightBuilder()),
-		front(glm::vec3(0, 0, 0.1)),
-		transformationMatrix(glm::mat4(1.0)) {
+			glm::vec3 pos,
+			glm::vec3 rot,
+			float scale) :
+			ModelClass(path),
+			playerPos(pos),
+			playerRot(rot),
+			playerScale(scale),
+			bulb(new lightBuilder()),
+			front(glm::vec3(0, 0, 0)),
+			transformationMatrix(glm::mat4(1.0)) {
 		glm::vec3 src = pos;
 		src.z -= 0.7;
 		bulb
@@ -708,7 +708,6 @@ public:
 			->setLightVec(&src)
 			->setLightColor(new glm::vec3(1))
 			->setAmbColor(new glm::vec3(1));
-
 	}
 
 	inline void placeUnifs(GLint* unifs) {
@@ -776,39 +775,49 @@ public:
 
 		// Draw
 		glDrawArrays(GL_TRIANGLES, 0, this->vertexData.size() / 5);
+
+		// TODO remove test
+		cout << "Front " << this->front.x << " " << this->front.y << " " << this->front.z << "\n";
+		cout << "Rotation " << this->playerRot.x << " " << this->playerRot.y << " " << this->playerRot.z << "\n";
+		cout << "Position " << this->playerPos.x << " " << this->playerPos.y << " " << this->playerPos.z << "\n";
 	}
 
 	float getDepth() {
 		return this->playerPos.y;
 	}
 
-	void forward() {
-		this->playerPos.z += -0.1;
-	}
-
-	void back() {
-		this->playerPos.z -= -0.1;
-	}
-
-	void up() {
-		playerPos.y += 0.1f;
-	}
-
-	void down() {
-		playerPos.y -= 0.1f;
-	}
-
 	void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
-		if (key == GLFW_KEY_W)forward();
-		else if (key == GLFW_KEY_S)back();
+		const float FORWARD_BACKWARD_MOVEMENT_SPEED = 0.3f;
+		const float ASCEND_DESCEND_MOVEMENT_SPEED = 0.3f;
+		const float LEFT_RIGHT_ROTATION_SPEED = 2.0f;
 
-		if (key == GLFW_KEY_Q && playerPos.y + 0.1f <= 0)up();
-		else if (key == GLFW_KEY_E) down();
+		// Submarine Forward/Backward movement
+		if (key == GLFW_KEY_W) {
+			this->playerPos.x += FORWARD_BACKWARD_MOVEMENT_SPEED * front.x;
+			this->playerPos.z -= FORWARD_BACKWARD_MOVEMENT_SPEED * front.z;
+		}
+		else if (key == GLFW_KEY_S) {
+			this->playerPos.x -= FORWARD_BACKWARD_MOVEMENT_SPEED * front.x;
+			this->playerPos.z += FORWARD_BACKWARD_MOVEMENT_SPEED * front.z;
+		}
 
-		if (key == GLFW_KEY_A) this->playerRot.y += 1;
-		else if (key == GLFW_KEY_D) this->playerRot.y -= 1;
+		// Submarine Ascend/Descend movement
+		if (key == GLFW_KEY_Q && playerPos.y + 0.1f <= 0) {
+			this->playerPos.y += ASCEND_DESCEND_MOVEMENT_SPEED;
+		}
+		else if (key == GLFW_KEY_E) {
+			this->playerPos.y -= ASCEND_DESCEND_MOVEMENT_SPEED;
+		}
 
-		if (key == GLFW_KEY_F && action == GLFW_PRESS) {
+		// Submarine Left/Right rotation movement
+		if (key == GLFW_KEY_A) {
+			this->playerRot.y += LEFT_RIGHT_ROTATION_SPEED;
+		}
+		else if (key == GLFW_KEY_D) {
+			this->playerRot.y -= LEFT_RIGHT_ROTATION_SPEED;
+		}
+
+		if (key == GLFW_KEY_F) {
 			switch (this->str)
 			{
 			case Intensity::LOW:
@@ -827,10 +836,14 @@ public:
 
 		glm::vec3 pos = playerPos;
 
-		front.x = glm::sin(glm::radians(playerRot.y));
-		front.z = glm::cos(glm::radians(playerRot.y));
+		front.x = playerRot.y == 90? 0 : glm::cos(glm::radians(playerRot.y));
+		front.z = playerRot.y == 90? 1 : glm::sin(glm::radians(playerRot.y));
+
+		front = normalize(front);
+
 		pos.z -= OFFSET;
 		pos += glm::normalize(front);
+
 		bulb->setLightVec(&pos);
 	}
 };
