@@ -71,7 +71,9 @@ public:
 
 
 
-
+	void tlMat(glm::vec3* tlv) {
+		viewMatrix = glm::translate(viewMatrix, *tlv);
+	}
 	void setCameraPos(glm::vec3 c_Pos) {
 		this->cameraPos = c_Pos;
 	}
@@ -88,7 +90,7 @@ public:
 	}
 
 	void setDir(glm::vec3* vecD) {
-		dir = *vecD;
+		dir = -*vecD;
 	}
 
 	glm::vec3 getDir() {
@@ -122,17 +124,49 @@ public:
 };
 
 class OrthoCamera : public MyCamera {
+	private:
+		float getDenom() {
+			return 1 / glm::dot(dir, dir);
+		}
+		
 public:
 	void setProjection(float left, float right, float bottom, float top, float zNear, float zFar) {
 		//cant we make this a mat4 in player then set it to the base camera class?
 		this->projectionMatrix = glm::ortho(left, right, bottom, top, zNear, zFar);
 	}
 	void moveCam(glm::vec3* center) {
+
+		//viewMatrix = glm::translate(viewMatrix, glm::vec3(center->x, dir.y, -center->z));
 		cameraCenter = *center;
-		cameraPos = cameraCenter - dir;
+		cameraPos = *center - dir;
 		cameraPos.y = dir.y;
+		setView();
 	}
-	void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {}
+	void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
+		const float speed = 0.01;
+		const float denom = getDenom();
+		const glm::vec3 numer = glm::cross(this->worldUp,this->dir);
+		const glm::vec3 right = numer * denom;
+		//glm::vec3* trans = (glm::vec3*)glfwGetWindowUserPointer(window);
+		switch (key)
+		{
+		//case GLFW_KEY_2:
+		//	glm::translate(viewMatrix,*trans);
+			break;
+		case GLFW_KEY_W:viewMatrix = glm::translate(viewMatrix,-speed*this->worldUp);
+			break;
+		case GLFW_KEY_S: viewMatrix = glm::translate(viewMatrix, speed*this->worldUp);
+			break;
+		case GLFW_KEY_A: viewMatrix = glm::translate(viewMatrix, -speed * glm::normalize(right));
+			break;
+
+		case GLFW_KEY_D: viewMatrix = glm::translate(viewMatrix, speed * glm::normalize(right));
+			break;
+		default:
+			break;
+		}
+	
+	}
 
 };
 
@@ -144,8 +178,11 @@ public:
 };
 
 class cam3p : public PerspectiveCamera {
+public:
 	void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {}
+
 	void moveCam(glm::vec3* center) {
+	
 		cameraCenter = *center;
 		cameraPos = cameraCenter - dir;
 	}
@@ -153,6 +190,7 @@ class cam3p : public PerspectiveCamera {
 };
 
 class cam1p : public PerspectiveCamera {
+public:
 	void kbCallBack(GLFWwindow* window, 
 					int key,
 					int scancode,
