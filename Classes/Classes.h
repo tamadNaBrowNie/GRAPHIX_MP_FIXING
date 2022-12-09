@@ -132,7 +132,7 @@ public:
 
 		cameraCenter = *center;
 		cameraPos = *center - forward;
-		cameraPos.y = forward.y;
+		cameraPos.y = -forward.y;
 		setView();
 	}
 	void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -740,7 +740,7 @@ public:
 		// Y-axis rotation
 		transformationMatrix = glm::rotate(transformationMatrix,
 			glm::radians(this->playerRot.y),
-			glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)));
+			glm::normalize(glm::vec3(0, 0.5f, 0)));
 		// Z-axis rotation
 		transformationMatrix = glm::rotate(transformationMatrix,
 			glm::radians(this->playerRot.z),
