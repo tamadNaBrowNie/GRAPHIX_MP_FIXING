@@ -54,12 +54,7 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	{
 		hand->player->kbCallBack(window, key, scancode, action, mods);
 	}
-	else
-	{
-		//handles TD cam controls
-		hand->cam->kbCallBack(window, key, scancode, action, mods);
 
-	}
 
 	//input handling for mode switching
 	//toggle Top-Down view
@@ -88,8 +83,8 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		}
 	}
 
-
-	
+	//handle inputs for camera
+	hand->cam->kbCallBack(window, key, scancode, action, mods);
 	
 	/*
 	Handling exit keys
@@ -507,7 +502,7 @@ int main(void)
 	td_camera.setCameraPos(td_cameraPos);
 	td_camera.setCameraCenter(glm::vec3(0));
 	td_camera.setWorldUp(glm::vec3(0, 0, -1));
-	td_camera.setProjection(-1.f, 1.f, -1.f, 1.0f, -0.1f, 255.0f);
+	td_camera.setProjection(-1, 1, -1, 1, -1.f, 255.0f);
 	td_camera.setView();
 	td_camera.setDir();
 

@@ -49,7 +49,7 @@ public:
 	GLuint getShader() {
 		return this->shaderProgram;
 	}
-
+	//gets uniform location
 	GLint findUloc(const GLchar* src) {
 		GLint unif = glGetUniformLocation(this->shaderProgram, src);
 		std::cout << glGetError() << src << '\n';
@@ -70,10 +70,6 @@ protected:
 public:
 
 
-
-	void tlMat(glm::vec3* tlv) {
-		viewMatrix = glm::translate(viewMatrix, *tlv);
-	}
 	void setCameraPos(glm::vec3 c_Pos) {
 		this->cameraPos = c_Pos;
 	}
@@ -125,41 +121,34 @@ public:
 
 class OrthoCamera : public MyCamera {
 	private:
-		float getDenom() {
-			return 1 / glm::dot(dir, dir);
-		}
+
 		
 public:
 	void setProjection(float left, float right, float bottom, float top, float zNear, float zFar) {
-		//cant we make this a mat4 in player then set it to the base camera class?
+		
 		this->projectionMatrix = glm::ortho(left, right, bottom, top, zNear, zFar);
 	}
 	void moveCam(glm::vec3* center) {
 
-		//viewMatrix = glm::translate(viewMatrix, glm::vec3(center->x, dir.y, -center->z));
 		cameraCenter = *center;
 		cameraPos = *center - dir;
 		cameraPos.y = dir.y;
 		setView();
 	}
 	void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
-		const float speed = 0.01;
-		const float denom = getDenom();
-		const glm::vec3 numer = glm::cross(this->worldUp,this->dir);
-		const glm::vec3 right = numer * denom;
-		//glm::vec3* trans = (glm::vec3*)glfwGetWindowUserPointer(window);
+		const float speed = 0.1;
+		const float denom = 1 / glm::dot(dir, dir);;
+		glm::vec3 numer = glm::cross(this->worldUp,this->dir);
+		glm::vec3 right = numer * denom;
+		
 		switch (key)
 		{
-		//case GLFW_KEY_2:
-		//	glm::translate(viewMatrix,*trans);
-			break;
 		case GLFW_KEY_W:viewMatrix = glm::translate(viewMatrix,-speed*this->worldUp);
 			break;
 		case GLFW_KEY_S: viewMatrix = glm::translate(viewMatrix, speed*this->worldUp);
 			break;
 		case GLFW_KEY_A: viewMatrix = glm::translate(viewMatrix, -speed * glm::normalize(right));
 			break;
-
 		case GLFW_KEY_D: viewMatrix = glm::translate(viewMatrix, speed * glm::normalize(right));
 			break;
 		default:
@@ -714,13 +703,13 @@ public:
 		switch (this->str)
 		{
 		case Intensity::LOW:
-			bulb->setLumens(2);
+			bulb->setLumens(1);
 			break;
 		case Intensity::MED:
-			bulb->setLumens(4);
+			bulb->setLumens(2);
 			break;
 		case Intensity::HI:
-			bulb->setLumens(8);
+			bulb->setLumens(3);
 			break;
 		default:
 			break;
@@ -829,7 +818,7 @@ public:
 			case Intensity::HI:
 				this->str = Intensity::LOW;
 				break;
-			default:
+			default:this->str = Intensity::LOW;
 				break;
 			}
 		}
@@ -841,9 +830,9 @@ public:
 
 		front = normalize(front);
 
-		pos.z -= OFFSET;
-		pos += glm::normalize(front);
 
+		pos += glm::normalize(front);//we need to add an x offset because sub is not centered.
+		
 		bulb->setLightVec(&pos);
 	}
 };
