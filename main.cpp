@@ -619,10 +619,6 @@ obj_shaderProgram.findUloc("pt_src")
         glDepthFunc(GL_LESS);
 
         // -----------------------------------------------------------------
-
-        playerSub.playerRot.x -= 0.3f;
-
-        // -----------------------------------------------------------------
         // RENDERING OBJECTS
 
         obj_shaderProgram.use();
