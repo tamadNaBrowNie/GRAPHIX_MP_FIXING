@@ -49,7 +49,15 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	//handles submarine controls
 	if (mode != Mode::TD)
 	{
+		glm::vec3 prev = hand->player->playerPos;
 		hand->player->kbCallBack(window, key, scancode, action, mods);
+		if(mode== Mode::FPS) {
+			cam1p* fpc = (cam1p*)hand->cam;
+			glm::vec3 posF = hand->player->playerPos - prev;
+			fpc->moveCam(&posF);
+	/*		fpc->rotateCam(glm::acos(posF.z));*/
+			
+		}
 	}
 	else {
 		OrthoCamera* orth = (OrthoCamera*)hand->cam;
@@ -504,7 +512,9 @@ int main(void)
 	td_camera.setProjection(-1, 1, -1, 1, -1.f, 255.0f);
 	td_camera.setView();
 	td_camera.setForward();
-
+	
+	float deg = 90-playerSub.playerRot.y;
+	glm::vec3 initial = playerSub.playerPos;
 	while (!glfwWindowShouldClose(window))
 	{
 		//gets the vector to move camera
@@ -536,10 +546,23 @@ int main(void)
 			
 			break;
 
-		case Mode::FPS:
-			fps_camera.setForward(new glm::vec3(playerSub.front));
-			fps_camera.moveCam(new glm::vec3(playerSub.playerPos ));
-			//fps_camera.rotateCam(90-playerSub.playerRot.y);
+		case Mode::FPS:		
+
+			
+//if (initial != playerSub.playerPos) {
+//			fps_camera.moveCam(new glm::vec3(playerSub.playerPos));
+//			initial = playerSub.playerPos;
+//		}
+			if (deg != 90-playerSub.playerRot.y) {
+				deg =90- playerSub.playerRot.y;
+				fps_camera.rotateCam(deg);
+			}
+
+			
+			
+			/*fps_camera.setForward(new glm::vec3(playerSub.front));
+			fps_camera.moveCam(new glm::vec3(playerSub.playerPos ));*/
+			
 			projectionMatrix = fps_camera.getProjectionMatrix();
 			viewMatrix = fps_camera.getViewMatrix();
 			glUniform3fv(eyePos, 1, glm::value_ptr(tps_camera.getCameraPos()));
