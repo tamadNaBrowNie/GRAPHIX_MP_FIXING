@@ -118,7 +118,7 @@ public:
 	}
 
 	virtual void kbCallBack(GLFWwindow*, int, int, int, int) = 0;
-	virtual void ptrCallBacK(GLFWwindow*, double, double) {};
+
 };
 
 class OrthoCamera : public MyCamera {
@@ -127,9 +127,13 @@ public:
 		//cant we make this a mat4 in player then set it to the base camera class?
 		this->projectionMatrix = glm::ortho(left, right, bottom, top, zNear, zFar);
 	}
-	void moveCam(glm::vec3* rst) {}
+	void moveCam(glm::vec3* center) {
+		cameraCenter = *center;
+		cameraPos = cameraCenter - dir;
+		cameraPos.y = dir.y;
+	}
 	void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {}
-	void ptrCallBack(GLFWwindow* win, double x, double y) {}
+
 };
 
 class PerspectiveCamera : public MyCamera {
@@ -145,18 +149,21 @@ class cam3p : public PerspectiveCamera {
 		cameraCenter = *center;
 		cameraPos = cameraCenter - dir;
 	}
-	void ptrCallBack(GLFWwindow* win, double x, double y) {}
+
 };
 
 class cam1p : public PerspectiveCamera {
-	void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
-		this->cameraPos = this->cameraCenter + this->dir + glm::vec3(0, 0, 0.5);
-	}
+	void kbCallBack(GLFWwindow* window, 
+					int key,
+					int scancode,
+					int action,
+					int mods){}
+
 	void moveCam(glm::vec3* pos) {
 		cameraPos = *pos;
 		cameraCenter = cameraPos + dir;
 	}
-	void ptrCallBack(GLFWwindow* win, double x, double y) {}
+
 };
 
 class ModelClass {
