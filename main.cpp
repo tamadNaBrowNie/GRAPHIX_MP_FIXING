@@ -536,11 +536,9 @@ int main(void)
 			break;
 
 		case Mode::FPS:
-			//fps_camera.setCameraPos(playerSub.playerPos - glm::vec3(0.f, 0.0f, 1.0f));
-			//fps_camera.setCameraCenter(playerSub.playerPos - glm::vec3(0.f, 0.0f, 2.0f));
-			
+
 			fps_camera.moveCam(new glm::vec3(playerSub.playerPos + fps_off));
-			fps_camera.setView();
+			fps_camera.rotateCam(-playerSub.playerRot.y);
 			projectionMatrix = fps_camera.getProjectionMatrix();
 			viewMatrix = fps_camera.getViewMatrix();
 			glUniform3fv(eyePos, 1, glm::value_ptr(tps_camera.getCameraPos()));
