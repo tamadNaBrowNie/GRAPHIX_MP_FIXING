@@ -197,16 +197,15 @@ public:
 		}
 	}
 	void moveCam(glm::vec3* pos) {
-		viewMatrix = glm::translate(viewMatrix, *pos);
-		//cameraPos += *pos;
-		//
-		//cameraCenter = cameraPos + forward;
-
-		//
-		//setView();
+		//viewMatrix = glm::translate(viewMatrix, *pos);
+		cameraPos += *pos;
+		
+		cameraCenter = cameraPos + forward;
+		
+		setView();
 	}
 	void rotateCam(float deg) {
-		viewMatrix = glm::rotate(viewMatrix, glm::radians(deg), glm::vec3(0, 1, 0));
+		viewMatrix = glm::rotate(viewMatrix, glm::radians(deg - 90), glm::vec3(0, 1, 0));
 	
 	}
 	
