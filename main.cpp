@@ -184,7 +184,7 @@ int main(void)
 	// LOADING OBJECTS
 
 	
-	PlayerClass playerSub("3D/submarine/submarine.obj",
+	PlayerClass playerSub("3D/submarine/sub2.obj",
 		glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3(0.0f, 90.0f, 0.0f),
 		0.15f);
@@ -516,7 +516,7 @@ int main(void)
 
 		playerSub.placeUnifs(ptUnifs);
 		if(glfwGetKey(window,GLFW_KEY_2) == GLFW_PRESS)
-			td_camera.moveCam(new glm::vec3(playerSub.playerPos - glm::vec3(0.4, 0, 0)));
+			td_camera.moveCam(new glm::vec3(playerSub.playerPos - glm::vec3(0, 0, 0)));
 		// -----------------------------------------------------------------
 		// TOGGLING CAMERAS BASED ON MODE
 
