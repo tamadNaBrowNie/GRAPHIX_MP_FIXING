@@ -47,27 +47,34 @@ Mode pre = mode;
 void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	Handler* hand = (Handler*)glfwGetWindowUserPointer(window);
-	glm::vec3* delta = new glm::vec3(0);
-	// Toggle TPS and FPS Camera
+	
 
-	// Toggle TD Camera
+	//handles submarine controls
+	if (mode != Mode::TD)
+	{
+		hand->player->kbCallBack(window, key, scancode, action, mods);
+	}
+	else
+	{
+		//handles TD cam controls
+		hand->cam->kbCallBack(window, key, scancode, action, mods);
 
+	}
 
 	//input handling for mode switching
 	//toggle Top-Down view
 	if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
+		
 		if (mode != Mode::TD) {
-
 			pre = mode;
 			mode = Mode::TD;
-
 		}
-		else {
+		else {	
 			mode = pre;
 		}
 	}
 	//toggle between 1st person and 3rd
-	if (key == GLFW_KEY_1&& mode != Mode::TD) {
+	if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
 		switch (mode)
 		{
 		case Mode::TPS:
@@ -82,27 +89,8 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 
 
-	//handles submarine controls
-	if (mode != Mode::TD)
-	{
-		hand->player->kbCallBack(window, key, scancode, action, mods);
-	}
-	//gets the vector to move camera
-	switch (mode)
-	{
-	case Mode::TPS:
-		delta = new glm::vec3(playerSub.playerPos + tps_off);
-		break;
-	case Mode::FPS:
-		delta = new glm::vec3(playerSub.playerPos + fps_off);
-		break;
-	case Mode::TD: *delta = hand->player->playerPos + tps_off;
-		break;
-	default:
-		break;
-	}
-	//moves camera
-	hand->cam->moveCam(delta);
+	
+	
 	/*
 	Handling exit keys
 	 */
@@ -178,6 +166,7 @@ int main(void)
 	OrthoCamera td_camera;
 	cam3p tps_camera;
 	cam1p fps_camera;
+	glm::vec3* delta = new glm::vec3(0);
 	/* Create a windowed mode window and its OpenGL context */
 	window = glfwCreateWindow(screenWidth, screenHeight, "No Man's Submarine", NULL, NULL);
 	if (!window)
@@ -504,29 +493,36 @@ int main(void)
 	tps_camera.setCameraCenter(playerSub.playerPos + tps_off);
 	tps_camera.setWorldUp(worldUp);
 	tps_camera.setProjection(60.0f, screenWidth, screenHeight);
-
+	tps_camera.setDir();
+	tps_camera.setView();
 	//1st person
 	fps_camera.setCameraPos(fps_cameraPos);   // Slight adjustments to align with playerSub
 	fps_camera.setCameraCenter(playerSub.playerPos - glm::vec3(0.0f, 0.0f, 5.0f));
 	fps_camera.setWorldUp(worldUp);
 	fps_camera.setProjection(100.0f, screenWidth, screenHeight);
+	fps_camera.setDir();
+	fps_camera.setView();
+
 	//Ortho
 	td_camera.setCameraPos(td_cameraPos);
 	td_camera.setCameraCenter(glm::vec3(0));
-	td_camera.setWorldUp(glm::vec3(0, 0, 1));
-	td_camera.setProjection(-0.1f, 1.f, -0.1f, 1.0f, -0.1f, 255.0f);
+	td_camera.setWorldUp(glm::vec3(0, 0, -1));
+	td_camera.setProjection(-1.f, 1.f, -1.f, 1.0f, -0.1f, 255.0f);
 	td_camera.setView();
-	tps_camera.setDir();
-	fps_camera.setDir();
 	td_camera.setDir();
 
 	while (!glfwWindowShouldClose(window))
 	{
+		//gets the vector to move camera
+
+		//moves camera
+		
 		/* Render here */
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		playerSub.placeUnifs(ptUnifs);
-
+		if(glfwGetKey(window,GLFW_KEY_2) == GLFW_PRESS)
+			td_camera.moveCam(new glm::vec3(playerSub.playerPos - glm::vec3(0.4, 0, 0)));
 		// -----------------------------------------------------------------
 		// TOGGLING CAMERAS BASED ON MODE
 
@@ -535,26 +531,35 @@ int main(void)
 		case Mode::TPS:
 			//tps_camera.setCameraPos(tps_cameraPos - glm::vec3(0, 0.0f, 0.1));
 			//tps_camera.setCameraCenter(playerSub.playerPos + glm::vec3(0.1f, 0.0f, 0.0f));
+			*delta = glm::vec3(playerSub.playerPos + tps_off);
+			tps_camera.moveCam(delta);
 			tps_camera.setView();
 
 			projectionMatrix = tps_camera.getProjectionMatrix();
 			viewMatrix = tps_camera.getViewMatrix();
 			glUniform3fv(eyePos, 1, glm::value_ptr(tps_camera.getCameraPos()));
 			hand->cam = &tps_camera;
+			
 			break;
 
 		case Mode::FPS:
 			//fps_camera.setCameraPos(playerSub.playerPos - glm::vec3(0.f, 0.0f, 1.0f));
 			//fps_camera.setCameraCenter(playerSub.playerPos - glm::vec3(0.f, 0.0f, 2.0f));
+			
+			fps_camera.moveCam(new glm::vec3(playerSub.playerPos + fps_off));
 			fps_camera.setView();
 			projectionMatrix = fps_camera.getProjectionMatrix();
 			viewMatrix = fps_camera.getViewMatrix();
 			glUniform3fv(eyePos, 1, glm::value_ptr(tps_camera.getCameraPos()));
 			hand->cam = &fps_camera;
+			
 			break;
 
 		case Mode::TD:
-			td_camera.setView();
+			
+			//td_camera.setView();
+			//td_camera.moveCam(new glm::vec3(playerSub.playerPos- glm::vec3(0.4,0,0)));
+
 			viewMatrix = td_camera.getViewMatrix();
 			projectionMatrix = td_camera.getProjectionMatrix();
 			glUniform3fv(eyePos, 1, glm::value_ptr(td_camera.getCameraPos()));
