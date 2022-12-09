@@ -491,7 +491,7 @@ int main(void)
     /// Setting up cameras
     /// </summary>
     //3rd person
-    tps_camera.setCameraPos(playerSub.playerPos);    // Slight adjustments to align with playerSub
+    tps_camera.setCameraPos(tps_cameraPos);    // Slight adjustments to align with playerSub
     tps_camera.setCameraCenter(playerSub.playerPos + tps_off);
     tps_camera.setWorldUp(worldUp);
     tps_camera.setProjection(60.0f, screenWidth, screenHeight);
@@ -548,7 +548,7 @@ int main(void)
                 td_camera.setView();
                 viewMatrix = td_camera.getViewMatrix();
                 projectionMatrix = td_camera.getProjectionMatrix();
-                glUniform3fv(eyePos, 1, glm::value_ptr(tps_camera.getCameraPos()));
+                glUniform3fv(eyePos, 1, glm::value_ptr(td_camera.getCameraPos()));
                 hand->cam = &td_camera;
                 break;
 
