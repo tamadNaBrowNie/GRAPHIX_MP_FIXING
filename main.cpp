@@ -34,10 +34,7 @@ const glm::vec3 fps_off = -glm::vec3(0.1f, 0.0f, 1.0f);
 const glm::vec3 tps_off = glm::vec3(0.1f, 0.0f, 0.0f);
 
 // Player object
-PlayerClass playerSub("3D/submarine/submarine.obj",
-	glm::vec3(0.0f, 0.0f, 0.0f),
-	glm::vec3(0.0f, 90.0f, 0.0f),
-	0.15f);
+
 
 
 Mode mode = Mode::TPS;
@@ -186,8 +183,12 @@ int main(void)
 	// -------------------------------------------------------
 	// LOADING OBJECTS
 
+	
+	PlayerClass playerSub("3D/submarine/submarine.obj",
+		glm::vec3(0.0f, 0.0f, 0.0f),
+		glm::vec3(0.0f, 90.0f, 0.0f),
+		0.15f);
 	playerSub.loadObj();
-
 	EnemyClass enemySub1("3D/enemy_submarine/enemy_sub_1.obj",
 		glm::vec3(0.0f, -5.0f, -10.0f),
 		glm::vec3(20.0f, 5.0f, 6.0f),
@@ -536,9 +537,9 @@ int main(void)
 			break;
 
 		case Mode::FPS:
-
-			fps_camera.moveCam(new glm::vec3(playerSub.playerPos + fps_off));
-			fps_camera.rotateCam(-playerSub.playerRot.y);
+			fps_camera.setForward(new glm::vec3(playerSub.front));
+			fps_camera.moveCam(new glm::vec3(playerSub.playerPos ));
+			//fps_camera.rotateCam(90-playerSub.playerRot.y);
 			projectionMatrix = fps_camera.getProjectionMatrix();
 			viewMatrix = fps_camera.getViewMatrix();
 			glUniform3fv(eyePos, 1, glm::value_ptr(tps_camera.getCameraPos()));
