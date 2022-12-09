@@ -8,18 +8,17 @@ uniform sampler2D norm_tex;
 uniform vec3 eyePos;
 
 void attenuate(out float val, in float dist){
-	//calculating attenuation modifier along with safeguards to prevent math error
+	// Calculating attenuation modifier along with safeguards to prevent math error
 	if(abs(dist)==0)
-  //set to a minimum value otherwise
-		val = MIN;
-  
+		val = MIN; //set to a minimum value, otherwise
   	else
-  
-  //if distance between light and object is not  zero, 
-  //attenuation is the minimum between the inverse 
-  //of the distance squared and the MIN constant
-  //this was done so the object would not shine brighter tha the source
-		val = min(1/pow(dist,2),MIN);
+		/* If distance between light and object is not zero, 
+		 * attenuation is the minimum between the inverse 
+		 * of the distance squared and the MIN constant this 
+		 * was done so the object would not shine brighter
+		 * than the source
+		 */
+		val = min(1 / pow(dist, 2), MIN);
 }
 
 uniform float dir_lumens;
@@ -32,22 +31,18 @@ uniform float dir_spec_str;
 
 void dirLight(out vec3 sun, in vec3 normals){
 	vec3 norm = normalize(normals);
-
 	vec3 direction = normalize(-dir_target);
 
 	float diff = max(dot(norm,direction),0.f);
 
-	vec3 viewDir = normalize(  eyePos-fragPos );
-
+	vec3 viewDir = normalize(eyePos-fragPos);
 	vec3 reflection = reflect(-direction,norm);
 
 	float spec = pow(max (dot (reflection,viewDir),0),dir_phong);
 			spec *= dir_spec_str;
 	
-	
 	sun = dir_lumens*(dir_amb_str+spec+diff)*(dir_amb_col+dir_color);
 }
-
 
 uniform vec3 pt_src;
 uniform float pt_lumens;
@@ -56,27 +51,36 @@ uniform vec3 pt_amb_col;
 uniform vec3 pt_color;
 uniform float pt_phong;
 uniform float pt_spec_str;
+
 void ptLight(out vec3 bulb, in vec3 norms){
-vec3 norm = normalize(norms);
-float val;
-vec3 src = pt_src;
-src.z-=0.7;
-vec3 rayVec = src - fragPos;
-float dist =length(rayVec);
-attenuate(val,dist);
-vec3 dir = normalize(rayVec);
-vec3 viewDir = normalize(eyePos-fragPos);
-vec3 reflection = reflect(-dir,norm);
-float diff = max(dot(norm,dir),0.f);
+	float val;
 
-float spec = pow(max (dot (reflection,viewDir),0),pt_phong);
-		spec*=pt_spec_str;
+	vec3 norm = normalize(norms);
 
-bulb = val*pt_lumens*(pt_amb_str+spec+diff)*(pt_amb_col*pt_color);
+	vec3 src = pt_src;
+	src.z-=0.7;
 
+	vec3 rayVec = src - fragPos;
+
+	float dist = length(rayVec);
+
+	attenuate(val,dist);
+
+	vec3 dir = normalize(rayVec);
+	vec3 viewDir = normalize(eyePos-fragPos);
+	vec3 reflection = reflect(-dir,norm);
+
+	float diff = max(dot(norm,dir), 0.f);
+
+	float spec = pow(max(dot(reflection,viewDir), 0), pt_phong);
+	
+	spec*=pt_spec_str;
+
+	bulb = val*pt_lumens*(pt_amb_str+spec+diff)*(pt_amb_col*pt_color);
 }
 
 uniform bool hasBmp;
+
 in mat3 TBN;
 in vec2 texCoord;
 in vec3 normCoord;
@@ -93,7 +97,7 @@ void main(){
 	vec3 norms = normCoord;
 	vec3 sun;
 		//norms = (normal-1)*2;
-		vec3 bulb;
+	vec3 bulb;
 /*
 	if(hasBmp)
 	

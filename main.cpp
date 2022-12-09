@@ -48,7 +48,6 @@ PlayerClass playerSub("3D/submarine/submarine.obj",
 Mode mode = Mode::TPS;
 Mode pre = mode;
 
-
 void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     Handler* hand =(Handler*) glfwGetWindowUserPointer(window);
@@ -444,6 +443,7 @@ int main(void)
     obj_shaderProgram.findUloc("dir_color"),
     obj_shaderProgram.findUloc("dir_target")
     };
+
     //creatig point light pointing down
     lightBuilder* dir = new lightBuilder();
     dir->setAmbColor(new glm::vec3(0.6))
@@ -456,15 +456,14 @@ int main(void)
         ->placeUnifs(dirUnifs);
 
     GLint ptUnifs[7]{
-obj_shaderProgram.findUloc("pt_phong"),
-obj_shaderProgram.findUloc("pt_spec_str"),
-obj_shaderProgram.findUloc("pt_amb_str"),
-obj_shaderProgram.findUloc("pt_lumens"),
-obj_shaderProgram.findUloc("pt_amb_col"),
-obj_shaderProgram.findUloc("pt_color"),
-obj_shaderProgram.findUloc("pt_src")
+        obj_shaderProgram.findUloc("pt_phong"),
+        obj_shaderProgram.findUloc("pt_spec_str"),
+        obj_shaderProgram.findUloc("pt_amb_str"),
+        obj_shaderProgram.findUloc("pt_lumens"),
+        obj_shaderProgram.findUloc("pt_amb_col"),
+        obj_shaderProgram.findUloc("pt_color"),
+        obj_shaderProgram.findUloc("pt_src")
     };
-
 
     GLint hasBmp = obj_shaderProgram.findUloc("hasBmp");
     GLint eyePos = obj_shaderProgram.findUloc("eyePos");
@@ -474,15 +473,14 @@ obj_shaderProgram.findUloc("pt_src")
     hand->player = &playerSub;
     
     /// <summary>
-/// Setting up cameras
-/// </summary>
+    /// Setting up cameras
+    /// </summary>
     
     tps_camera.setCameraPos(tps_cameraPos);    // Slight adjustments to align with playerSub
     tps_camera.setCameraCenter(playerSub.playerPos + glm::vec3(0.1f, 0.0f, 0.0f));
     tps_camera.setWorldUp(worldUp);
     tps_camera.setProjection(60.0f, screenWidth, screenHeight);
     tps_camera.setMode(Mode::TPS);
-    
     
     fps_camera.setCameraPos(fps_cameraPos - glm::vec3(0.1f, 0.0f, 1.0f));   // Slight adjustments to align with playerSub
     fps_camera.setCameraCenter(playerSub.playerPos - glm::vec3(0.0f, 0.0f, 5.0f));
@@ -497,6 +495,7 @@ obj_shaderProgram.findUloc("pt_src")
     tps_camera.setDir();
     fps_camera.setDir();
     td_camera.setDir();
+
     while (!glfwWindowShouldClose(window))
     {
         /* Render here */
@@ -506,41 +505,43 @@ obj_shaderProgram.findUloc("pt_src")
 
         // -----------------------------------------------------------------
         // CAMERA USE
+
         switch (mode)
         {
-        case Mode::TPS:
-            //tps_camera.setCameraPos(tps_cameraPos - glm::vec3(0, 0.0f, 0.1));
-            //tps_camera.setCameraCenter(playerSub.playerPos + glm::vec3(0.1f, 0.0f, 0.0f));
-            tps_camera.setView();
+            case Mode::TPS:
+                //tps_camera.setCameraPos(tps_cameraPos - glm::vec3(0, 0.0f, 0.1));
+                //tps_camera.setCameraCenter(playerSub.playerPos + glm::vec3(0.1f, 0.0f, 0.0f));
+                tps_camera.setView();
 
-            projectionMatrix = tps_camera.getProjectionMatrix();
-            viewMatrix = tps_camera.getViewMatrix();
-            glUniform3fv(eyePos, 1, glm::value_ptr(tps_camera.getCameraPos()));
-            hand->cam = &tps_camera;
-            break;
-        case Mode::FPS:
+                projectionMatrix = tps_camera.getProjectionMatrix();
+                viewMatrix = tps_camera.getViewMatrix();
+                glUniform3fv(eyePos, 1, glm::value_ptr(tps_camera.getCameraPos()));
+                hand->cam = &tps_camera;
+                break;
 
-            //fps_camera.setCameraPos(playerSub.playerPos - glm::vec3(0.f, 0.0f, 1.0f));
-            //fps_camera.setCameraCenter(playerSub.playerPos - glm::vec3(0.f, 0.0f, 2.0f));
-            fps_camera.setView();
-            projectionMatrix = fps_camera.getProjectionMatrix();
-            viewMatrix = fps_camera.getViewMatrix();
-            glUniform3fv(eyePos, 1, glm::value_ptr(tps_camera.getCameraPos()));
-            hand->cam = &fps_camera;
-            break;
-        case Mode::TD:
-            td_camera.setView();
-            viewMatrix = td_camera.getViewMatrix();
-            projectionMatrix = td_camera.getProjectionMatrix();
-            glUniform3fv(eyePos, 1, glm::value_ptr(tps_camera.getCameraPos()));
-            hand->cam = &td_camera;
-            break;
-        default:
-            break;
+            case Mode::FPS:
+                //fps_camera.setCameraPos(playerSub.playerPos - glm::vec3(0.f, 0.0f, 1.0f));
+                //fps_camera.setCameraCenter(playerSub.playerPos - glm::vec3(0.f, 0.0f, 2.0f));
+                fps_camera.setView();
+                projectionMatrix = fps_camera.getProjectionMatrix();
+                viewMatrix = fps_camera.getViewMatrix();
+                glUniform3fv(eyePos, 1, glm::value_ptr(tps_camera.getCameraPos()));
+                hand->cam = &fps_camera;
+                break;
+
+            case Mode::TD:
+                td_camera.setView();
+                viewMatrix = td_camera.getViewMatrix();
+                projectionMatrix = td_camera.getProjectionMatrix();
+                glUniform3fv(eyePos, 1, glm::value_ptr(tps_camera.getCameraPos()));
+                hand->cam = &td_camera;
+                break;
+
+            default:
+                break;
         }
+
         glfwSetWindowUserPointer(window, hand);
-
-
 
         glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(viewMatrix));
@@ -598,12 +599,12 @@ obj_shaderProgram.findUloc("pt_src")
 
         after = GetTickCount64();
         int temp = (after - before) / 1000;
+
         if (!(elapsed == temp)) {
             elapsed = temp;
             // Use cout to display playerPos on console
             cout << "Player Depth: " << playerSub.getDepth() << "\n";
         }
-
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);

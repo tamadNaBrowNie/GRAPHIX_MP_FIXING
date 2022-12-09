@@ -1,5 +1,6 @@
 #pragma once
 #include "main.h"
+
 enum class Mode {
 	TPS, FPS, TD
 };
@@ -65,13 +66,16 @@ protected:
 	glm::mat4 viewMatrix;
 	glm::vec3 dir;
 	Mode mode;
+
 public:
 	void setMode(Mode mode) {
 		this->mode = mode;
 	}
+
 	Mode getMode() {
 		return mode;
 	}
+
 	void setCameraPos(glm::vec3 c_Pos) {
 		this->cameraPos = c_Pos;
 	}
@@ -90,13 +94,19 @@ public:
 	void setDir(glm::vec3* vecD) {
 		dir = *vecD;
 	}
-	glm::vec3 getDir() { return this->dir; }
+
+	glm::vec3 getDir() {
+		return this->dir;
+	}
+
 	void setView() {
 		this->viewMatrix = glm::lookAt(this->cameraPos, this->cameraCenter, this->worldUp);
 	}
+
 	void movePos() {
 		this->cameraPos = cameraCenter - dir;
 	}
+
 	glm::vec3 getCameraPos() {
 		return this->cameraPos;
 	}
@@ -112,6 +122,7 @@ public:
 	glm::mat4 getViewMatrix() {
 		return this->viewMatrix;
 	}
+
 	virtual void kbCallBack(GLFWwindow*, int, int, int, int) = 0;
 	virtual void ptrCallBacK(GLFWwindow*, double, double){};
 };
@@ -122,86 +133,34 @@ public:
 		//cant we make this a mat4 in player then set it to the base camera class?
 		this->projectionMatrix = glm::ortho(left, right, bottom, top, zNear, zFar);
 	}
-	void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
 
-	}
+	void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {}
 	void ptrCallBack(GLFWwindow* win, double x, double y) {}
 };
 
 class PerspectiveCamera : public MyCamera {
 public:
-
 	void setProjection(float fov, float width, float height) {
 		this->projectionMatrix = glm::perspective(glm::radians(fov), width / height, 0.1f, 100.0f);
 	}
-	//void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
-
-	//	if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
-	//		switch (mode)
-	//		{
-	//		case Mode::TPS:
-
-	//			mode = Mode::FPS;
-	//			//manipulate center and position here
-	//			break;
-	//		case Mode::FPS:
-
-	//			mode = Mode::TPS;
-	//			//manipulate center and position here
-	//			break;
-	//		}
-
-	//	}
-
-	//	// make 0.1 a constant
-	//	if (GLFW_KEY_W == key) {
-
-	//		this->cameraPos.z -= 0.1f;
-	//		this->cameraCenter.z -= 0.1f;
-
-
-	//		//this->cameraPos.x += 0.1f;
-	//	}
-
-	//	else if (key == GLFW_KEY_S)
-	//	{
-	//		this->cameraPos.z += 0.1f;
-	//		this->cameraCenter.z += 0.1f;
-	//		//this->cameraPos.x += 0.1f;
-	//	}
-
-	//	if (key == GLFW_KEY_Q) {
-	//		if (this->cameraPos.y <= 0) {
-	//			this->cameraPos.y += 0.1f;
-	//			this->cameraCenter.y += 0.1f;
-	//		}
-	//	}
-	//	else if (key == GLFW_KEY_E) {
-	//		this->cameraPos.y -= 0.1f;
-	//		this->cameraCenter.y -= 0.1f;
-	//	}
-
-	//}
-
-	
 };
+
 class cam3p : public PerspectiveCamera {
 	void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
 		this->cameraPos = this->cameraCenter + this->dir +glm::vec3(0,0,0.1);
 	}
-	void ptrCallBack(GLFWwindow* win, double x, double y) {
-				
-	}
+
+	void ptrCallBack(GLFWwindow* win, double x, double y) {}
 };
 
 class cam1p : public PerspectiveCamera {
 	void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
 		this->cameraPos = this->cameraCenter + this->dir + glm::vec3(0, 0, 0.5);
 	}
-	void ptrCallBack(GLFWwindow* win, double x, double y) {
 
-	}
+	void ptrCallBack(GLFWwindow* win, double x, double y) {}
 };
+
 class ModelClass {
 protected:
 	std::string objPath;
@@ -530,15 +489,17 @@ public:
 		glm::mat4 transformationMatrix = glm::translate(glm::mat4(1.0f), this->enemyPos);
 		transformationMatrix = glm::scale(transformationMatrix, glm::vec3(this->enemyScale));
 
-		// X axis rotation
+		// X-axis rotation
 		transformationMatrix = glm::rotate(transformationMatrix,
 			glm::radians(this->enemyRot.x),
 			glm::normalize(glm::vec3(1.0f, 0.0f, 0.0f)));
-		// Y axis rotation
+
+		// Y-axis rotation
 		transformationMatrix = glm::rotate(transformationMatrix,
 			glm::radians(this->enemyRot.y),
 			glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)));
-		// Z axis rotation
+
+		// Z-axis rotation
 		transformationMatrix = glm::rotate(transformationMatrix,
 			glm::radians(this->enemyRot.z),
 			glm::normalize(glm::vec3(0.0f, 0.0f, 1.0f)));
@@ -563,6 +524,7 @@ public:
 		glDrawArrays(GL_TRIANGLES, 0, this->vertexData.size() / 5);
 	}
 };
+
 /// <summary>
 /// builder classes allow you to chain methods. similar to java builder classes
 /// </summary>
@@ -591,6 +553,7 @@ public:
 		specStr = str;
 		return this;
 	}
+
 	inline float getSpecStr() {
 		return this->specStr;
 	}
@@ -599,6 +562,7 @@ public:
 		specPhong = phong;
 		return this;
 	}
+
 	inline float getSpecPhong() {
 		return this->specPhong;
 	}
@@ -607,6 +571,7 @@ public:
 		ambStr = str;
 		return this;
 	}
+
 	inline float getAmbStr() {
 		return ambStr;
 	}
@@ -615,6 +580,7 @@ public:
 		lumens = str;
 		return this;
 	}
+
 	inline float getLumens() {
 		return lumens;
 	}
@@ -623,21 +589,26 @@ public:
 		ambRGB = *color;
 		return this;
 	}
+
 	inline glm::vec3 getAmbRGB() {
 		return ambRGB;
 	}
+
 	inline lightBuilder* setLightColor(glm::vec3* color) {
 
 		lightRGB = *color;
 		return this;
 	}
+
 	inline glm::vec3 getLightRGB() {
 		return lightRGB;
 	}
+
 	inline lightBuilder* setLightVec(glm::vec3* dir) {
 		ray = *dir;
 		return this;
 	}
+
 	inline glm::vec3 getLightVec() {
 		return ray;
 	}
@@ -648,15 +619,10 @@ public:
 
 	virtual void placeUnifs(GLint* uniforms) {
 		glUniform1f(uniforms[0], specPhong);
-
 		glUniform1f(uniforms[1], specStr);
-
 		glUniform1f(uniforms[2], ambStr);
-
 		glUniform1f(uniforms[3], lumens);
-
 		glUniform3fv(uniforms[4], 1, glm::value_ptr(ambRGB));
-
 		glUniform3fv(uniforms[5], 1, glm::value_ptr(lightRGB));
 
 		placeLight(uniforms[6]);
@@ -664,10 +630,12 @@ public:
 };
 
 class PlayerClass : public ModelClass {
-private: enum class Intensity {
-	LOW,MED,HI
-};
-	   Intensity str = Intensity::LOW;
+private:
+	enum class Intensity {
+		LOW,MED,HI
+	};
+	Intensity str = Intensity::LOW;
+
 public:
 	glm::vec3 playerPos;
 	glm::vec3 playerRot;
@@ -675,14 +643,18 @@ public:
 	lightBuilder* bulb;
 	glm::mat4 transformationMatrix;
 	glm::vec3 front;
+
 	inline PlayerClass(std::string path,
-		glm::vec3 pos,
-		glm::vec3 rot,
-		float scale) :
-		ModelClass(path),
-		playerPos(pos),
-		playerRot(rot),
-		playerScale(scale), bulb(new lightBuilder()), front(glm::vec3(0, 0, 0.1)), transformationMatrix(glm::mat4(1.0)) {
+			glm::vec3 pos,
+			glm::vec3 rot,
+			float scale) :
+			ModelClass(path),
+			playerPos(pos),
+			playerRot(rot),
+			playerScale(scale),
+			bulb(new lightBuilder()),
+			front(glm::vec3(0, 0, 0.1)),
+			transformationMatrix(glm::mat4(1.0)) {
 		glm::vec3 src = pos;
 		src.z -= 0.7;
 		bulb
@@ -695,28 +667,31 @@ public:
 			->setAmbColor(new glm::vec3(1));
 
 	}
+
 	inline void placeUnifs(GLint* unifs) {
 		switch (this->str)
 		{
-		case Intensity::LOW:
-			bulb->setLumens(2);
-			break;
-		case Intensity::MED:
-			bulb->setLumens(4);
-			break;
-		case Intensity::HI:
-			bulb->setLumens(8);
-			break;
-		default:
-			break;
+			case Intensity::LOW:
+				bulb->setLumens(2);
+				break;
+			case Intensity::MED:
+				bulb->setLumens(4);
+				break;
+			case Intensity::HI:
+				bulb->setLumens(8);
+				break;
+			default:
+				break;
 		}
+
 		bulb->placeUnifs(unifs);
 	}
+
 	inline void placeLight(GLint unif) {
 		bulb->placeLight(unif);
 	}
-	void draw(GLuint shaderProgram) {
 
+	void draw(GLuint shaderProgram) {
 		glUseProgram(shaderProgram);
 		glBindVertexArray(this->VAO);
 
@@ -727,15 +702,15 @@ public:
 		// Scale
 		transformationMatrix = glm::scale(transformationMatrix, glm::vec3(this->playerScale));
 
-		// X axis rotation
+		// X-axis rotation
 		transformationMatrix = glm::rotate(transformationMatrix,
 			glm::radians(this->playerRot.x),
 			glm::normalize(glm::vec3(1.0f, 0.0f, 0.0f)));
-		// Y axis rotation
+		// Y-axis rotation
 		transformationMatrix = glm::rotate(transformationMatrix,
 			glm::radians(this->playerRot.y),
 			glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)));
-		// Z axis rotation
+		// Z-axis rotation
 		transformationMatrix = glm::rotate(transformationMatrix,
 			glm::radians(this->playerRot.z),
 			glm::normalize(glm::vec3(0.0f, 0.0f, 1.0f)));
@@ -763,44 +738,50 @@ public:
 	float getDepth() {
 		return this->playerPos.y;
 	}
+
 	void forward() {
 		this->playerPos.z += -0.1;
 	}
+
 	void back() {
 		this->playerPos.z -= -0.1;
 	}
+
 	void up() {
 		playerPos.y += 0.1f;
-
 	}
+
 	void down() {
 		playerPos.y -= 0.1f;
 	}
+
 	void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
-
-
 		if (key == GLFW_KEY_W)forward();
 		else if (key == GLFW_KEY_S)back();
+
 		if (key == GLFW_KEY_Q && playerPos.y + 0.1f <= 0)up();
 		else if (key == GLFW_KEY_E) down();
+
 		if (key == GLFW_KEY_A) this->playerRot.y += 1;
-		if (key == GLFW_KEY_D) this->playerRot.y -= 1;
+		else if (key == GLFW_KEY_D) this->playerRot.y -= 1;
+
 		if (key == GLFW_KEY_F) {
 			switch (this->str)
 			{
-			case Intensity::LOW:
-				this->str = Intensity::MED;
-				break;
-			case Intensity::MED:
-				this->str = Intensity::HI;
-				break;
-			case Intensity::HI:
-				this->str = Intensity::LOW;
-				break;
-			default:
-				break;
+				case Intensity::LOW:
+					this->str = Intensity::MED;
+					break;
+				case Intensity::MED:
+					this->str = Intensity::HI;
+					break;
+				case Intensity::HI:
+					this->str = Intensity::LOW;
+					break;
+				default:
+					break;
 			}
 		}
+
 		glm::vec3 pos = playerPos;
 
 		front.x = glm::sin(glm::radians(playerRot.y));
@@ -808,10 +789,10 @@ public:
 		pos.z -= OFFSET;
 		pos += glm::normalize(front);
 		bulb->setLightVec(&pos);
-
 	}
 };
-/// handler class holds pointers for classes that need to use callbacks
+
+// Handler class holds pointers for classes that need to use callbacks
 class Handler {
 public:
 	PlayerClass* player;
