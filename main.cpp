@@ -16,18 +16,16 @@
 // GLOBAL VARIABLES
 
 // Screen width and height
-float screenWidth = 1000.0f;
-float screenHeight = 1000.0f;
+const float screenWidth = 1000.0f;
+const float screenHeight = 1000.0f;
 
-// Camera Positioning
+// Cameras
 OrthoCamera td_camera;
 cam3p tps_camera;
 cam1p fps_camera;
 
-glm::vec3 tps_cameraPos = glm::vec3(0.0f, 0.0f, 1.0f);
-glm::vec3 fps_cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
-glm::vec3 td_cameraPos = glm::vec3(0.0f, 3.f, 0.0f);
-const glm::vec3 worldUp = glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f));
+
+
 
 // Camera Rotation (yaw and pitch)
 bool    firstMouse = true;
@@ -35,8 +33,14 @@ float   lastX = 500.0f, lastY = 500.0f,
 yaw = -90.0f, pitch = 0.0f,
 sensitivity = 0.1f;
 
-// Player positioning
-int face = 0;
+//initial positions
+const glm::vec3 fps_off = -glm::vec3(0.1f, 0.0f, 1.0f);
+const glm::vec3 tps_off = glm::vec3(0.1f, 0.0f, 0.0f);
+
+glm::vec3 tps_cameraPos = glm::vec3(0.0f, 0.0f, 1.0f);
+glm::vec3 fps_cameraPos = glm::vec3(0.0f, 0.0f, 0.0f) +fps_off;
+glm::vec3 td_cameraPos = glm::vec3(0.0f, 3.f, 0.0f);
+const glm::vec3 worldUp = glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f));
 
 // Player object
 PlayerClass playerSub("3D/submarine/submarine.obj",
@@ -51,13 +55,24 @@ Mode pre = mode;
 void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     Handler* hand =(Handler*) glfwGetWindowUserPointer(window);
+    glm::vec3* delta = new glm::vec3(0);
     // Toggle TPS and FPS Camera
 
     // Toggle TD Camera
     
     
     //input handling for mode switching
+    if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
+        if (mode != Mode::TD) {
 
+            pre = mode;
+            mode = Mode::TD;
+            //hand->cam->moveCam();
+        }
+        else {
+            mode = pre;
+        }
+    }
     //toggle between 1st person and 3rd
     if (key == GLFW_KEY_1 && action == GLFW_PRESS &&  mode != Mode::TD) {
         switch (mode)
@@ -73,39 +88,27 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
         }
     }
     //toggle top-down
-    if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
-        if (mode != Mode::TD) {
-
-            pre = mode;
-            mode = Mode::TD;
-            hand->cam->setCameraCenter(hand->player->playerPos);
-            hand->cam->movePos();
-        }
-        else {
-            mode = pre;
-        }
-    }
+    
     //handles submarine controls
     if (mode != Mode::TD)
     {
-        hand->player->kbCallBack(window, key, scancode, action, mods);
-        switch (mode)
-        {
-        case Mode::TPS:
-            hand->cam->setCameraCenter(playerSub.playerPos + glm::vec3(0.1f, 0.0f, 0.0f));
-            break;
-        case Mode::FPS:
-            hand->cam->setCameraCenter(playerSub.playerPos + glm::vec3(0.0f, 0.0f, 5.0f));
-            break;
-        case Mode::TD:
-            break;
-        default:
-            break;
-        }
-        //I am tearing my hair out. will virtualize this shit again
-        hand->cam->movePos();
+        hand->player->kbCallBack(window, key, scancode, action, mods);  
     }
-
+    switch (mode)
+    {
+    case Mode::TPS:
+        delta = new glm::vec3(playerSub.playerPos + tps_off);
+        break;
+    case Mode::FPS:
+        delta = new glm::vec3(playerSub.playerPos + fps_off);
+        break;
+    case Mode::TD:
+        break;
+    default:
+        break;
+    }
+    //I am tearing my hair out. will virtualize this shit again
+    hand->cam->moveCam(delta);
     /*
     Handling exit keys
      */
@@ -488,13 +491,13 @@ int main(void)
     /// Setting up cameras
     /// </summary>
     //3rd person
-    tps_camera.setCameraPos(tps_cameraPos);    // Slight adjustments to align with playerSub
-    tps_camera.setCameraCenter(playerSub.playerPos + glm::vec3(0.1f, 0.0f, 0.0f));
+    tps_camera.setCameraPos(playerSub.playerPos);    // Slight adjustments to align with playerSub
+    tps_camera.setCameraCenter(playerSub.playerPos + tps_off);
     tps_camera.setWorldUp(worldUp);
     tps_camera.setProjection(60.0f, screenWidth, screenHeight);
-    tps_camera.setMode(Mode::TPS);
+
     //1st person
-    fps_camera.setCameraPos(fps_cameraPos - glm::vec3(0.1f, 0.0f, 1.0f));   // Slight adjustments to align with playerSub
+    fps_camera.setCameraPos(fps_cameraPos);   // Slight adjustments to align with playerSub
     fps_camera.setCameraCenter(playerSub.playerPos - glm::vec3(0.0f, 0.0f, 5.0f));
     fps_camera.setWorldUp(worldUp);
     fps_camera.setProjection(100.0f, screenWidth, screenHeight);
