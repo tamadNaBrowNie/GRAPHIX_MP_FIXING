@@ -55,15 +55,10 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			cam1p* fpc = (cam1p*)hand->cam;
 			glm::vec3 posF = hand->player->playerPos - prev;
 			fpc->moveCam(&posF);
-	/*		fpc->rotateCam(glm::acos(posF.z));*/
-			
+			//fpc->rotateCam(90-hand->player->playerRot.y);
 		}
 	}
-	else {
-		OrthoCamera* orth = (OrthoCamera*)hand->cam;
-		orth->kbCallBack(window, key, scancode, action, mods);
-	}
-
+	hand->cam->kbCallBack(window, key, scancode, action, mods);
 
 	/*
 	* Only allow to swap camera perspective, once that

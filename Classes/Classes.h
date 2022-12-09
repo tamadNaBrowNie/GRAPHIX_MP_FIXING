@@ -115,7 +115,7 @@ public:
 		return this->viewMatrix;
 	}
 
-
+	virtual void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) = 0;
 
 };
 
@@ -168,7 +168,7 @@ public:
 
 class cam3p : public PerspectiveCamera {
 public:
-
+	void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {}
 	void moveCam(glm::vec3* center) {
 	
 		cameraCenter = *center;
@@ -180,20 +180,36 @@ public:
 class cam1p : public PerspectiveCamera {
 public:
 
+	void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
 
+		switch (key)
+		{/*
+		case GLFW_KEY_W:viewMatrix = glm::translate(viewMatrix, -speed * this->worldUp);
+			break;
+		case GLFW_KEY_S: viewMatrix = glm::translate(viewMatrix, speed * this->worldUp);
+			break;
+		case GLFW_KEY_A: viewMatrix = glm::translate(viewMatrix, -speed * glm::normalize(right));
+			break;
+		case GLFW_KEY_D: viewMatrix = glm::translate(viewMatrix, speed * glm::normalize(right));
+			break;
+		default:
+			break;*/
+		}
+	}
 	void moveCam(glm::vec3* pos) {
+		viewMatrix = glm::translate(viewMatrix, *pos);
+		//cameraPos += *pos;
+		//
+		//cameraCenter = cameraPos + forward;
 
-		cameraPos += *pos;
-		
-		cameraCenter = cameraPos + forward;
-
-		
-		setView();
+		//
+		//setView();
 	}
 	void rotateCam(float deg) {
 		viewMatrix = glm::rotate(viewMatrix, glm::radians(deg), glm::vec3(0, 1, 0));
 	
 	}
+	
 
 };
 
