@@ -65,16 +65,12 @@ protected:
 	glm::mat4 projectionMatrix;
 	glm::mat4 viewMatrix;
 	glm::vec3 dir;
-	Mode mode;
+
 
 public:
-	void setMode(Mode mode) {
-		this->mode = mode;
-	}
 
-	Mode getMode() {
-		return mode;
-	}
+
+
 
 	void setCameraPos(glm::vec3 c_Pos) {
 		this->cameraPos = c_Pos;
@@ -88,7 +84,7 @@ public:
 		this->worldUp = w_Up;
 	}
 	void setDir() {
-		dir = glm::normalize(cameraPos - cameraCenter);
+		dir = glm::normalize(cameraCenter - cameraPos);
 	}
 
 	void setDir(glm::vec3* vecD) {
@@ -103,9 +99,7 @@ public:
 		this->viewMatrix = glm::lookAt(this->cameraPos, this->cameraCenter, this->worldUp);
 	}
 
-	void movePos() {
-		this->cameraPos = cameraCenter - dir;
-	}
+	virtual void moveCam(glm::vec3*) = 0;
 
 	glm::vec3 getCameraPos() {
 		return this->cameraPos;
@@ -124,7 +118,7 @@ public:
 	}
 
 	virtual void kbCallBack(GLFWwindow*, int, int, int, int) = 0;
-	virtual void ptrCallBacK(GLFWwindow*, double, double){};
+
 };
 
 class OrthoCamera : public MyCamera {
@@ -133,9 +127,13 @@ public:
 		//cant we make this a mat4 in player then set it to the base camera class?
 		this->projectionMatrix = glm::ortho(left, right, bottom, top, zNear, zFar);
 	}
-
+	void moveCam(glm::vec3* center) {
+		cameraCenter = *center;
+		cameraPos = cameraCenter - dir;
+		cameraPos.y = dir.y;
+	}
 	void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {}
-	void ptrCallBack(GLFWwindow* win, double x, double y) {}
+
 };
 
 class PerspectiveCamera : public MyCamera {
@@ -146,19 +144,26 @@ public:
 };
 
 class cam3p : public PerspectiveCamera {
-	void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
-		this->cameraPos = this->cameraCenter + this->dir +glm::vec3(0,0,0.1);
+	void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {}
+	void moveCam(glm::vec3* center) {
+		cameraCenter = *center;
+		cameraPos = cameraCenter - dir;
 	}
 
-	void ptrCallBack(GLFWwindow* win, double x, double y) {}
 };
 
 class cam1p : public PerspectiveCamera {
-	void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
-		this->cameraPos = this->cameraCenter + this->dir + glm::vec3(0, 0, 0.5);
+	void kbCallBack(GLFWwindow* window, 
+					int key,
+					int scancode,
+					int action,
+					int mods){}
+
+	void moveCam(glm::vec3* pos) {
+		cameraPos = *pos;
+		cameraCenter = cameraPos + dir;
 	}
 
-	void ptrCallBack(GLFWwindow* win, double x, double y) {}
 };
 
 class ModelClass {
@@ -170,10 +175,10 @@ protected:
 	GLuint VAO, VBO;
 
 public:
-    ModelClass(std::string path) :
-        objPath(path),
-        VAO(NULL),
-        VBO(NULL) {}
+	ModelClass(std::string path) :
+		objPath(path),
+		VAO(NULL),
+		VBO(NULL) {}
 
 	void loadObj() {
 		// Loading .obj file
@@ -298,33 +303,33 @@ public:
 				attributes.texcoords[uvIndex + 1]
 			);
 
-            // ---------------------------------------------------
-            // TANGENTS
+			// ---------------------------------------------------
+			// TANGENTS
 
-            this->vertexData.push_back(
-                tangents[i].x
-            );
-            this->vertexData.push_back(
-                tangents[i].y
-            );
-            this->vertexData.push_back(
-                tangents[i].z
-            );
+			this->vertexData.push_back(
+				tangents[i].x
+			);
+			this->vertexData.push_back(
+				tangents[i].y
+			);
+			this->vertexData.push_back(
+				tangents[i].z
+			);
 
-            // ---------------------------------------------------
-            // BITANGENTS
+			// ---------------------------------------------------
+			// BITANGENTS
 
-            this->vertexData.push_back(
-                bitangents[i].x
-            );
-            this->vertexData.push_back(
-                bitangents[i].y
-            );
-            this->vertexData.push_back(
-                bitangents[i].z
-            );
-        }
-    }
+			this->vertexData.push_back(
+				bitangents[i].x
+			);
+			this->vertexData.push_back(
+				bitangents[i].y
+			);
+			this->vertexData.push_back(
+				bitangents[i].z
+			);
+		}
+	}
 
 	void attachTexture(std::string texPath, GLint format) {
 		// Flip image vertically on load
@@ -632,7 +637,7 @@ public:
 class PlayerClass : public ModelClass {
 private:
 	enum class Intensity {
-		LOW,MED,HI
+		LOW, MED, HI
 	};
 	Intensity str = Intensity::LOW;
 
@@ -670,17 +675,17 @@ public:
 	inline void placeUnifs(GLint* unifs) {
 		switch (this->str)
 		{
-			case Intensity::LOW:
-				bulb->setLumens(2);
-				break;
-			case Intensity::MED:
-				bulb->setLumens(4);
-				break;
-			case Intensity::HI:
-				bulb->setLumens(8);
-				break;
-			default:
-				break;
+		case Intensity::LOW:
+			bulb->setLumens(2);
+			break;
+		case Intensity::MED:
+			bulb->setLumens(4);
+			break;
+		case Intensity::HI:
+			bulb->setLumens(8);
+			break;
+		default:
+			break;
 		}
 
 		bulb->placeUnifs(unifs);
@@ -777,17 +782,17 @@ public:
 		if (key == GLFW_KEY_F) {
 			switch (this->str)
 			{
-				case Intensity::LOW:
-					this->str = Intensity::MED;
-					break;
-				case Intensity::MED:
-					this->str = Intensity::HI;
-					break;
-				case Intensity::HI:
-					this->str = Intensity::LOW;
-					break;
-				default:
-					break;
+			case Intensity::LOW:
+				this->str = Intensity::MED;
+				break;
+			case Intensity::MED:
+				this->str = Intensity::HI;
+				break;
+			case Intensity::HI:
+				this->str = Intensity::LOW;
+				break;
+			default:
+				break;
 			}
 		}
 
