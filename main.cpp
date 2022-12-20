@@ -1,6 +1,14 @@
+#include "Players.h"
+#include "Enemies.h"
+
+#include "stb_image.h"
+
 #include "ShaderClass.h"
-#include "Classes/Classes.h"
+//#include "Classes/Classes.h"
+#include "Cameras.h"
+
 #include "main.h"
+
 
 using namespace Cameras;
 // -------------------------------------------------------
@@ -39,6 +47,12 @@ const glm::vec3 tps_off = glm::vec3(0.1f, 0.0f, 0.0f);
 
 Mode mode = Mode::TPS;
 Mode pre = mode;
+class Handler
+{
+public:
+	PlayerClass* player;
+	Cameras::MyCamera* cam;
+};
 
 void Key_Callback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
