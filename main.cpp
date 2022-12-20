@@ -1,7 +1,9 @@
 #include "ShaderClass.h"
+//#include "Cameras.h"
 #include "Classes/Classes.h"
 #include "main.h"
 
+using namespace Cameras;
 // -------------------------------------------------------
 // MODEL & TEXTURE REFERENCES
 // 
@@ -162,6 +164,7 @@ void Mouse_Callback(GLFWwindow* window, double xpos, double ypos)
 
 int main(void)
 {
+	
 	GLFWwindow* window;
 
 	/* Initialize the library */
