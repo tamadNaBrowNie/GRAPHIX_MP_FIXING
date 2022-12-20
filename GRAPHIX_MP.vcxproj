@@ -135,11 +135,13 @@
   <ItemGroup>
     <ClCompile Include="glad.c" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ShaderClass.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Classes\Classes.h" />
     <ClInclude Include="Dependencies\Shader.h" />
     <ClInclude Include="Dependencies\include\main.h" />
+    <ClInclude Include="ShaderClass.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="tiny_obj_loader.h" />
   </ItemGroup>

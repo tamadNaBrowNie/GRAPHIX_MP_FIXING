@@ -1,5 +1,6 @@
-#include "main.h"
+#include "ShaderClass.h"
 #include "Classes/Classes.h"
+#include "main.h"
 
 // -------------------------------------------------------
 // MODEL & TEXTURE REFERENCES
