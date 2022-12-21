@@ -6,11 +6,18 @@
 #include "ShaderClass.h"
 //#include "Classes/Classes.h"
 #include "Cameras.h"
+#include "fpc.h"
+//#include "main.h"
+using namespace std;
+enum class Mode
+{
+	TPS,
+	FPS,
+	TD
+};
 
-#include "main.h"
 
-
-using namespace Cameras;
+//using namespace Cameras;
 // -------------------------------------------------------
 // MODEL & TEXTURE REFERENCES
 //
@@ -51,7 +58,7 @@ class Handler
 {
 public:
 	PlayerClass* player;
-	Cameras::MyCamera* cam;
+	MyCamera* cam;
 };
 
 void Key_Callback(GLFWwindow *window, int key, int scancode, int action, int mods)

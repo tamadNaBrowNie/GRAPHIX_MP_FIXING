@@ -144,7 +144,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Dependencies\Shader.h" />
-    <ClInclude Include="Dependencies\include\main.h" />
     <ClInclude Include="Cameras.h" />
     <ClInclude Include="Enemies.h" />
     <ClInclude Include="fpc.h" />

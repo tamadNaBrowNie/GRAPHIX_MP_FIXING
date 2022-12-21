@@ -122,6 +122,10 @@ public:
 class PlayerClass : public ModelClass
 {
 private:
+	const float FORWARD_BACKWARD_MOVEMENT_SPEED = 0.3f;
+	const float ASCEND_DESCEND_MOVEMENT_SPEED = 0.3f;
+	const float LEFT_RIGHT_ROTATION_SPEED = 2.0f;
+	const float LIGHT_SWAP_COOLDOWN = 0.2f;
 	float timeOfLastLightStrengthSwap = 0.0f;
 	enum class Intensity
 	{
@@ -240,10 +244,7 @@ public:
 
 	void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
-		const float FORWARD_BACKWARD_MOVEMENT_SPEED = 0.3f;
-		const float ASCEND_DESCEND_MOVEMENT_SPEED = 0.3f;
-		const float LEFT_RIGHT_ROTATION_SPEED = 2.0f;
-		const float LIGHT_SWAP_COOLDOWN = 0.2f;
+		
 
 		// Submarine Forward/Backward movement
 		if (key == GLFW_KEY_W)

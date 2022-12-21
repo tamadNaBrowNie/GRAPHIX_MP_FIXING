@@ -1,5 +1,5 @@
 #include "Cameras.h"
-using namespace Cameras;
+
 void MyCamera::setCameraPos(glm::vec3 c_Pos) {
 	this->cameraPos = c_Pos;
 }
