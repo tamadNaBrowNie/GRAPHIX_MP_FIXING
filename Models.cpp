@@ -165,7 +165,7 @@ void ModelClass::attachTexture(std::string texPath, GLint format)
         img_width,
         img_height,
         0,
-        format,
+        (colorChannels == 3) ? GL_RGB : GL_RGBA,
         GL_UNSIGNED_BYTE,
         tex_bytes);
     // Generate Mipmap
