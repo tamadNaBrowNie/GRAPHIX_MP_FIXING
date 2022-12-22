@@ -16,7 +16,7 @@ void MyCamera::setForward() {
 }
 
 void MyCamera::setForward(glm::vec3* vecD) {
-	forward = -*vecD;
+	forward = -(*vecD);
 }
 
 glm::vec3 MyCamera::getForward() {

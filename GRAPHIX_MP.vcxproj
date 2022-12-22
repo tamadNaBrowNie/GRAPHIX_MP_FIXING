@@ -137,6 +137,7 @@
     <ClCompile Include="Enemies.cpp" />
     <ClCompile Include="fpc.cpp" />
     <ClCompile Include="glad.c" />
+    <ClCompile Include="light.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Models.cpp" />
     <ClCompile Include="Players.cpp" />
@@ -147,6 +148,8 @@
     <ClInclude Include="Cameras.h" />
     <ClInclude Include="Enemies.h" />
     <ClInclude Include="fpc.h" />
+    <ClInclude Include="light.h" />
+    <ClInclude Include="Misc.h" />
     <ClInclude Include="Models.h" />
     <ClInclude Include="Players.h" />
     <ClInclude Include="ShaderClass.h" />

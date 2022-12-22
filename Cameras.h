@@ -1,8 +1,10 @@
 #pragma once
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+
 #include <GLFW/glfw3.h>
+
 
 	class MyCamera {
 	protected:
@@ -14,6 +16,7 @@
 		glm::vec3 forward;
 
 	public:
+
 		void setCameraPos(glm::vec3 c_Pos);
 		
 		void setCameraCenter(glm::vec3 c_Center);
@@ -47,7 +50,15 @@
 
 	class OrthoCamera : public MyCamera {
 	public:
-		inline void setProjection(float left, float right, float bottom, float top, float zNear, float zFar) {
+		inline void setProjection(
+									float left, 
+									float right, 
+									float bottom, 
+									float top, 
+									float zNear, 
+									float zFar
+								) 
+		{
 			this->projectionMatrix = glm::ortho(left, 
 												right,
 												bottom,
@@ -63,71 +74,51 @@
 		}
 		void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
 			const float speed = 0.1;
-			const float denom = 1 / glm::dot(forward, forward);
-			glm::vec3 numer = glm::cross(this->worldUp, this->forward);
-			glm::vec3 right = numer * denom;
+			glm::vec3 right = glm::cross(this->worldUp, this->forward);
+	
 			switch (key)
 			{
-			case GLFW_KEY_W:viewMatrix = glm::translate(viewMatrix, -speed * this->worldUp);
+			case GLFW_KEY_W:viewMatrix = 
+				glm::translate(viewMatrix, -speed * this->worldUp);
 				break;
-			case GLFW_KEY_S: viewMatrix = glm::translate(viewMatrix, speed * this->worldUp);
+			case GLFW_KEY_S: viewMatrix = 
+				glm::translate(viewMatrix, speed * this->worldUp);
 				break;
-			case GLFW_KEY_A: viewMatrix = glm::translate(viewMatrix, -speed * glm::normalize(right));
+			case GLFW_KEY_A: viewMatrix = 
+				glm::translate(viewMatrix, -speed * glm::normalize(right));
 				break;
-			case GLFW_KEY_D: viewMatrix = glm::translate(viewMatrix, speed * glm::normalize(right));
+			case GLFW_KEY_D: viewMatrix = 
+				glm::translate(viewMatrix, speed * glm::normalize(right));
 				break;
 			default:
 				break;
 			}
 		}
-
 	};
 
 	class PerspectiveCamera : public MyCamera {
 	public:
 		inline void setProjection(float fov, float width, float height) {
-			this->projectionMatrix = glm::perspective(glm::radians(fov), width / height, 0.1f, 100.0f);
+			this->projectionMatrix = 
+				glm::perspective(
+									glm::radians(fov), 
+									width / height, 
+									0.1f, 100.0f
+				);
 		}
 	};
 
 	class cam3p : public PerspectiveCamera {
 	public:
-		inline void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {}
+		inline void kbCallBack(GLFWwindow* window, 
+								int key, 
+								int scancode, 
+								int action, 
+								int mods) {}
 		inline void moveCam(glm::vec3* center) {
 			cameraCenter = *center;
 			cameraPos = cameraCenter - forward;
 		}
 
 	};
-
-	//class cam1p : public PerspectiveCamera {
-	//public:
-
-	//	void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	//		switch (key)
-	//		{/*
-	//		case GLFW_KEY_W:viewMatrix = glm::translate(viewMatrix, -speed * this->worldUp);
-	//			break;
-	//		case GLFW_KEY_S: viewMatrix = glm::translate(viewMatrix, speed * this->worldUp);
-	//			break;
-	//		case GLFW_KEY_A: viewMatrix = glm::translate(viewMatrix, -speed * glm::normalize(right));
-	//			break;
-	//		case GLFW_KEY_D: viewMatrix = glm::translate(viewMatrix, speed * glm::normalize(right));
-	//			break;
-	//		default:
-	//			break;*/
-	//		}
-	//	}
-	//	void moveCam(glm::vec3* pos) {
-	//		cameraPos += *pos;
-	//		cameraCenter = cameraPos + forward;
-	//		setView();
-	//	}
-	//	void rotateCam(float deg) {
-	//		viewMatrix = glm::rotate(viewMatrix,
-	//			glm::radians(deg - 90),
-	//			glm::vec3(0, 1, 0));
-	//	}
-
-	//};
 

@@ -1,4 +1,4 @@
-#include "fpc.h"
+#include  "fpc.h"
 
 void cam1p::kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	switch (key)
