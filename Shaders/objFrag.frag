@@ -83,6 +83,16 @@ in mat3 TBN;
 in vec2 texCoord;
 in vec3 normCoord;
 
+uniform float nearClip;
+uniform float farClip;
+
+float calculateFog() {
+	float dist = 500;
+	float deno = 1 / (farClip - nearClip);
+	float nume = farClip - dist;
+	return nume * deno;
+}
+
 out vec4 FragColor;
 uniform bool fgState;
 void main() {
@@ -101,9 +111,8 @@ void main() {
 	FragColor = pixelColor *
 		vec4(sun + bulb, 1);
 	if(fgState) {
-		FragColor = mix(FragColor, vec4(1, 0, 0, 1), 0.5);
-		// FragColor.r = 1;
-		// FragColor -= vec4(0, 1, 1, 0);
+
+		FragColor -= vec4(0, 1, 1, 0);
 	}
-	FragColor = mix(FragColor, vec4(1, 1, 1, 1), 0.3);
+	FragColor = mix(FragColor, vec4(1, 1, 1, 1), calculateFog());
 }
