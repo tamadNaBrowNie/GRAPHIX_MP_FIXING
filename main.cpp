@@ -11,13 +11,7 @@
 #include "Misc.h"
 
 
-class Handler
-{
-public:
-	MyCamera* cam;
-	PlayerClass* player;
 
-};
 
 //#include "main.h"
 using namespace std;
@@ -194,6 +188,7 @@ void Mouse_Callback(GLFWwindow *window, double xpos, double ypos)
 
 int main(void)
 {
+
 	enum filter {
 		ON = 1, OFF = 0
 	};
@@ -231,6 +226,7 @@ int main(void)
 							0.15f
 						);
 	playerSub.loadObj();
+	
 	EnemyClass enemySub1("3D/enemy_submarine/enemy_sub_1.obj",
 						 glm::vec3(0.0f, -5.0f, -10.0f),
 						 glm::vec3(20.0f, 5.0f, 6.0f),
@@ -495,6 +491,7 @@ int main(void)
 		obj_shaderProgram.findUloc("pt_amb_col"),
 		obj_shaderProgram.findUloc("pt_color"),
 		obj_shaderProgram.findUloc("pt_src")};
+	playerSub.placeUnifs(ptUnifs);
 	// getting uniforms for if object has normals
 	GLint hasBmp = obj_shaderProgram.findUloc("hasBmp");
 	// uniform location for camera position
@@ -538,16 +535,12 @@ int main(void)
 	glm::vec3 initial = playerSub.playerPos;
 	while (!glfwWindowShouldClose(window))
 	{
-		// gets the vector to move camera
-
-		// moves camera
-
 		/* Render here */
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		playerSub.placeUnifs(ptUnifs);
 		if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-			td_camera.moveCam(new glm::vec3(playerSub.playerPos - glm::vec3(0, 0, 0)));
+			td_camera.moveCam(&playerSub.playerPos);
 		// -----------------------------------------------------------------
 		// TOGGLING CAMERAS BASED ON MODE
 
@@ -651,7 +644,7 @@ int main(void)
 		const float PRINT_DEPTH_COOLDOWN = 1.0f;
 
 		if (timeOfLastDepthPrint == 0 ||
-			glfwGetTime() - timeOfLastDepthPrint > PRINT_DEPTH_COOLDOWN)
+glfwGetTime() - timeOfLastDepthPrint > PRINT_DEPTH_COOLDOWN)
 		{
 			cout << "Player Depth: " << playerSub.getDepth() << "\n";
 			timeOfLastDepthPrint = glfwGetTime();
