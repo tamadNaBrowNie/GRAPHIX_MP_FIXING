@@ -1,7 +1,5 @@
 
 
-
-
 #include "Enemies.h"
 #include "fpc.h"
 #include "Players.h"
@@ -10,25 +8,20 @@
 #include <iostream>
 #include "Misc.h"
 
-
-
-
-//#include "main.h"
+// #include "main.h"
 using namespace std;
 
-
-
-//using namespace Cameras;
-// -------------------------------------------------------
-// MODEL & TEXTURE REFERENCES
+// using namespace Cameras;
+//  -------------------------------------------------------
+//  MODEL & TEXTURE REFERENCES
 //
-// Player Submarine  : https://sketchfab.com/3d-models/submarine-27477e4ea05940ec9902a1484e54cf65
-// Enemy Submarine 1 : https://sketchfab.com/3d-models/the-project-941-akula-typhoon-submarine-b7aef99dcf9f4252887a02a7afb3b75e
-// Enemy Submarine 2 : https://sketchfab.com/3d-models/ohio-class-submarine-ssbn-315be00711a24dce9f0fa6657df7521e
-// Enemy Submarine 3 : https://sketchfab.com/3d-models/u-boat-eae3d9b194f542f29cd80b6a1e9504a6
-// Enemy Submarine 4 : https://free3d.com/3d-model/seaview-submarine-78646.html
-// Enemy Submarine 5 : https://sketchfab.com/3d-models/koreanavy-jang-bogo-classtype209-submarine-abd6a2cd5fe14f6baa16e64c2d20f317
-// Enemy Submarine 6 : https://sketchfab.com/3d-models/strange-shape-930fe8641f25480cba0d44f9047d553c
+//  Player Submarine  : https://sketchfab.com/3d-models/submarine-27477e4ea05940ec9902a1484e54cf65
+//  Enemy Submarine 1 : https://sketchfab.com/3d-models/the-project-941-akula-typhoon-submarine-b7aef99dcf9f4252887a02a7afb3b75e
+//  Enemy Submarine 2 : https://sketchfab.com/3d-models/ohio-class-submarine-ssbn-315be00711a24dce9f0fa6657df7521e
+//  Enemy Submarine 3 : https://sketchfab.com/3d-models/u-boat-eae3d9b194f542f29cd80b6a1e9504a6
+//  Enemy Submarine 4 : https://free3d.com/3d-model/seaview-submarine-78646.html
+//  Enemy Submarine 5 : https://sketchfab.com/3d-models/koreanavy-jang-bogo-classtype209-submarine-abd6a2cd5fe14f6baa16e64c2d20f317
+//  Enemy Submarine 6 : https://sketchfab.com/3d-models/strange-shape-930fe8641f25480cba0d44f9047d553c
 
 // -------------------------------------------------------
 // GLOBAL VARIABLES
@@ -49,12 +42,10 @@ float lastX = 500.0f,
 
 // camera offsets for alignment
 
-
 // Player object
 
 Mode mode = Mode::TPS;
 Mode pre = mode;
-
 
 void Key_Callback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
@@ -67,14 +58,13 @@ void Key_Callback(GLFWwindow *window, int key, int scancode, int action, int mod
 		glm::vec3 prev = hand->player->playerPos;
 		float ini = hand->player->playerRot.y;
 		hand->player->kbCallBack(window, key, scancode, action, mods);
-		
+
 		if (mode == Mode::FPS)
 		{
-			glm::vec3 fwd = 2.f * (-hand->player->front +fps_off);
+			glm::vec3 fwd = 2.f * (-hand->player->front + fps_off);
 			cam1p *fpc = (cam1p *)hand->cam;
 			glm::vec3 posF = hand->player->playerPos - prev;
 			fpc->setForward(&fwd);
-			
 		}
 	}
 	hand->cam->kbCallBack(window, key, scancode, action, mods);
@@ -126,10 +116,10 @@ void Key_Callback(GLFWwindow *window, int key, int scancode, int action, int mod
 		glfwSetWindowShouldClose(window, true);
 	}
 }
-//TODO move this to TPS
+// TODO move this to TPS
 void Mouse_Callback(GLFWwindow *window, double xpos, double ypos)
 {
-	
+
 	if (mode != Mode::TPS)
 	{
 		return;
@@ -189,8 +179,10 @@ void Mouse_Callback(GLFWwindow *window, double xpos, double ypos)
 int main(void)
 {
 
-	enum filter {
-		ON = 1, OFF = 0
+	enum filter
+	{
+		ON = 1,
+		OFF = 0
 	};
 	filter state = OFF;
 	GLFWwindow *window;
@@ -221,12 +213,11 @@ int main(void)
 	// LOADING OBJECTS
 
 	PlayerClass playerSub("3D/submarine/submarine.obj",
-							glm::vec3(0.0f, 0.0f, 0.0f),
-							glm::vec3(0.0f, THETA0, 0.0f),
-							0.15f
-						);
+						  glm::vec3(0.0f, 0.0f, 0.0f),
+						  glm::vec3(0.0f, THETA0, 0.0f),
+						  0.15f);
 	playerSub.loadObj();
-	
+
 	EnemyClass enemySub1("3D/enemy_submarine/enemy_sub_1.obj",
 						 glm::vec3(0.0f, -5.0f, -10.0f),
 						 glm::vec3(20.0f, 5.0f, 6.0f),
@@ -324,10 +315,9 @@ int main(void)
 	enemySub6.attachTexture("3D/enemy_submarine/enemy_sub_6.jpg", GL_RGB);
 
 	playerSub.attachNormalTexture("3D/submarine/submarine_submarine_Normal.png", GL_RGB);
-	
+
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
-	
 
 	// -------------------------------------------------------
 	// CREATING OBJECT SHADERS
@@ -512,6 +502,8 @@ int main(void)
 	tps_camera.setCameraPos(tps_cameraPos); // Slight adjustments to align with playerSub
 	tps_camera.setCameraCenter(playerSub.playerPos + tps_off);
 	tps_camera.setWorldUp(worldUp);
+	tps_camera.setFar(30);
+	tps_camera.setNear(0.1);
 	tps_camera.setProjection(60.0f, SCREEN_WIDTH, SCREEN_HEIGHT);
 	tps_camera.setForward();
 	tps_camera.setView();
@@ -520,14 +512,18 @@ int main(void)
 	fps_camera.setCameraPos(fps_cameraPos); // Slight adjustments to align with playerSub
 	fps_camera.setCameraCenter(playerSub.playerPos - glm::vec3(0.0f, 0.0f, 5.0f));
 	fps_camera.setWorldUp(worldUp);
+	tps_camera.setFar(200);
+	tps_camera.setNear(0.1);
 	fps_camera.setProjection(100.0f, SCREEN_WIDTH, SCREEN_HEIGHT);
 	fps_camera.setForward();
+
 	fps_camera.setView();
+
 	// Ortho
 	td_camera.setCameraPos(td_cameraPos);
 	td_camera.setCameraCenter(glm::vec3(0));
 	td_camera.setWorldUp(glm::vec3(0, 0, -1));
-	td_camera.setProjection(-1, 1, -1, 1, -1.f, 255.0f);
+	td_camera.setProjection(-1, 1, -1, 1, 0.1f, 255.0f);
 	td_camera.setView();
 	td_camera.setForward();
 	glEnable(GL_CULL_FACE);
@@ -583,7 +579,8 @@ int main(void)
 		default:
 			break;
 		}
-
+		float near = hand->cam->getNear();
+		float far = hand->cam->getFar();
 		glUniform1i(obj_shaderProgram.findUloc("fgState"), state);
 
 		glfwSetWindowUserPointer(window, hand);
@@ -622,7 +619,7 @@ int main(void)
 
 		obj_shaderProgram.use();
 		glUniform1i(hasBmp, GL_TRUE);
-		
+
 		glCullFace(GL_BACK);
 		playerSub.draw(
 			obj_shaderProgram.getShader() // Shader Program to use
@@ -644,7 +641,7 @@ int main(void)
 		const float PRINT_DEPTH_COOLDOWN = 1.0f;
 
 		if (timeOfLastDepthPrint == 0 ||
-glfwGetTime() - timeOfLastDepthPrint > PRINT_DEPTH_COOLDOWN)
+			glfwGetTime() - timeOfLastDepthPrint > PRINT_DEPTH_COOLDOWN)
 		{
 			cout << "Player Depth: " << playerSub.getDepth() << "\n";
 			timeOfLastDepthPrint = glfwGetTime();

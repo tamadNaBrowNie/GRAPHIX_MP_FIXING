@@ -12,5 +12,6 @@ void main() {
 		FragColor *= vec4(0.5, 2, 0.5, 1);
 
 	}
+	FragColor = mix(FragColor, vec4(1, 1, 1, 1), 0.1);
 
 }

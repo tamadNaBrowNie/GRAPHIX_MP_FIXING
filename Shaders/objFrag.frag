@@ -105,5 +105,5 @@ void main() {
 		// FragColor.r = 1;
 		// FragColor -= vec4(0, 1, 1, 0);
 	}
-
+	FragColor = mix(FragColor, vec4(1, 1, 1, 1), 0.3);
 }
