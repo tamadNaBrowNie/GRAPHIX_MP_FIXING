@@ -3,21 +3,15 @@
 
 
 #include "Enemies.h"
+#include "tpc.h"
 #include "fpc.h"
-#include "Players.h"
+
 #include "stb_image.h"
 #include "ShaderClass.h"
 #include <iostream>
 #include "Misc.h"
 
-
-class Handler
-{
-public:
-	MyCamera* cam;
-	PlayerClass* player;
-
-};
+#include "TDCam.h"
 
 //#include "main.h"
 using namespace std;
@@ -68,21 +62,7 @@ void Key_Callback(GLFWwindow *window, int key, int scancode, int action, int mod
 	Handler *hand = (Handler *)glfwGetWindowUserPointer(window);
 
 	// handles submarine controls
-	if (mode != Mode::TD)
-	{
-		glm::vec3 prev = hand->player->playerPos;
-		float ini = hand->player->playerRot.y;
-		hand->player->kbCallBack(window, key, scancode, action, mods);
-		
-		if (mode == Mode::FPS)
-		{
-			glm::vec3 fwd = 2.f * (-hand->player->front +fps_off);
-			cam1p *fpc = (cam1p *)hand->cam;
-			glm::vec3 posF = hand->player->playerPos - prev;
-			fpc->setForward(&fwd);
-			
-		}
-	}
+	
 	hand->cam->kbCallBack(window, key, scancode, action, mods);
 
 	/*
@@ -662,7 +642,7 @@ int main(void)
 		glfwSwapBuffers(window);
 
 		/* Poll for and process events */
-		glfwPollEvents();
+		glfwWaitEventsTimeout(3);
 	}
 
 	// Cleanup

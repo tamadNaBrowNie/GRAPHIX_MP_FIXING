@@ -1,5 +1,6 @@
-#include "Cameras.h"
 
+
+#include "Cameras.h"
 void MyCamera::setCameraPos(glm::vec3 c_Pos) {
 	this->cameraPos = c_Pos;
 }
@@ -41,3 +42,4 @@ glm::mat4 MyCamera::getProjectionMatrix() {
 glm::mat4 MyCamera::getViewMatrix() {
 	return this->viewMatrix;
 }
+
