@@ -77,14 +77,14 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (glfwGetTime() - cameraSwapCD < PERSPECTIVE_SWAP_COOLDOWN 
 		&&
 		cameraSwapCD != 0.0f 
-		&&
-		action != GLFW_PRESS
+		
 		)
 	{
 		return;
 	}
 
-	if (key == GLFW_KEY_2)
+	if (key == GLFW_KEY_2 &&
+		action == GLFW_PRESS)
 	{
 		cameraSwapCD = glfwGetTime();
 		
@@ -101,7 +101,8 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 
 	// Toggle between First-Person View (FPS) and Third-Person View (TPS)
-	if (key == GLFW_KEY_1)
+	if (key == GLFW_KEY_1 &&
+		action == GLFW_PRESS)
 	{
 		cameraSwapCD = glfwGetTime();
 		switch (mode)
