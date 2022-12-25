@@ -44,7 +44,7 @@ float lastX = 500.0f,
 	  yaw = -90.0f,
 	  pitch = 0.0f,
 	  sensitivity = 0.1f,
-	  timeOfLastCameraPerspectiveSwap = 0.0f,
+	  cameraSwapCD = 0.0f,
 	  timeOfLastDepthPrint = 0.0f;
 
 // camera offsets for alignment
@@ -56,60 +56,64 @@ Mode mode = Mode::TPS;
 Mode pre = mode;
 
 
-void Key_Callback(GLFWwindow *window, int key, int scancode, int action, int mods)
+void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	const float PERSPECTIVE_SWAP_COOLDOWN = 0.1f;
-	Handler *hand = (Handler *)glfwGetWindowUserPointer(window);
+	Handler* hand = (Handler*)glfwGetWindowUserPointer(window);
 
-	// handles submarine controls
-	
+	if (key == GLFW_KEY_ESCAPE)
+	{
+		glfwSetWindowShouldClose(window, true);
+	}
+
+	// handles camera then submarine controls depends on camera implementation
+
 	hand->cam->kbCallBack(window, key, scancode, action, mods);
 
 	/*
 	 * Only allow to swap camera perspective, once that
 	 * the camera swap cooldown is done.
 	 */
-	if (glfwGetTime() - timeOfLastCameraPerspectiveSwap > PERSPECTIVE_SWAP_COOLDOWN ||
-		timeOfLastCameraPerspectiveSwap == 0.0f)
+	if (glfwGetTime() - cameraSwapCD < PERSPECTIVE_SWAP_COOLDOWN 
+		&&
+		cameraSwapCD != 0.0f 
+		&&
+		action != GLFW_PRESS
+		)
 	{
-		if (key == GLFW_KEY_2 && action == GLFW_PRESS)
-		{
-			// Toggle Top-Down view
-			if (mode != Mode::TD)
-			{
-				pre = mode;
-				mode = Mode::TD;
-			}
-			else
-			{
-				mode = pre;
-			}
-		}
+		return;
+	}
 
-		// Toggle between First-Person View (FPS) and Third-Person View (TPS)
-		if (key == GLFW_KEY_1 && action == GLFW_PRESS)
+	if (key == GLFW_KEY_2)
+	{
+		cameraSwapCD = glfwGetTime();
+		
+		// Toggle Top-Down view
+		if (mode != Mode::TD)
 		{
-			switch (mode)
-			{
-			case Mode::TPS:
-				mode = Mode::FPS;
-				timeOfLastCameraPerspectiveSwap = glfwGetTime();
-				break;
-			case Mode::FPS:
-				mode = Mode::TPS;
-				timeOfLastCameraPerspectiveSwap = glfwGetTime();
-				break;
-			default:
-				break;
-			}
+			pre = mode;
+			mode = Mode::TD;
+		}
+		else
+		{
+			mode = pre;
 		}
 	}
 
-	// Handling exit keys
-	if (key == GLFW_KEY_ESCAPE ||
-		key == GLFW_KEY_ENTER)
+	// Toggle between First-Person View (FPS) and Third-Person View (TPS)
+	if (key == GLFW_KEY_1)
 	{
-		glfwSetWindowShouldClose(window, true);
+		cameraSwapCD = glfwGetTime();
+		switch (mode)
+		{
+		case Mode::TPS:
+			mode = Mode::FPS;
+			break;
+		case Mode::FPS:
+			mode = Mode::TPS;
+			break;
+		default:return;
+		}
 	}
 }
 //TODO move this to TPS
@@ -184,6 +188,7 @@ int main(void)
 	if (!glfwInit())
 		return -1;
 	// Cameras
+	//to lazy, but I get to it, i can combine cameras into a crew class and find  a way to swap among them.
 	OrthoCamera td_camera;
 	cam3p tps_camera;
 	cam1p fps_camera;
