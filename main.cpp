@@ -1,7 +1,3 @@
-
-
-
-
 #include "Enemies.h"
 #include "tpc.h"
 #include "fpc.h"
@@ -13,12 +9,8 @@
 
 #include "TDCam.h"
 
-//#include "main.h"
 using namespace std;
 
-
-
-//using namespace Cameras;
 // -------------------------------------------------------
 // MODEL & TEXTURE REFERENCES
 //
@@ -40,12 +32,12 @@ const float SCREEN_HEIGHT = 1000.0f;
 // Camera Rotation (yaw and pitch)
 bool firstMouse = true;
 float lastX = 500.0f,
-	  lastY = 500.0f,
-	  yaw = -90.0f,
-	  pitch = 0.0f,
-	  sensitivity = 0.1f,
-	  cameraSwapCD = 0.0f,
-	  timeOfLastDepthPrint = 0.0f;
+lastY = 500.0f,
+yaw = -90.0f,
+pitch = 0.0f,
+sensitivity = 0.1f,
+cameraSwapCD = 0.0f,
+timeOfLastDepthPrint = 0.0f;
 
 // camera offsets for alignment
 
@@ -58,7 +50,7 @@ Mode pre = mode;
 
 void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	const float PERSPECTIVE_SWAP_COOLDOWN = 0.1f;
+
 	Handler* hand = (Handler*)glfwGetWindowUserPointer(window);
 
 	if (key == GLFW_KEY_ESCAPE)
@@ -74,21 +66,14 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	 * Only allow to swap camera perspective, once that
 	 * the camera swap cooldown is done.
 	 */
-	if (glfwGetTime() - cameraSwapCD < PERSPECTIVE_SWAP_COOLDOWN 
-		&&
-		cameraSwapCD != 0.0f 
-		
-		)
-	{
+	float delta = glfwGetTime() - cameraSwapCD;
+	if (delta < P_CD || action != GLFW_PRESS)
 		return;
-	}
 
-	if (key == GLFW_KEY_2 &&
-		action == GLFW_PRESS)
+	cameraSwapCD = glfwGetTime();
+	// Toggle Top-Down view
+	if (key == GLFW_KEY_2)
 	{
-		cameraSwapCD = glfwGetTime();
-		
-		// Toggle Top-Down view
 		if (mode != Mode::TD)
 		{
 			pre = mode;
@@ -101,10 +86,8 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 
 	// Toggle between First-Person View (FPS) and Third-Person View (TPS)
-	if (key == GLFW_KEY_1 &&
-		action == GLFW_PRESS)
+	if (key == GLFW_KEY_1)
 	{
-		cameraSwapCD = glfwGetTime();
 		switch (mode)
 		{
 		case Mode::TPS:
@@ -113,19 +96,19 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		case Mode::FPS:
 			mode = Mode::TPS;
 			break;
-		default:return;
+		default:;
 		}
 	}
 }
 //TODO move this to TPS
-void Mouse_Callback(GLFWwindow *window, double xpos, double ypos)
+void Mouse_Callback(GLFWwindow* window, double xpos, double ypos)
 {
-	
+
 	if (mode != Mode::TPS)
 	{
 		return;
 	}
-	Handler *handler = (Handler *)glfwGetWindowUserPointer(window);
+	Handler* handler = (Handler*)glfwGetWindowUserPointer(window);
 
 	/*
 		Placing the cursor to the center of the screen (500.0f, 500.0f)
@@ -183,7 +166,7 @@ int main(void)
 		ON = 1, OFF = 0
 	};
 	filter state = OFF;
-	GLFWwindow *window;
+	GLFWwindow* window;
 
 	/* Initialize the library */
 	if (!glfwInit())
@@ -193,7 +176,7 @@ int main(void)
 	OrthoCamera td_camera;
 	cam3p tps_camera;
 	cam1p fps_camera;
-	glm::vec3 *delta = new glm::vec3(0);
+	glm::vec3* delta = new glm::vec3(0);
 	/* Create a windowed mode window and its OpenGL context */
 	window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "No Man's Submarine", NULL, NULL);
 	if (!window)
@@ -203,8 +186,8 @@ int main(void)
 	}
 
 	// initial positions
-	glm::vec3 tps_cameraPos = glm::vec3(0.0f, 0.0f, 1.0f);
-	glm::vec3 fps_cameraPos = glm::vec3(0.0f, 0.0f, 0.0f) + fps_off;
+	glm::vec3 tps_cameraPos = glm::vec3(1,1,1);
+	glm::vec3 fps_cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::vec3 td_cameraPos = glm::vec3(0.0f, 3.f, 0.0f);
 	const glm::vec3 worldUp = glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f));
 
@@ -212,35 +195,35 @@ int main(void)
 	// LOADING OBJECTS
 
 	PlayerClass playerSub("3D/submarine/submarine.obj",
-							glm::vec3(0.0f, 0.0f, 0.0f),
-							glm::vec3(0.0f, THETA0, 0.0f),
-							0.15f
-						);
+		glm::vec3(0.0f, 0.0f, 0.0f),
+		glm::vec3(0.0f, THETA0, 0.0f),
+		0.15f
+	);
 	playerSub.loadObj();
 	EnemyClass enemySub1("3D/enemy_submarine/enemy_sub_1.obj",
-						 glm::vec3(0.0f, -5.0f, -10.0f),
-						 glm::vec3(20.0f, 5.0f, 6.0f),
-						 0.08f);
+		glm::vec3(0.0f, -5.0f, -10.0f),
+		glm::vec3(20.0f, 5.0f, 6.0f),
+		0.08f);
 	EnemyClass enemySub2("3D/enemy_submarine/enemy_sub_2.obj",
-						 glm::vec3(15.0f, -3.0f, 10.0f),
-						 glm::vec3(10.0f, 8.0f, 3.0f),
-						 0.025f);
+		glm::vec3(15.0f, -3.0f, 10.0f),
+		glm::vec3(10.0f, 8.0f, 3.0f),
+		0.025f);
 	EnemyClass enemySub3("3D/enemy_submarine/enemy_sub_3.obj",
-						 glm::vec3(-15.0f, -8.0f, 20.0f),
-						 glm::vec3(9.0f, 7.0f, 3.0f),
-						 0.165f);
+		glm::vec3(-15.0f, -8.0f, 20.0f),
+		glm::vec3(9.0f, 7.0f, 3.0f),
+		0.165f);
 	EnemyClass enemySub4("3D/enemy_submarine/enemy_sub_4.obj",
-						 glm::vec3(-20.0f, -25.0f, -15.0f),
-						 glm::vec3(0.0f, 120.0f, 11.0f),
-						 0.03f);
+		glm::vec3(-20.0f, -25.0f, -15.0f),
+		glm::vec3(0.0f, 120.0f, 11.0f),
+		0.03f);
 	EnemyClass enemySub5("3D/enemy_submarine/enemy_sub_5.obj",
-						 glm::vec3(15.0f, -5.0f, 15.0f),
-						 glm::vec3(-5.0f, 30.0f, 4.0f),
-						 0.12f);
+		glm::vec3(15.0f, -5.0f, 15.0f),
+		glm::vec3(-5.0f, 30.0f, 4.0f),
+		0.12f);
 	EnemyClass enemySub6("3D/enemy_submarine/enemy_sub_6.obj",
-						 glm::vec3(10.0f, -0.5f, -15.0f),
-						 glm::vec3(9.0f, 0.0f, 10.0f),
-						 1.0f);
+		glm::vec3(10.0f, -0.5f, -15.0f),
+		glm::vec3(9.0f, 0.0f, 10.0f),
+		1.0f);
 
 	enemySub1.loadObj();
 	enemySub2.loadObj();
@@ -256,7 +239,7 @@ int main(void)
 	 *   These vertices and indices were taken from previous individual submissions
 	 *   and class hands-on activities
 	 */
-	// Vertices for the cube
+	 // Vertices for the cube
 	float skyboxVertices[]{
 		-1.f, -1.f, 1.f,
 		1.f, -1.f, 1.f,
@@ -265,7 +248,7 @@ int main(void)
 		-1.f, 1.f, 1.f,
 		1.f, 1.f, 1.f,
 		1.f, 1.f, -1.f,
-		-1.f, 1.f, -1.f};
+		-1.f, 1.f, -1.f };
 
 	// Skybox Indices
 	unsigned int skyboxIndices[]{
@@ -285,7 +268,7 @@ int main(void)
 		5, 4, 0,
 
 		3, 7, 6,
-		6, 2, 3};
+		6, 2, 3 };
 
 	// -------------------------------------------------------
 
@@ -314,10 +297,10 @@ int main(void)
 	enemySub6.attachTexture("3D/enemy_submarine/enemy_sub_6.jpg", GL_RGB);
 
 	playerSub.attachNormalTexture("3D/submarine/submarine_submarine_Normal.png", GL_RGB);
-	
+
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
-	
+
 
 	// -------------------------------------------------------
 	// CREATING OBJECT SHADERS
@@ -360,7 +343,7 @@ int main(void)
 		int w, h, skyCChannel;
 		stbi_set_flip_vertically_on_load(false);
 
-		unsigned char *data = stbi_load(
+		unsigned char* data = stbi_load(
 			facesSkybox[i].c_str(),
 			&w,
 			&h,
@@ -415,11 +398,11 @@ int main(void)
 		GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0,
-						  3,
-						  GL_FLOAT,
-						  GL_FALSE,
-						  3 * sizeof(GL_FLOAT),
-						  (void *)0);
+		3,
+		GL_FLOAT,
+		GL_FALSE,
+		3 * sizeof(GL_FLOAT),
+		(void*)0);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxEBO);
 	glBufferData(
@@ -452,11 +435,11 @@ int main(void)
 		obj_shaderProgram.findUloc("dir_lumens"),
 		obj_shaderProgram.findUloc("dir_amb_col"),
 		obj_shaderProgram.findUloc("dir_color"),
-		obj_shaderProgram.findUloc("dir_target")};
+		obj_shaderProgram.findUloc("dir_target") };
 
 	// creatig directional light pointing down
-	lightBuilder *dir = new lightBuilder();
-	dir->setAmbColor(new glm::vec3(0.6))
+	lightBuilder* dir = new lightBuilder();
+	dir->setAmbColor(new glm::vec3(1))
 		->setAmbStr(0.5)
 		->setLumens(1)
 		->setSpecPhong(10)
@@ -480,7 +463,9 @@ int main(void)
 		obj_shaderProgram.findUloc("pt_lumens"),
 		obj_shaderProgram.findUloc("pt_amb_col"),
 		obj_shaderProgram.findUloc("pt_color"),
-		obj_shaderProgram.findUloc("pt_src")};
+		obj_shaderProgram.findUloc("pt_src") };
+
+	//playerSub.placeUnifs(ptUnifs);
 	// getting uniforms for if object has normals
 	GLint hasBmp = obj_shaderProgram.findUloc("hasBmp");
 	// uniform location for camera position
@@ -490,7 +475,7 @@ int main(void)
 	// uniform for projection matrix
 	GLint viewLoc = obj_shaderProgram.findUloc("view");
 	// instantiating handler object hand
-	Handler *hand = new Handler();
+	Handler* hand = new Handler();
 	// setting player to be handled
 	hand->player = &playerSub;
 
@@ -499,15 +484,15 @@ int main(void)
 	/// </summary>
 	// 3rd person
 	tps_camera.setCameraPos(tps_cameraPos); // Slight adjustments to align with playerSub
-	tps_camera.setCameraCenter(playerSub.playerPos + tps_off);
+	tps_camera.setCameraCenter(playerSub.playerPos);
 	tps_camera.setWorldUp(worldUp);
 	tps_camera.setProjection(60.0f, SCREEN_WIDTH, SCREEN_HEIGHT);
 	tps_camera.setForward();
 	tps_camera.setView();
 
 	// 1st person
-	fps_camera.setCameraPos(fps_cameraPos); // Slight adjustments to align with playerSub
-	fps_camera.setCameraCenter(playerSub.playerPos - glm::vec3(0.0f, 0.0f, 5.0f));
+	fps_camera.setCameraPos(playerSub.front); // Slight adjustments to align with playerSub
+	fps_camera.setCameraCenter(playerSub.front+glm::vec3 (0,0,5));
 	fps_camera.setWorldUp(worldUp);
 	fps_camera.setProjection(100.0f, SCREEN_WIDTH, SCREEN_HEIGHT);
 	fps_camera.setForward();
@@ -532,54 +517,47 @@ int main(void)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		playerSub.placeUnifs(ptUnifs);
-		if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-			td_camera.moveCam(new glm::vec3(playerSub.playerPos - glm::vec3(0, 0, 0)));
-		// -----------------------------------------------------------------
-		// TOGGLING CAMERAS BASED ON MODE
+		/*if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+			td_camera.moveCam(new glm::vec3(playerSub.playerPos - glm::vec3(0, 0, 0)));*/
+			// -----------------------------------------------------------------
+			// TOGGLING CAMERAS BASED ON MODE
 
 		switch (mode)
 		{
 		case Mode::TPS:
-			// tps_camera.setCameraPos(tps_cameraPos - glm::vec3(0, 0.0f, 0.1));
-			// tps_camera.setCameraCenter(playerSub.playerPos + glm::vec3(0.1f, 0.0f, 0.0f));
-
-			tps_camera.moveCam(&playerSub.playerPos);
-			tps_camera.setView();
-
-			projectionMatrix = tps_camera.getProjectionMatrix();
-			viewMatrix = tps_camera.getViewMatrix();
-			glUniform3fv(eyePos, 1, glm::value_ptr(tps_camera.getCameraPos()));
-			state = filter::OFF;
 			hand->cam = &tps_camera;
-
 			break;
 
 		case Mode::FPS:
-
-			projectionMatrix = fps_camera.getProjectionMatrix();
-			viewMatrix = fps_camera.getViewMatrix();
-			glUniform3fv(eyePos, 1, glm::value_ptr(tps_camera.getCameraPos()));
+			fps_camera.setCameraPos(playerSub.playerPos+playerSub.front);
+			fps_camera.setCameraCenter(fps_camera.getCameraPos() -fps_camera.getForward());
+			
 			hand->cam = &fps_camera;
-			state = filter::ON;
-
 			break;
 
 		case Mode::TD:
 
-			viewMatrix = td_camera.getViewMatrix();
-			projectionMatrix = td_camera.getProjectionMatrix();
-			glUniform3fv(eyePos, 1, glm::value_ptr(td_camera.getCameraPos()));
 			hand->cam = &td_camera;
-			state = filter::OFF;
 			break;
 
 		default:
 			break;
 		}
-
+		state =
+			(mode == Mode::FPS) ?
+			filter::ON
+			:
+			filter::OFF;
+		hand->cam->setView();
+		viewMatrix = hand->cam->getViewMatrix();
+		projectionMatrix = hand->cam->getProjectionMatrix();
+		glUniform3fv(eyePos, 1, glm::value_ptr(hand->cam->getCameraPos()));
 		glUniform1i(obj_shaderProgram.findUloc("fgState"), state);
 
 		glfwSetWindowUserPointer(window, hand);
+
+
+
 
 		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(viewMatrix));
@@ -615,7 +593,7 @@ int main(void)
 
 		obj_shaderProgram.use();
 		glUniform1i(hasBmp, GL_TRUE);
-		
+
 		glCullFace(GL_BACK);
 		playerSub.draw(
 			obj_shaderProgram.getShader() // Shader Program to use
