@@ -9,6 +9,8 @@ void cam3p::kbCallBack(
 	int mods
 ) {
 	Handler* hand = (Handler*)glfwGetWindowUserPointer(window);
+
 	hand->player->kbCallBack(window,key,scancode,action,mods);
-	moveCam(&(hand->player->playerPos));
+	moveCam(&hand->player->playerPos);
+	
 }

@@ -5,8 +5,10 @@ void cam1p::kbCallBack(GLFWwindow* window, int key, int scancode, int action, in
 	Handler* hand = (Handler*)glfwGetWindowUserPointer(window);
 	hand->player->kbCallBack(window, key, scancode, action, mods);
 
-	moveCam(new glm::vec3(hand->player->front+hand->player->playerPos));
-	rotateCam(90 - hand->player->playerRot.y);
+	forward = hand->player->front;
+	cameraPos = hand->player->playerPos + hand->player->front;
+	cameraCenter = forward + cameraPos;
+	setView();
 }
 void cam1p::moveCam(glm::vec3* pos) {
 	cameraPos = *pos;

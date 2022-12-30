@@ -10,6 +10,7 @@ public:
 	inline void moveCam(glm::vec3* center) {
 		cameraCenter = *center;
 		cameraPos = cameraCenter - forward;
+		setView();
 	}
 
 };

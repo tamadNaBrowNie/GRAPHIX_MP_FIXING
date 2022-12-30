@@ -158,6 +158,7 @@ void Mouse_Callback(GLFWwindow* window, double xpos, double ypos)
 
 	handler->cam->setForward(new glm::vec3(glm::normalize(direction)));
 	handler->cam->setCameraPos(handler->cam->getCameraCenter() - handler->cam->getForward());
+	handler->cam->setView();
 }
 
 int main(void)
@@ -186,7 +187,7 @@ int main(void)
 	}
 
 	// initial positions
-	glm::vec3 tps_cameraPos = glm::vec3(1,1,1);
+	glm::vec3 tps_cameraPos = glm::vec3(1, 1, 1);
 	glm::vec3 fps_cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::vec3 td_cameraPos = glm::vec3(0.0f, 3.f, 0.0f);
 	const glm::vec3 worldUp = glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f));
@@ -491,11 +492,11 @@ int main(void)
 	tps_camera.setView();
 
 	// 1st person
-	fps_camera.setCameraPos(playerSub.front); // Slight adjustments to align with playerSub
-	fps_camera.setCameraCenter(playerSub.front+glm::vec3 (0,0,5));
+	fps_camera.setCameraPos(playerSub.front+playerSub.playerPos); // Slight adjustments to align with playerSub
+	fps_camera.setForward(&playerSub.front);
+	fps_camera.setCameraCenter(fps_camera.getForward() + fps_camera.getCameraPos());
 	fps_camera.setWorldUp(worldUp);
 	fps_camera.setProjection(100.0f, SCREEN_WIDTH, SCREEN_HEIGHT);
-	fps_camera.setForward();
 	fps_camera.setView();
 	// Ortho
 	td_camera.setCameraPos(td_cameraPos);
@@ -529,9 +530,9 @@ int main(void)
 			break;
 
 		case Mode::FPS:
-			fps_camera.setCameraPos(playerSub.playerPos+playerSub.front);
-			fps_camera.setCameraCenter(fps_camera.getCameraPos() -fps_camera.getForward());
-			
+			fps_camera.setCameraPos(playerSub.playerPos + playerSub.front);
+			fps_camera.setCameraCenter(fps_camera.getCameraPos() - fps_camera.getForward());
+
 			hand->cam = &fps_camera;
 			break;
 
@@ -548,7 +549,7 @@ int main(void)
 			filter::ON
 			:
 			filter::OFF;
-		hand->cam->setView();
+		//hand->cam->setView();
 		viewMatrix = hand->cam->getViewMatrix();
 		projectionMatrix = hand->cam->getProjectionMatrix();
 		glUniform3fv(eyePos, 1, glm::value_ptr(hand->cam->getCameraPos()));
