@@ -22,14 +22,14 @@ void OrthoCamera::kbCallBack(GLFWwindow* window, int key, int scancode, int acti
 		break;
 	case GLFW_KEY_2:
 		
-		move = player.playerPos - cameraCenter;
+		//move = player.playerPos - cameraCenter;
 
-		cameraCenter = player.playerPos;
-		cameraPos = cameraCenter - forward;
-		move.y = 0;
-			//cameraCenter = player.playerPos;
+		//cameraCenter = player.playerPos;
 		//cameraPos = cameraCenter - forward;
-		//setView();
+		//move.y = 0;
+			cameraCenter = player.playerPos;
+		cameraPos = cameraCenter - forward;
+		setView();
 
 		break;
 
