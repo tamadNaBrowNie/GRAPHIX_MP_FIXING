@@ -111,7 +111,7 @@ void PlayerClass::kbCallBack(GLFWwindow* window, int key, int scancode, int acti
 	switch (key)
 	{
 	case GLFW_KEY_F:cycleLight(); break;
-	case GLFW_KEY_W:this->playerPos += ZX_V * front; break;
+	case GLFW_KEY_W:this->playerPos += ZX_V * front;break;
 	case GLFW_KEY_S:this->playerPos -= ZX_V * front; break;
 	case GLFW_KEY_A:this->playerRot.y += DELTA; break;
 	case GLFW_KEY_D:this->playerRot.y -= DELTA; break;

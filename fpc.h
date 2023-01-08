@@ -5,8 +5,6 @@ class cam1p : public PerspectiveCamera {
 public:
 	void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods);
 
-	void rotateCam(float deg);
-
 };
 
 

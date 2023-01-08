@@ -8,7 +8,7 @@
 
 #include <string>
 #include <vector>
-
+//TODO: restructure. compose model to enemy and player.
 class ModelClass
 {
 protected:
