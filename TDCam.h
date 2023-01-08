@@ -18,9 +18,6 @@ void setProjection(
 			zNear,
 			zFar);
 	}
-	void moveCam(glm::vec3* center) {
-		viewMatrix = glm::translate(viewMatrix, *center);
-	}
 	void kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 };

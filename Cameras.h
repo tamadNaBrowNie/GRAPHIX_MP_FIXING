@@ -31,8 +31,6 @@
 		
 		void setView();
 		
-		virtual void moveCam(glm::vec3*) = 0;
-		
 		glm::vec3 getCameraPos();
 		
 		glm::vec3 getCameraCenter();

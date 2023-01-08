@@ -10,10 +10,6 @@ void cam1p::kbCallBack(GLFWwindow* window, int key, int scancode, int action, in
 	cameraCenter = forward + cameraPos;
 	setView();
 }
-void cam1p::moveCam(glm::vec3* pos) {
-	cameraPos = *pos;
-}
-
 void cam1p::rotateCam(float deg) {
 	//viewMatrix = glm::rotate(viewMatrix,
 	//	glm::radians(deg - 90),

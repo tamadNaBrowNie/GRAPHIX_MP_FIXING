@@ -8,7 +8,7 @@
 #include "Misc.h"
 
 #include "TDCam.h"
-
+#define DEPTH_CD 1.f
 using namespace std;
 
 // -------------------------------------------------------
@@ -147,16 +147,26 @@ void Mouse_Callback(GLFWwindow* window, double xpos, double ypos)
 		pitch = -89.0f;
 	}
 	// getting the forward vector
-
-	glm::vec3 direction = glm::vec3(
-		(cos(glm::radians(yaw)) * cos(glm::radians(pitch))),
-		-(sin(glm::radians(pitch))),
-		(sin(glm::radians(yaw)) * cos(glm::radians(pitch))));
+	float x, y, z;
+	x = cos(glm::radians(yaw)) 
+		*
+		cos(glm::radians(pitch));
+	
+	y = -sin(glm::radians(pitch));
+	
+	z = sin(glm::radians(yaw))
+		* 
+		cos(glm::radians(pitch));
+	
+	glm::vec3 direction = 
+		glm::normalize(
+			glm::vec3(x,y,z)
+		);
 	/*
 	Updating the position of the camera.
 	*/
-
-	handler->cam->setForward(new glm::vec3(glm::normalize(direction)));
+	handler->cam->setView();
+	handler->cam->setForward(&direction);
 	handler->cam->setCameraPos(handler->cam->getCameraCenter() - handler->cam->getForward());
 	handler->cam->setView();
 }
@@ -492,7 +502,7 @@ int main(void)
 	tps_camera.setView();
 
 	// 1st person
-	fps_camera.setCameraPos(playerSub.front+playerSub.playerPos); // Slight adjustments to align with playerSub
+	fps_camera.setCameraPos(playerSub.front + playerSub.playerPos); // Slight adjustments to align with playerSub
 	fps_camera.setForward(&playerSub.front);
 	fps_camera.setCameraCenter(fps_camera.getForward() + fps_camera.getCameraPos());
 	fps_camera.setWorldUp(worldUp);
@@ -506,8 +516,7 @@ int main(void)
 	td_camera.setView();
 	td_camera.setForward();
 	glEnable(GL_CULL_FACE);
-	float deg = 90 - playerSub.playerRot.y;
-	glm::vec3 initial = playerSub.playerPos;
+	glfwSetWindowUserPointer(window, hand);
 	while (!glfwWindowShouldClose(window))
 	{
 		// gets the vector to move camera
@@ -518,9 +527,7 @@ int main(void)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		playerSub.placeUnifs(ptUnifs);
-		/*if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-			td_camera.moveCam(new glm::vec3(playerSub.playerPos - glm::vec3(0, 0, 0)));*/
-			// -----------------------------------------------------------------
+		// -----------------------------------------------------------------
 			// TOGGLING CAMERAS BASED ON MODE
 
 		switch (mode)
@@ -530,14 +537,10 @@ int main(void)
 			break;
 
 		case Mode::FPS:
-			fps_camera.setCameraPos(playerSub.playerPos + playerSub.front);
-			fps_camera.setCameraCenter(fps_camera.getCameraPos() - fps_camera.getForward());
-
 			hand->cam = &fps_camera;
 			break;
 
 		case Mode::TD:
-
 			hand->cam = &td_camera;
 			break;
 
@@ -552,17 +555,19 @@ int main(void)
 		//hand->cam->setView();
 		viewMatrix = hand->cam->getViewMatrix();
 		projectionMatrix = hand->cam->getProjectionMatrix();
+
+
+
+		glCullFace(GL_FRONT);
+
 		glUniform3fv(eyePos, 1, glm::value_ptr(hand->cam->getCameraPos()));
 		glUniform1i(obj_shaderProgram.findUloc("fgState"), state);
 
-		glfwSetWindowUserPointer(window, hand);
-
-
-
+		
 
 		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(viewMatrix));
-
+		//TODO: Declutter render loop
 		// -----------------------------------------------------------------
 		// RENDERING SKYBOX
 
@@ -596,6 +601,7 @@ int main(void)
 		glUniform1i(hasBmp, GL_TRUE);
 
 		glCullFace(GL_BACK);
+		
 		playerSub.draw(
 			obj_shaderProgram.getShader() // Shader Program to use
 		);
@@ -613,28 +619,26 @@ int main(void)
 		// MISC
 
 		// Display player's depth every second
-		const float PRINT_DEPTH_COOLDOWN = 1.0f;
-
-		if (timeOfLastDepthPrint == 0 ||
-			glfwGetTime() - timeOfLastDepthPrint > PRINT_DEPTH_COOLDOWN)
+		float now = glfwGetTime();
+		if ( now - timeOfLastDepthPrint > DEPTH_CD)
 		{
 			cout << "Player Depth: " << playerSub.getDepth() << "\n";
-			timeOfLastDepthPrint = glfwGetTime();
+			timeOfLastDepthPrint = now;
 		}
-		glCullFace(GL_FRONT);
+		
 
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
+	
 
 		/* Poll for and process events */
-		glfwWaitEventsTimeout(3);
+		glfwWaitEventsTimeout(0);
 	}
 
 	// Cleanup
-	glDeleteVertexArrays(1, &skyboxVAO);
-	glDeleteBuffers(1, &skyboxVBO);
-	glDeleteBuffers(1, &skyboxEBO);
-
+		glDeleteVertexArrays(1, &skyboxVAO);
+		glDeleteBuffers(1, &skyboxVBO);
+		glDeleteBuffers(1, &skyboxEBO);
 	glfwTerminate();
 	return 0;
 }
