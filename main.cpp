@@ -66,7 +66,7 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	 * Only allow to swap camera perspective, once that
 	 * the camera swap cooldown is done.
 	 */
-	float delta = glfwGetTime() - cameraSwapCD;
+	double delta = glfwGetTime() - cameraSwapCD;
 	if (delta < P_CD || action != GLFW_PRESS)
 		return;
 

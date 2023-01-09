@@ -1,7 +1,7 @@
 #include "TDCam.h"
 
 void OrthoCamera::kbCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	const float speed = 0.1;
+	const float speed = 0.1f;
 	glm::vec3 right = glm::cross(this->worldUp, this->forward);
 	glm::vec3 move = glm::vec3(0);
 	Handler* hand = (Handler*)glfwGetWindowUserPointer(window);
@@ -21,22 +21,13 @@ void OrthoCamera::kbCallBack(GLFWwindow* window, int key, int scancode, int acti
 
 		break;
 	case GLFW_KEY_2:
-		
-		//move = player.playerPos - cameraCenter;
-
-		//cameraCenter = player.playerPos;
-		//cameraPos = cameraCenter - forward;
-		//move.y = 0;
-			cameraCenter = player.playerPos;
+		cameraCenter = player.playerPos;
 		cameraPos = cameraCenter - forward;
 		setView();
-
 		break;
-
-	default:;
 	}
-	if (move != glm::vec3(0));
-		moveCam(&move);
+	if (move != glm::vec3(0) && move.y == 0)
+		viewMatrix = glm::translate(viewMatrix, move);
 
 }
 

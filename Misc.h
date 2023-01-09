@@ -5,13 +5,12 @@
 const float THETA0 = 90.f;
 
 const glm::vec3 fps_off = glm::vec3(0,1,0);
-class Handler
+typedef struct 
 {
 public:
 	MyCamera* cam;
 	PlayerClass* player;
-
-};
+}Handler;
 
 enum class Mode
 {
