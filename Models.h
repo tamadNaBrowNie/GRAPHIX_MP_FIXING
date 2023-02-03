@@ -9,7 +9,6 @@
 #include <string>
 #include <vector>
 //TODO: restructure. compose model to enemy and player.
-//if to make this to engine, probably find a way to make this composable to new classes devs will create
 class ModelClass
 {
 protected:
@@ -18,28 +17,18 @@ protected:
 	std::vector<GLuint> textures;
 	bool withNormals = false;
 	GLuint VAO, VBO;
-	glm::vec3 place;
-	glm::vec3 spin;
-	GLfloat	scale;
+
 public:
 	inline ModelClass(std::string path) : objPath(path),
 		VAO(NULL),
-		VBO(NULL),place(0),spin(0),scale(0) {}
+		VBO(NULL) {}
 
 	void loadObj();
 
 	void attachTexture(std::string texPath, GLint format);
 	void attachNormalTexture(std::string texPath, GLint format);
 	void createVAO_VBO();
-	inline glm::vec3 getPlace() {
-		return place;
-	}
-	inline glm::vec3 getSpin() {
-		return spin;
-	}
-	inline GLfloat getScale() {
-		return scale;
-	}
+
 	inline GLuint getVAO()
 	{
 		return this->VAO;
