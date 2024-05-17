@@ -67,7 +67,7 @@ void ModelClass::loadObj()
         glm::vec2 deltaUV1 = uv2 - uv1;
         glm::vec2 deltaUV2 = uv3 - uv1;
 
-        float r = 1.0f / ((deltaUV1.x * deltaUV2.y) - (deltaUV1.y * deltaUV2.x));
+        float r = _mm_rcp_ss(_mm_set_ss ((deltaUV1.x * deltaUV2.y) - (deltaUV1.y * deltaUV2.x)));
 
         glm::vec3 tangent = r * (deltaPos1 * deltaUV2.y - deltaPos2 * deltaUV1.y);
         glm::vec3 bitangent = r * (deltaPos2 * deltaUV1.x - deltaPos1 * deltaUV2.x);
